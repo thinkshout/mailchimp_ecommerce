@@ -5,6 +5,26 @@
  * MailChimp eCommerce core functionality.
  */
 
+/**
+ * Implements hook_menu().
+ */
+function mailchimp_ecommerce_menu() {
+  $items = array();
+
+  $items['admin/config/services/mailchimp/ecommerce'] = array(
+    'title' => t('eCommerce'),
+    'description' => t('Configure MailChimp eCommerce.'),
+    'page callback' => 'mailchimp_ecommerce_admin_settings',
+    'access callback' => 'mailchimp_apikey_ready_access',
+    'access arguments' => array('administer mailchimp'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'includes/mailchimp_ecommerce.admin.inc',
+    'weight' => 20,
+  );
+
+  return $items;
+}
+
 function mailchimp_ecommerce_add_store() {
 
 }
