@@ -17,5 +17,14 @@ function mailchimp_ecommerce_admin_settings() {
     '#description' => t('The name of your store as it should appear in your MailChimp account.'),
   );
 
+  $form['mailchimp_ecommerce_integration'] = array(
+    '#type' => 'fieldset',
+    '#title' => 'Enabled Integration',
+  );
+
+  $form['mailchimp_ecommerce_integration']['none'] = array(
+    '#markup' => 'None yet.',
+  );
+
   return system_settings_form($form);
 }

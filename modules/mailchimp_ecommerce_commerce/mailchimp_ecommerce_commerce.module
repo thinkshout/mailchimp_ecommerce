@@ -1,0 +1,14 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_form_mailchimp_ecommerce_admin_settings_alter(&$form, &$form_state) {
+  if (isset($form['mailchimp_ecommerce_integration']['none'])) {
+    unset($form['mailchimp_ecommerce_integration']['none']);
+  }
+
+  $form['mailchimp_ecommerce_integration']['commerce'] = array(
+    '#markup' => 'Drupal Commerce',
+  );
+}

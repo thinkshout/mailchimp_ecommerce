@@ -1,0 +1,6 @@
+name = MailChimp eCommerce Commerce
+description = Integrates Drupal Commerce with MailChimp eCommerce.
+package = MailChimp
+core = 7.x
+
+dependencies[] = mailchimp_ecommerce
