@@ -1,1 +1,46 @@
 <?php
+
+/**
+ * @file
+ * MailChimp eCommerce core functionality.
+ */
+
+function mailchimp_ecommerce_add_store() {
+
+}
+
+function mailchimp_ecommerce_update_store() {
+
+}
+
+function mailchimp_ecommerce_add_customer() {
+
+}
+
+function mailchimp_ecommerce_update_customer() {
+
+}
+
+function mailchimp_ecommerce_add_order() {
+
+}
+
+function mailchimp_ecommerce_update_order() {
+
+}
+
+function mailchimp_ecommerce_add_product() {
+
+}
+
+function mailchimp_ecommerce_update_product() {
+
+}
+
+function mailchimp_ecommerce_add_product_variant() {
+
+}
+
+function mailchimp_ecommerce_update_product_variant() {
+
+}
