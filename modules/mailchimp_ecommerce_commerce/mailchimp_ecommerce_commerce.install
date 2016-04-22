@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * MailChimp eCommerce Commerce install and update hooks.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function mailchimp_ecommerce_commerce_uninstall() {
+  variable_del('mailchimp_ecommerce_commerce_store_id');
+}

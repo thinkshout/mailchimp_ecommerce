@@ -26,8 +26,10 @@ function mailchimp_ecommerce_menu() {
   return $items;
 }
 
-function mailchimp_ecommerce_add_store() {
-
+function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_code) {
+  /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+  $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+  $mc_ecommerce->addStore($store_id, $list_id, $name, $currency_code);
 }
 
 function mailchimp_ecommerce_update_store() {
@@ -64,4 +66,13 @@ function mailchimp_ecommerce_add_product_variant() {
 
 function mailchimp_ecommerce_update_product_variant() {
 
+}
+
+/**
+ * Generates a unique ID used to identify a store integration to MailChimp.
+ *
+ * @return string The unique store ID.
+ */
+function mailchimp_ecommerce_generate_store_id() {
+  return uniqid();
 }

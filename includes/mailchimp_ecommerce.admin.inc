@@ -18,12 +18,12 @@ function mailchimp_ecommerce_admin_settings() {
   );
 
   $form['mailchimp_ecommerce_integration'] = array(
-    '#type' => 'fieldset',
+    '#type' => 'radios',
     '#title' => 'Enabled Integration',
-  );
-
-  $form['mailchimp_ecommerce_integration']['none'] = array(
-    '#markup' => 'None yet.',
+    '#options' => array(
+      '' => t('None'),
+    ),
+    '#default_value' => variable_get('mailchimp_ecommerce_integration', ''),
   );
 
   return system_settings_form($form);
