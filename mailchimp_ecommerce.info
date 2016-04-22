@@ -4,3 +4,4 @@ package = MailChimp
 core = 7.x
 
 dependencies[] = mailchimp
+dependencies[] = mailchimp_lists
