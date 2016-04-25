@@ -11,16 +11,17 @@
 function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_alter(&$form, &$form_state) {
   $form['mailchimp_ecommerce_integration']['#options']['commerce'] = t('Drupal Commerce');
 
-  $form['#submit'][] = 'mailchimp_ecommerce_commerce_integration_admin_settings_submit';
+  // Add submit handler as first element in submit array.
+  array_unshift($form['#submit'], 'mailchimp_ecommerce_commerce_integration_admin_settings_submit');
 }
 
 /**
- * Submit handler for MailChimp eCommerce settings form.
+ * Submit handler for the MailChimp eCommerce settings form.
  */
 function mailchimp_ecommerce_commerce_integration_admin_settings_submit($form, &$form_state) {
-  if (empty(variable_get('mailchimp_ecommerce_commerce_store_id', ''))) {
+  if (variable_get('mailchimp_ecommerce_store_id', NULL) == NULL) {
     $store_id = mailchimp_ecommerce_generate_store_id();
-    variable_set('mailchimp_ecommerce_commerce_store_id', $store_id);
+    variable_set('mailchimp_ecommerce_store_id', $store_id);
   }
 }
 
