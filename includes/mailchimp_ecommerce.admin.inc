@@ -54,11 +54,24 @@ function mailchimp_ecommerce_admin_settings() {
  */
 function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   $store_id = variable_get('mailchimp_ecommerce_store_id', NULL);
+
   if ($store_id != NULL) {
+    $existing_store = mailchimp_ecommerce_get_store($store_id);
+
     // TODO: Get currency from active shopping cart.
-    mailchimp_ecommerce_add_store($store_id,
-      $form_state['values']['mailchimp_ecommerce_list_id'],
-      $form_state['values']['mailchimp_ecommerce_store_name'],
-      'USD');
+    $currency = 'USD';
+
+    if (empty($existing_store)) {
+      mailchimp_ecommerce_add_store($store_id,
+        $form_state['values']['mailchimp_ecommerce_list_id'],
+        $form_state['values']['mailchimp_ecommerce_store_name'],
+        $currency);
+    }
+    else {
+      mailchimp_ecommerce_update_store($store_id,
+        $form_state['values']['mailchimp_ecommerce_list_id'],
+        $form_state['values']['mailchimp_ecommerce_store_name'],
+        $currency);
+    }
   }
 }
