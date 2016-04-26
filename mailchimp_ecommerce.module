@@ -68,12 +68,48 @@ function mailchimp_ecommerce_update_store($store_id, $list_id, $name, $currency_
   }
 }
 
-function mailchimp_ecommerce_add_customer() {
+function mailchimp_ecommerce_add_customer($customer_id, $email_address, $parameters = array()) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot add a customer without a store ID.');
+    }
 
+    // TODO: Get opt-in status from list settings. Default to TRUE for now.
+    $opt_in_status = TRUE;
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->addCustomer($store_id, $customer_id, $email_address, $opt_in_status, $parameters);
+  }
+  catch (Exception $e) {
+    watchdog('mailchimp_ecommerce', 'Unable to add a customer: %message', array(
+      '%message' => $e->getMessage(),
+    ), WATCHDOG_ERROR);
+    drupal_set_message($e->getMessage(), 'error');
+  }
 }
 
-function mailchimp_ecommerce_update_customer() {
+function mailchimp_ecommerce_update_customer($customer_id, $email_address, $parameters = array()) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot update a customer without a store ID.');
+    }
 
+    // TODO: Get opt-in status from list settings. Default to TRUE for now.
+    $opt_in_status = TRUE;
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->updateCustomer($store_id, $customer_id, $email_address, $opt_in_status, $parameters);
+  }
+  catch (Exception $e) {
+    watchdog('mailchimp_ecommerce', 'Unable to update a customer: %message', array(
+      '%message' => $e->getMessage(),
+    ), WATCHDOG_ERROR);
+    drupal_set_message($e->getMessage(), 'error');
+  }
 }
 
 function mailchimp_ecommerce_add_order() {
@@ -107,4 +143,24 @@ function mailchimp_ecommerce_update_product_variant() {
  */
 function mailchimp_ecommerce_generate_store_id() {
   return uniqid();
+}
+
+/**
+ * Gets the store ID of the MailChimp eCommerce integration.
+ *
+ * @return string
+ *   The store ID.
+ */
+function mailchimp_ecommerce_get_store_id() {
+  return variable_get('mailchimp_ecommerce_store_id', NULL);
+}
+
+/**
+ * Determines if a MailChimp eCommerce integration is enabled.
+ *
+ * @return bool
+ *   TRUE if an integration is enabled.
+ */
+function mailchimp_ecommerce_is_enabled() {
+  return (variable_get('mailchimp_ecommerce_integration', '') !== '');
 }
