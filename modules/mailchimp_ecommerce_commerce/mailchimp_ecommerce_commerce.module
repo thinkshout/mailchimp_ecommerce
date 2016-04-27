@@ -68,6 +68,17 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
 }
 
 /**
+ * Implements hook_commerce_customer_profile_delete().
+ */
+function mailchimp_ecommerce_commerce_commerce_customer_profile_delete($customer_profile) {
+  if (!mailchimp_ecommerce_is_enabled()) {
+    return;
+  }
+
+  mailchimp_ecommerce_delete_customer($customer_profile->profile_id);
+}
+
+/**
  * Implements hook_commerce_cart_order_refresh().
  */
 function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper) {
