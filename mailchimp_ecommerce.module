@@ -54,11 +54,11 @@ function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_cod
   }
 }
 
-function mailchimp_ecommerce_update_store($store_id, $list_id, $name, $currency_code) {
+function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateStore($store_id, $list_id, $name, $currency_code);
+    $mc_ecommerce->updateStore($store_id, $name, $currency_code);
   }
   catch (Exception $e) {
     watchdog('mailchimp_ecommerce', 'Unable to update a store: %message', array(
