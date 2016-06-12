@@ -69,7 +69,6 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
     }
     else {
       mailchimp_ecommerce_update_store($store_id,
-        $form_state['values']['mailchimp_ecommerce_list_id'],
         $form_state['values']['mailchimp_ecommerce_store_name'],
         $currency);
     }
