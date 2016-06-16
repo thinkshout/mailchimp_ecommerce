@@ -26,6 +26,12 @@ function mailchimp_ecommerce_menu() {
   return $items;
 }
 
+/**
+ * Return information about the store from the supplied id.
+ *
+ * @param string $store_id
+ * @return object
+ */
 function mailchimp_ecommerce_get_store($store_id) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
@@ -40,6 +46,15 @@ function mailchimp_ecommerce_get_store($store_id) {
   }
 }
 
+/**
+ * Add a new store to Mailchimp.
+ *
+ * @param string $store_id
+ * @param string $list_id
+ * @param string $name
+ * @param string $currency_code
+ *  The three-letter ISO 4217 code.
+ */
 function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_code) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
@@ -54,6 +69,14 @@ function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_cod
   }
 }
 
+/**
+ * Update a store name or currency code.
+ *
+ * @param string $store_id
+ * @param string $name
+ * @param string $currency_code
+ *  The three-letter ISO 4217 code.
+ */
 function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
@@ -68,6 +91,17 @@ function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
   }
 }
 
+/**
+ * Add a new customer to Mailchimp.
+ *
+ * @param string $customer_id
+ *  The unique ID you assign to the user.
+ * @param string $email_address
+ *  Email address of the user.
+ * @param array $parameters
+ *  Optional parameters.
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
+ */
 function mailchimp_ecommerce_add_customer($customer_id, $email_address, $parameters = array()) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
@@ -90,6 +124,17 @@ function mailchimp_ecommerce_add_customer($customer_id, $email_address, $paramet
   }
 }
 
+/**
+ * Update a customer record in Mailchimp.
+ *
+ * @param string $customer_id
+ *  The Unique ID of the customer you are updating.
+ * @param $email_address
+ *  The customer email address.
+ * @param array $parameters
+ *  Optional parameters.
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
+ */
 function mailchimp_ecommerce_update_customer($customer_id, $email_address, $parameters = array()) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
@@ -112,6 +157,12 @@ function mailchimp_ecommerce_update_customer($customer_id, $email_address, $para
   }
 }
 
+/**
+ * Delete a customer from Mailchimp.
+ *
+ * @param string $customer_id
+ *  Unique id of customer.
+ */
 function mailchimp_ecommerce_delete_customer($customer_id) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
@@ -158,7 +209,8 @@ function mailchimp_ecommerce_update_product_variant() {
 /**
  * Generates a unique ID used to identify a store integration to MailChimp.
  *
- * @return string The unique store ID.
+ * @return string
+ *  The unique store ID.
  */
 function mailchimp_ecommerce_generate_store_id() {
   return uniqid();

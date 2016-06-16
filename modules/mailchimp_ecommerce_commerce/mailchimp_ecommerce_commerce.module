@@ -95,7 +95,7 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 /**
  * Parses an address from a Commerce customer profile.
  *
- * @param object $customer_profile
+ * @param object $customer_profile_wrapper
  *   Commerce customer profile object.
  *
  * @return object
