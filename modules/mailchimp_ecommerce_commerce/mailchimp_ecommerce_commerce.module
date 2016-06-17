@@ -90,6 +90,9 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $currency_code = $wrapper->commerce_order_total->currency_code->value();
+
 }
 
 /**
