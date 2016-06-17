@@ -43,6 +43,24 @@ function mailchimp_ecommerce_admin_settings() {
     '#default_value' => variable_get('mailchimp_ecommerce_list_id', ''),
   );
 
+  if (module_exists('commerce')) {
+    $form['mailchimp_ecommere_commerce_default_currency'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Use Commerce Default Currency'),
+      '#description' => t('Drupal Commerce was detected as being installed. Check this box to use the default currency of Commerce'),
+    );
+  }
+
+  // @TODO Make this item go away with AJAX if the Drupal commerce box is checked.
+  $list_options_currency = array(
+    '' => '-- Select --',
+  ) + mailchimp_ecommerce_get_currency_codes();
+  $form['mailchimp_ecommerce_currency'] = array(
+    '#type' => 'select',
+    '#options' => $list_options_currency,
+    '#title' => t('Store Currence Code'),
+  );
+
   $settings_form = system_settings_form($form);
   $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
@@ -58,8 +76,14 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   if ($store_id != NULL) {
     $existing_store = mailchimp_ecommerce_get_store($store_id);
 
-    // TODO: Get currency from active shopping cart.
-    $currency = 'USD';
+    // Detect if Commerce is installed and use the default currency.
+
+    if (!empty($form_state['values']['mailchimp_ecommere_commerce_default_currency'])) {
+      $currency = commerce_default_currency();
+    }
+    else {
+      $currency = $form_state['values']['mailchimp_ecommerce_currency'];
+    }
 
     if (empty($existing_store)) {
       mailchimp_ecommerce_add_store($store_id,
