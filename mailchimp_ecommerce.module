@@ -248,3 +248,25 @@ function mailchimp_ecommerce_is_enabled() {
 function mailchimp_ecommerce_get_list_id(){
   return variable_get('mailchimp_ecommerce_list_id', '');
 }
+
+/**
+ * Returns currency codes from the xml file.
+ *
+ * This is used if Drupal Commerce is not available.
+ *
+ * @return array
+ */
+function mailchimp_ecommerce_get_currency_codes() {
+
+  $currencyfile = drupal_get_path('module', 'mailchimp_ecommerce') . '/' . 'currency-codes-iso4217.xml';
+  $currencydata = simplexml_load_file($currencyfile);
+  $json_string = json_encode($currencydata);
+  $result_array = json_decode($json_string, TRUE);
+  $currencycodes = [];
+  foreach ($result_array['CcyTbl']['CcyNtry'] as $item) {
+    if (!empty($item['Ccy'])) {
+      $currencycodes[$item['Ccy']] = $item['CcyNm'] . ' (' . $item['Ccy'] . ')';
+    }
+  }
+  return $currencycodes;
+}
