@@ -105,12 +105,14 @@ function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
 function mailchimp_ecommerce_add_customer($customer_id, $email_address, $parameters = array()) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
+    $list_id = mailchimp_ecommerce_get_list_id();
     if (empty($store_id)) {
       throw new Exception('Cannot add a customer without a store ID.');
     }
 
-    // TODO: Get opt-in status from list settings. Default to TRUE for now.
-    $opt_in_status = TRUE;
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $email_address, TRUE);
+    $opt_in_status = ($memberinfo['status'] == 'subscribed') ? TRUE : FALSE;
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
@@ -146,7 +148,7 @@ function mailchimp_ecommerce_update_customer($customer_id, $email_address, $para
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
     // Pull member information to get member status.
-    $memberinfo = $mc_ecommerce->getMemberInfo($list_id, $email_address);
+    $memberinfo = mailchimp_get_memberinfo($list_id, $email_address, TRUE);
     $opt_in_status = ($memberinfo['status'] == 'subscribed') ? TRUE : FALSE;
     $mc_ecommerce->updateCustomer($store_id, $customer_id, $email_address, $opt_in_status, $parameters);
   }
