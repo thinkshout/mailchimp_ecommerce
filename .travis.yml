@@ -1,0 +1,59 @@
+language: php
+sudo: false
+php:
+- 5.5
+- 5.6
+- 7
+- hhvm
+matrix:
+  fast_finish: true
+  allow_failures:
+  - php: hhvm
+  - php: 7
+env:
+  global:
+  - PATH="$PATH:$HOME/.composer/vendor/bin"
+  - DRUPAL_TI_MODULE_NAME="mailchimp_ecommerce"
+  - DRUPAL_TI_SIMPLETEST_GROUP="Mailchimp eCommerce"
+  - DRUPAL_TI_ENVIRONMENT="drupal-7"
+  - DRUPAL_TI_DB="drupal_travis_db"
+  - DRUPAL_TI_DB_URL="mysql://root:@127.0.0.1/drupal_travis_db"
+  - DRUPAL_TI_WEBSERVER_URL="http://127.0.0.1"
+  - DRUPAL_TI_WEBSERVER_PORT="8080"
+  - DRUPAL_TI_SIMPLETEST_ARGS="--verbose --color --concurrency 4 --url $DRUPAL_TI_WEBSERVER_URL:$DRUPAL_TI_WEBSERVER_PORT"
+  - DRUPAL_TI_BEHAT_DIR="./tests/behat"
+  - DRUPAL_TI_BEHAT_ARGS=""
+  - DRUPAL_TI_BEHAT_YML="behat.yml.dist"
+  - DRUPAL_TI_BEHAT_SCREENSIZE_COLOR="1280x1024x16"
+  - DRUPAL_TI_BEHAT_SELENIUM_VERSION="2.48.2"
+  - DRUPAL_TI_BEHAT_DRIVER="phantomjs"
+  - DRUPAL_TI_BEHAT_BROWSER="firefox"
+  - DRUPAL_TI_PHPUNIT_ARGS=""
+  - DRUPAL_TI_COVERAGE="satooshi/php-coveralls:0.6.*"
+  - DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
+  - DRUPAL_TI_DRUSH_VERSION="drush/drush:8.*"
+  matrix:
+  - DRUPAL_TI_RUNNERS="simpletest"
+mysql:
+  database: drupal_travis_db
+  username: root
+  encoding: utf8
+before_install:
+- composer self-update
+- git config --global github.accesstoken $GITHUB_OAUTH_TOKEN
+- cd ./tests
+- composer global require "lionsad/drupal_ti:dev-master"
+- drupal-ti before_install
+install:
+- drupal-ti install
+before_script:
+- drupal-ti before_script
+- drupal-ti --include before.sh
+script:
+- drupal-ti script
+after_script:
+- drupal-ti after_script
+notifications:
+  email: false
+  slack:
+    secure: BIYOARSKJJid3z+nrEh9mtv2/4ZV40dbJRary52RuB5OgsxLGLw7mjOexcXHGtt2qyxgOW08UtwO5LZUdaw1VZlwAwUy921k3UGZ7hR2rGss6bKTUzJu+6b5qsL10z1aCruD47GanibNDSMCPbMPTtvF6dpxyuY/0bEob5Bo+z2P4gRLbIJxC8yuc8ZT7RG6nZK6UJWusuz5WbZw37JN7DMwx035gbhugOkHEcAtlcAENc3BqX3a1ljIo3jA1ZSwGtmR3km4CiurpK3Y3a0Ib+KJIoF8KcadLyQK9C8qMRbW7oA1iOTemtmWWX2+43gbdDtUezqMZ/lCSLSkW17aIDBstWl65iaijg/CzVmDdQc43Tpa4VXmGzJKv5ub9W90g4LJi5e5/jzKeURQiJkWERNV3A0d71oqCqktcZDbTx64Jznr/3gh74XuD38qe9klnJHSqq6XlQZCraKwfVMaQrPO7dZ+4ljVcTyGAjVgTKcOC/QCNCK+fvwsuXUDSz2kHCLM04hp+zlvpogE5lIe+ycVVKO35hY5snqEvcISn482UseSNOvCdfi0CyAtmlgHi0EcZ56tDLmMKOb5Ed2hCZH7VxLnlO+cvvfxcJAdpWec3LmcgprxK0hVvlSiaI6GQ7BTWaIg5c+lF5TZ2cEsjx9sF9lbDQg4Z6r3pYlP7M8=
