@@ -17,7 +17,9 @@ function mailchimp_ecommerce_admin_settings() {
     ),
     '#default_value' => variable_get('mailchimp_ecommerce_integration', ''),
   );
-
+  $form['mailchimp_ecommerce_notice'] = array(
+    '#markup' => t('This page will allow you to create a store. Once created, you cannot change the list associated with the store.'),
+  );
   $form['mailchimp_ecommerce_store_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Store Name'),
@@ -35,13 +37,20 @@ function mailchimp_ecommerce_admin_settings() {
     $list_options[$list_id] = $list->name;
   }
 
-  $form['mailchimp_ecommerce_list_id'] = array(
-    '#type' => 'select',
-    '#title' => t('Store List'),
-    '#required' => TRUE,
-    '#options' => $list_options,
-    '#default_value' => variable_get('mailchimp_ecommerce_list_id', ''),
-  );
+  if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
+    $form['mailchimp_ecommerce_list_id_existing'] = array(
+      '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . variable_get('mailchimp_ecommerce_list_id'),
+    );
+  }
+  else {
+    $form['mailchimp_ecommerce_list_id'] = array(
+      '#type' => 'select',
+      '#title' => t('Store List'),
+      '#required' => TRUE,
+      '#options' => $list_options,
+      '#default_value' => variable_get('mailchimp_ecommerce_list_id', ''),
+    );
+  }
 
   if (module_exists('commerce')) {
     $form['mailchimp_ecommere_commerce_default_currency'] = array(
