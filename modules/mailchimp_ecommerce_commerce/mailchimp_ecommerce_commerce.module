@@ -132,6 +132,13 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
 }
 
 /**
+ * Implements hook_commerce_product_delete().
+ */
+function mailchimp_ecommerce_commerce_commerce_product_delete($product) {
+  mailchimp_ecommerce_delete_product_variant($product->product_id, $product->sku);
+}
+
+/**
  * Parses an address from a Commerce customer profile.
  *
  * @param object $customer_profile_wrapper

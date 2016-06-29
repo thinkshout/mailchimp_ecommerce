@@ -316,6 +316,80 @@ function mailchimp_ecommerce_update_product($product_id, $title, $sku, $price) {
 }
 
 /**
+ * Deletes a product in MailChimp.
+ *
+ * @param string $product_id
+ *   Unique ID of the product.
+ */
+function mailchimp_ecommerce_delete_product($product_id) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot delete a product without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->deleteProduct($store_id, $product_id);
+  }
+  catch (Exception $e) {
+    watchdog('mailchimp_ecommerce', 'Unable to delete product: %message', array(
+      '%message' => $e->getMessage(),
+    ), WATCHDOG_ERROR);
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
+ * Deletes a product variant in MailChimp.
+ *
+ * @param string $product_id
+ *   Unique ID of the product.
+ * @param $sku
+ *   SKU of the product variant.
+ */
+function mailchimp_ecommerce_delete_product_variant($product_id, $sku) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot delete a product variant without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+    try {
+      $variants = $mc_ecommerce->getProductVariants($store_id, $product_id);
+
+      // Delete the variant if the product contains multiple variants.
+      if ($variants->total_items > 1) {
+        $mc_ecommerce->deleteProductVariant($store_id, $product_id, $sku);
+      }
+      else {
+        // Delete the product if the product has only one variant.
+        $mc_ecommerce->deleteProduct($store_id, $product_id);
+      }
+    }
+    catch (Exception $e) {
+      if ($e->getCode() == 404) {
+        // This product isn't in MailChimp.
+        return;
+      }
+      else {
+        // An actual error occurred; pass on the exception.
+        throw new Exception($e->getMessage(), $e->getCode(), $e);
+      }
+    }
+  }
+  catch (Exception $e) {
+    watchdog('mailchimp_ecommerce', 'Unable to delete product variant: %message', array(
+      '%message' => $e->getMessage(),
+    ), WATCHDOG_ERROR);
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
  * Generates a unique ID used to identify a store integration to MailChimp.
  *
  * @return string
