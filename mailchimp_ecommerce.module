@@ -59,7 +59,9 @@ function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_cod
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->addStore($store_id, $list_id, $name, $currency_code);
+    $store = $mc_ecommerce->addStore($store_id, $list_id, $name, $currency_code);
+
+    module_invoke_all('mailchimp_ecommerce_add_store', $store);
   }
   catch (Exception $e) {
     watchdog('mailchimp_ecommerce', 'Unable to add a new store: %message', array(
