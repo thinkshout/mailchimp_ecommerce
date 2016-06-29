@@ -343,6 +343,8 @@ function mailchimp_ecommerce_delete_product($product_id) {
 /**
  * Deletes a product variant in MailChimp.
  *
+ * Automatically deletes the product if the only product variant is removed.
+ *
  * @param string $product_id
  *   Unique ID of the product.
  * @param $sku
