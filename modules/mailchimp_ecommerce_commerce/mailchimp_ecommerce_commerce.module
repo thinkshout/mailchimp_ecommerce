@@ -119,7 +119,7 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
   $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
   // TODO: Get product description from product display, if available.
-  mailchimp_ecommerce_add_product($product->product_id, $product->title, '', $product->type, $product->sku, $price);
+  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $price);
 }
 
 /**
@@ -128,7 +128,7 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
 function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
-  mailchimp_ecommerce_update_product($product->product_id, $product->title, $product->sku, $price);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $price);
 }
 
 /**

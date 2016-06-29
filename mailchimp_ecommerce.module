@@ -196,14 +196,19 @@ function mailchimp_ecommerce_update_order() {
 /**
  * Adds a product to MailChimp.
  *
- * In MailChimp, each product requires at least one product variant. This
- * function will create a default product variant if one does not exist.
+ * Adds a product variant if a product with the given ID exists.
  *
- * Variants are products that share the same ID as an existing product.
- * This could represent shirt size, color, etc.
+ * In MailChimp, each product requires at least one product variant. This
+ * function will create a single product variant when creating new products.
+ *
+ * A product variant is contained within a product and can be used to
+ * represent shirt size, color, etc.
  *
  * @param string $product_id
  *   Unique ID of the product.
+ * @param string $product_variant_id
+ *   ID of the product variant.
+ *   May be identical to $product_id for single products.
  * @param string $title
  *   The product title.
  * @param string $description
@@ -215,7 +220,7 @@ function mailchimp_ecommerce_update_order() {
  * @param float $price
  *   The product price
  */
-function mailchimp_ecommerce_add_product($product_id, $title, $description, $type, $sku, $price) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -224,10 +229,6 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
 
     // TRUE when a new product is created, false if a product variant is added.
     $new_product = FALSE;
-
-    // Use the product SKU as the variant ID to allow variants with the
-    // same product ID, as is standard in Drupal Commerce.
-    $variant_product_id = $sku;
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
@@ -240,7 +241,7 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
       if ($e->getCode() == 404) {
         // No existing product; create new product with default variant.
         $variant = (object) [
-          'id' => $variant_product_id,
+          'id' => $product_variant_id,
           'title' => $title,
           'sku' => $sku,
           'price' => $price,
@@ -262,7 +263,7 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
     if (!$new_product) {
       // Add a variant to an existing product.
       $mc_ecommerce->addProductVariant($store_id, $product_id, [
-        'id' => $variant_product_id,
+        'id' => $product_variant_id,
         'title' => $title,
         'sku' => $sku,
         'price' => $price,
@@ -286,6 +287,9 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
  *
  * @param string $product_id
  *   Unique ID of the product.
+ * @param string $product_variant_id
+ *   ID of the product variant.
+ *   May be identical to $product_id for single products.
  * @param string $title
  *   The product title.
  * @param string $sku
@@ -293,7 +297,7 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
  * @param float $price
  *   The product price
  */
-function mailchimp_ecommerce_update_product($product_id, $title, $sku, $price) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -302,8 +306,9 @@ function mailchimp_ecommerce_update_product($product_id, $title, $sku, $price) {
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateProductVariant($store_id, $product_id, $sku, [
+    $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
       'title' => $title,
+      'sku' => $sku,
       'price' => $price,
     ]);
   }
@@ -347,10 +352,11 @@ function mailchimp_ecommerce_delete_product($product_id) {
  *
  * @param string $product_id
  *   Unique ID of the product.
- * @param $sku
- *   SKU of the product variant.
+ * @param $product_variant_id
+ *   ID of the product variant.
+ *   Can be identical to $product_id for single products.
  */
-function mailchimp_ecommerce_delete_product_variant($product_id, $sku) {
+function mailchimp_ecommerce_delete_product_variant($product_id, $product_variant_id) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -365,7 +371,7 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $sku) {
 
       // Delete the variant if the product contains multiple variants.
       if ($variants->total_items > 1) {
-        $mc_ecommerce->deleteProductVariant($store_id, $product_id, $sku);
+        $mc_ecommerce->deleteProductVariant($store_id, $product_id, $product_variant_id);
       }
       else {
         // Delete the product if the product has only one variant.
