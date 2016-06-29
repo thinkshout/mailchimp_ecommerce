@@ -225,6 +225,10 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
     // TRUE when a new product is created, false if a product variant is added.
     $new_product = FALSE;
 
+    // Use the product SKU as the variant ID to allow variants with the
+    // same product ID, as is standard in Drupal Commerce.
+    $variant_product_id = $sku;
+
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
@@ -236,9 +240,7 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
       if ($e->getCode() == 404) {
         // No existing product; create new product with default variant.
         $variant = (object) [
-          // Use the product SKU as the variant ID to allow variants with the
-          // same product ID, as is standard in Drupal Commerce.
-          'id' => $sku,
+          'id' => $variant_product_id,
           'title' => $title,
           'sku' => $sku,
           'price' => $price,
@@ -258,7 +260,13 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
     }
 
     if (!$new_product) {
-      // TODO: Add a variant to an existing product.
+      // Add a variant to an existing product.
+      $mc_ecommerce->addProductVariant($store_id, $product_id, [
+        'id' => $variant_product_id,
+        'title' => $title,
+        'sku' => $sku,
+        'price' => $price,
+      ]);
     }
   }
   catch (Exception $e) {
@@ -269,8 +277,42 @@ function mailchimp_ecommerce_add_product($product_id, $title, $description, $typ
   }
 }
 
-function mailchimp_ecommerce_update_product() {
+/**
+ * Updates an existing product in MailChimp.
+ *
+ * MailChimp only allows for product variants to be updated. The parent
+ * product cannot be changed once created. This function will update the
+ * variant associated with the given product ID and SKU.
+ *
+ * @param string $product_id
+ *   Unique ID of the product.
+ * @param string $title
+ *   The product title.
+ * @param string $sku
+ *   The product SKU.
+ * @param float $price
+ *   The product price
+ */
+function mailchimp_ecommerce_update_product($product_id, $title, $sku, $price) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot update a product without a store ID.');
+    }
 
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->updateProductVariant($store_id, $product_id, $sku, [
+      'title' => $title,
+      'price' => $price,
+    ]);
+  }
+  catch (Exception $e) {
+    watchdog('mailchimp_ecommerce', 'Unable to update product: %message', array(
+      '%message' => $e->getMessage(),
+    ), WATCHDOG_ERROR);
+    drupal_set_message($e->getMessage(), 'error');
+  }
 }
 
 /**
