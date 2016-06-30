@@ -100,7 +100,7 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
 
       if (empty($existing_store)) {
         mailchimp_ecommerce_add_store($store_id,
-          $form_state['values']['mailchimp_ecommerce_list_id'],
+          isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
           $form_state['values']['mailchimp_ecommerce_store_name'],
           $currency);
       }
