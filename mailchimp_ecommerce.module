@@ -196,7 +196,7 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
  *  Optional parameters to supply with the order.
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#create-post_ecommerce_stores_store_id_orders
  */
-function mailchimp_ecommerce_add_order($order_id, $customer, $parameters = array()) {
+function mailchimp_ecommerce_add_order($order_id, $customer, array $parameters) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
