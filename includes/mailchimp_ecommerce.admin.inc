@@ -119,4 +119,7 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
       variable_set('mailchimp_ecommerce_store_name', $form_state['values']['mailchimp_ecommerce_store_name']);
     }
   }
+  else {
+    variable_del('mailchimp_ecommerce_integration');
+  }
 }
