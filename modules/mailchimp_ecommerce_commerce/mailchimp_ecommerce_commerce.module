@@ -131,7 +131,16 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
   }
   if (isset($wrapper->commerce_customer_billing->commerce_customer_address)) {
     $commerce_billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
-
+    $billing_address = [
+      'name' => $commerce_billing_address['name_line'],
+      'address1' => $commerce_billing_address['thoroughfare'],
+      'address2' => $commerce_billing_address['premise'],
+      'city' => $commerce_billing_address['locality'],
+      'province_code' => $commerce_billing_address['adnubustratuve_area'],
+      'postal_code' => $commerce_billing_address['postal_code'],
+      'country_code' => $commerce_billing_address['country'],
+      'company' => $commerce_billing_address['organisation_name'],
+    ];
   }
 
   foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
