@@ -159,7 +159,7 @@ function mailchimp_ecommerce_commerce_batch_add_products(&$context) {
     $query = new EntityFieldQuery();
 
     $context['sandbox']['total'] = $query->entityCondition('entity_type', 'commerce_product')
-      ->count();
+      ->count()->execute();
 
     $context['sandbox']['progress'] = 0;
   }
