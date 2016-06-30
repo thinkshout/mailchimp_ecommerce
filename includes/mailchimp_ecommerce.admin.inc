@@ -52,11 +52,13 @@ function mailchimp_ecommerce_admin_settings() {
     );
   }
 
+  // TODO: Can this be moved into the mailchimp_ecommerce_commerce module?
   if (module_exists('commerce')) {
     $form['mailchimp_ecommere_commerce_default_currency'] = array(
       '#type' => 'checkbox',
       '#title' => t('Use Commerce Default Currency'),
       '#description' => t('Drupal Commerce was detected as being installed. Check this box to use the default currency of Commerce'),
+      '#default_value' => variable_get('mailchimp_ecommere_commerce_default_currency', ''),
     );
   }
 
@@ -67,12 +69,7 @@ function mailchimp_ecommerce_admin_settings() {
   $form['mailchimp_ecommerce_currency'] = array(
     '#type' => 'select',
     '#options' => $list_options_currency,
-    '#title' => t('Store Currence Code'),
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save changes'),
+    '#title' => t('Store Currency Code'),
   );
 
   $settings_form = system_settings_form($form);
