@@ -104,12 +104,51 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  * Implements hook_commerce_checkout_complete().
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
+  global $user;
+  $campaign_id = '';
   $currency_code = '';
+  $order_total = '';
+  $billing_address = [];
+  $product_ids = [];
+
+  $lines = [
+    [
+    'id' => '',
+    'product_id' => '',
+    'product_varient_id' => '',
+    'quantity' => '',
+    'price' => '',
+  ],
+  ];
+  $parameters = [];
 
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
   if (isset($wrapper->commerce_order_total->currency_code)) {
     $currency_code = $wrapper->commerce_order_total->currency_code->value();
   }
+  if (isset($wrapper->commerce_order_total->amount)) {
+    $order_total = $wrapper->commerce_order_total->amount->value();
+  }
+  if (isset($wrapper->commerce_customer_billing->commerce_customer_address)) {
+    $commerce_billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
+
+  }
+
+  foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      $products[] = $line_item_wrapper->commerce_product;
+      $product_ids[] = $line_item_wrapper->commerce_product->raw();
+    }
+  }
+
+  $parameters = [
+    'currenency_code' => $currency_code,
+    'order_total' => $order_total,
+    'billing_address' => $billing_address,
+  ];
+
+  die();
+  mailchimp_ecommerce_add_order($order->order_id, ['id' => $user->uid], $parameters);
 }
 
 /**
