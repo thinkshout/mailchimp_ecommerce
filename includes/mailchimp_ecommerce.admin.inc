@@ -75,9 +75,10 @@ function mailchimp_ecommerce_admin_settings() {
     '#value' => t('Save changes'),
   );
 
-  $form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
+  $settings_form = system_settings_form($form);
+  $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
-  return $form;
+  return $settings_form;
 }
 
 /**
@@ -88,8 +89,6 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
 
   // Add / update store only if an eCommerce integration is selected.
   if (!empty($form_state['values']['mailchimp_ecommerce_integration'])) {
-    variable_set('mailchimp_ecommerce_integration', $form_state['values']['mailchimp_ecommerce_integration']);
-
     if ($store_id != NULL) {
       $existing_store = mailchimp_ecommerce_get_store($store_id);
 
@@ -107,16 +106,12 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
           $form_state['values']['mailchimp_ecommerce_list_id'],
           $form_state['values']['mailchimp_ecommerce_store_name'],
           $currency);
-
-        variable_set('mailchimp_ecommerce_list_id', $form_state['values']['mailchimp_ecommerce_list_id']);
       }
       else {
         mailchimp_ecommerce_update_store($store_id,
           $form_state['values']['mailchimp_ecommerce_store_name'],
           $currency);
       }
-
-      variable_set('mailchimp_ecommerce_store_name', $form_state['values']['mailchimp_ecommerce_store_name']);
     }
   }
   else {
