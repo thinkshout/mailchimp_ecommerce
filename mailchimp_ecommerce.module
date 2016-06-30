@@ -187,7 +187,16 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
   }
 }
 
-function mailchimp_ecommerce_add_order($order_id, $customer, $parameters) {
+/**
+ * @param string $order_id
+ *  The order ID.
+ * @param string $customer
+ *  The customer email address.
+ * @param array $parameters
+ *  Optional parameters to supply with the order.
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#create-post_ecommerce_stores_store_id_orders
+ */
+function mailchimp_ecommerce_add_order($order_id, $customer, $parameters = array()) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -199,7 +208,7 @@ function mailchimp_ecommerce_add_order($order_id, $customer, $parameters) {
     $mc_ecommerce->addOrder($store_id, $order_id, $customer, $parameters);
   }
   catch (Exception $e) {
-    watchdog('mailchimp_ecommerce', 'Unable to add a customer: %message', [
+    watchdog('mailchimp_ecommerce', 'Unable to add an order: %message', [
       '%message' => $e->getMessage(),
     ], WATCHDOG_ERROR);
     drupal_set_message($e->getMessage(), 'error');
