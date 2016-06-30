@@ -111,15 +111,7 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
   $billing_address = [];
   $product_ids = [];
 
-  $lines = [
-    [
-    'id' => '',
-    'product_id' => '',
-    'product_varient_id' => '',
-    'quantity' => '',
-    'price' => '',
-  ],
-  ];
+  $lines = [];
   $parameters = [];
 
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
@@ -146,7 +138,14 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
   foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
       $products[] = $line_item_wrapper->commerce_product;
-      $product_ids[] = $line_item_wrapper->commerce_product->raw();
+      $line = [
+        'id' => '',
+        'product_id' => $line_item_wrapper->commerce_product->raw(),
+        'product_varient_id' => $line_item_wrapper->commerce_product->raw(),
+        'quantity' => $line_item_wrapper->quantity->value(),
+        'price' => $line_item_wrapper->commerce_unit_price->amount->value(),
+      ];
+      $lines[] = $line;
     }
   }
 
@@ -154,9 +153,9 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
     'currenency_code' => $currency_code,
     'order_total' => $order_total,
     'billing_address' => $billing_address,
+    'lines' => $lines,
   ];
 
-  die();
   mailchimp_ecommerce_add_order($order->order_id, ['id' => $user->uid], $parameters);
 }
 
