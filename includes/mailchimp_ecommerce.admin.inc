@@ -87,16 +87,16 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   // Add / update store only if an eCommerce integration is selected.
   if (!empty($form_state['values']['mailchimp_ecommerce_integration'])) {
     if ($store_id != NULL) {
-      $existing_store = mailchimp_ecommerce_get_store($store_id);
-
       // Detect if Commerce is installed and use the default currency.
-
       if (!empty($form_state['values']['mailchimp_ecommere_commerce_default_currency'])) {
         $currency = commerce_default_currency();
       }
       else {
         $currency = $form_state['values']['mailchimp_ecommerce_currency'];
       }
+
+      // Determine if a store is being created or updated.
+      $existing_store = mailchimp_ecommerce_get_store($store_id);
 
       if (empty($existing_store)) {
         mailchimp_ecommerce_add_store($store_id,

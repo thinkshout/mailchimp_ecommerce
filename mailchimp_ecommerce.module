@@ -39,10 +39,16 @@ function mailchimp_ecommerce_get_store($store_id) {
     return $mc_ecommerce->getStore($store_id);
   }
   catch (Exception $e) {
-    watchdog('mailchimp_ecommerce', 'Unable to get store: %message', array(
-      '%message' => $e->getMessage(),
-    ), WATCHDOG_ERROR);
-    drupal_set_message($e->getMessage(), 'error');
+    if ($e->getCode() == 404) {
+      // Store doesn't exist; no need to log an error.
+      return NULL;
+    }
+    else {
+      watchdog('mailchimp_ecommerce', 'Unable to get store: %message', array(
+        '%message' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
+      drupal_set_message($e->getMessage(), 'error');
+    }
   }
 }
 
