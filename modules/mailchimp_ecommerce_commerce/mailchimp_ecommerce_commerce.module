@@ -139,6 +139,51 @@ function mailchimp_ecommerce_commerce_commerce_product_delete($product) {
 }
 
 /**
+ * Implements hook_mailchimp_ecommerce_add_store().
+ */
+function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
+  // Add existing Drupal Commerce products to MailChimp.
+  $batch = [
+    'title' => t('Adding products to MailChimp'),
+    'operations' => ['mailchimp_ecommerce_commerce_batch_add_products'],
+  ];
+
+  batch_set($batch);
+}
+
+/**
+ * Batch callback used to add products to MailChimp.
+ */
+function mailchimp_ecommerce_commerce_batch_add_products(&$context) {
+  if (empty($context['sandbox'])) {
+    $query = new EntityFieldQuery();
+
+    $context['sandbox']['total'] = $query->entityCondition('entity_type', 'commerce_product')
+      ->count();
+
+    $context['sandbox']['progress'] = 0;
+  }
+
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'commerce_product')
+    ->range($context['sandbox']['progress'], 10)
+    ->propertyOrderBy('product_id', 'ASC')
+    ->execute();
+
+  if (isset($result['commerce_product'])) {
+    $product_ids = array_keys($result['commerce_product']);
+
+    foreach ($product_ids as $product_id) {
+      $product = commerce_product_load($product_id);
+      mailchimp_ecommerce_commerce_commerce_product_insert($product);
+      $context['sandbox']['progress']++;
+    }
+  }
+
+  $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+}
+
+/**
  * Parses an address from a Commerce customer profile.
  *
  * @param object $customer_profile_wrapper
