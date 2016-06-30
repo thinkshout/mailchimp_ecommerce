@@ -128,7 +128,7 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
       'address1' => $commerce_billing_address['thoroughfare'],
       'address2' => $commerce_billing_address['premise'],
       'city' => $commerce_billing_address['locality'],
-      'province_code' => $commerce_billing_address['adnubustratuve_area'],
+      'province_code' => $commerce_billing_address['administrative_area'],
       'postal_code' => $commerce_billing_address['postal_code'],
       'country_code' => $commerce_billing_address['country'],
       'company' => $commerce_billing_address['organisation_name'],
