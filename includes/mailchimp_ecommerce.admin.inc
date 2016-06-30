@@ -70,10 +70,14 @@ function mailchimp_ecommerce_admin_settings() {
     '#title' => t('Store Currence Code'),
   );
 
-  $settings_form = system_settings_form($form);
-  $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save changes'),
+  );
 
-  return $settings_form;
+  $form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
+
+  return $form;
 }
 
 /**
@@ -82,28 +86,37 @@ function mailchimp_ecommerce_admin_settings() {
 function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   $store_id = variable_get('mailchimp_ecommerce_store_id', NULL);
 
-  if ($store_id != NULL) {
-    $existing_store = mailchimp_ecommerce_get_store($store_id);
+  // Add / update store only if an eCommerce integration is selected.
+  if (!empty($form_state['values']['mailchimp_ecommerce_integration'])) {
+    variable_set('mailchimp_ecommerce_integration', $form_state['values']['mailchimp_ecommerce_integration']);
 
-    // Detect if Commerce is installed and use the default currency.
+    if ($store_id != NULL) {
+      $existing_store = mailchimp_ecommerce_get_store($store_id);
 
-    if (!empty($form_state['values']['mailchimp_ecommere_commerce_default_currency'])) {
-      $currency = commerce_default_currency();
-    }
-    else {
-      $currency = $form_state['values']['mailchimp_ecommerce_currency'];
-    }
+      // Detect if Commerce is installed and use the default currency.
 
-    if (empty($existing_store)) {
-      mailchimp_ecommerce_add_store($store_id,
-        $form_state['values']['mailchimp_ecommerce_list_id'],
-        $form_state['values']['mailchimp_ecommerce_store_name'],
-        $currency);
-    }
-    else {
-      mailchimp_ecommerce_update_store($store_id,
-        $form_state['values']['mailchimp_ecommerce_store_name'],
-        $currency);
+      if (!empty($form_state['values']['mailchimp_ecommere_commerce_default_currency'])) {
+        $currency = commerce_default_currency();
+      }
+      else {
+        $currency = $form_state['values']['mailchimp_ecommerce_currency'];
+      }
+
+      if (empty($existing_store)) {
+        mailchimp_ecommerce_add_store($store_id,
+          $form_state['values']['mailchimp_ecommerce_list_id'],
+          $form_state['values']['mailchimp_ecommerce_store_name'],
+          $currency);
+
+        variable_set('mailchimp_ecommerce_list_id', $form_state['values']['mailchimp_ecommerce_list_id']);
+      }
+      else {
+        mailchimp_ecommerce_update_store($store_id,
+          $form_state['values']['mailchimp_ecommerce_store_name'],
+          $currency);
+      }
+
+      variable_set('mailchimp_ecommerce_store_name', $form_state['values']['mailchimp_ecommerce_store_name']);
     }
   }
 }
