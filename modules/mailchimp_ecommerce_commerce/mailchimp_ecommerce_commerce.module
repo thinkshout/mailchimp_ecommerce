@@ -154,14 +154,18 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
     }
   }
 
-  $parameters = [
+  $customer = [
+    'id' => $user->uid,
+  ];
+
+  $order = [
     'currency_code' => $currency_code,
     'order_total' => $order_total,
     'billing_address' => $billing_address,
     'lines' => $lines,
   ];
 
-  mailchimp_ecommerce_add_order($order->order_id, ['id' => $user->uid], $parameters);
+  mailchimp_ecommerce_add_order($order->order_id, $customer, $order);
 }
 
 /**
