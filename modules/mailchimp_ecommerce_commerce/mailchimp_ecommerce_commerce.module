@@ -160,7 +160,6 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 
   $parameters = [
     'billing_address' => $billing_address,
-    'lines' => $lines,
   ];
 
   mailchimp_ecommerce_add_order($order->order_id, $customer, $currency_code, $order_total, $lines, $parameters);
