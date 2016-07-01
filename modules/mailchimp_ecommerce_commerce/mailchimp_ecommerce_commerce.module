@@ -32,7 +32,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
   if (!mailchimp_ecommerce_is_enabled()) {
     return;
   }
-  $parameters = [];
+
   $first_name = '';
   $last_name = '';
   $user = user_load($customer_profile->uid);
@@ -50,7 +50,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  mailchimp_ecommerce_add_customer($customer_profile->profile_id, $user->mail, $parameters);
+  mailchimp_ecommerce_add_customer($user->uid, $user->mail, $parameters);
 }
 
 /**
