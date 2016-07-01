@@ -182,6 +182,43 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
 }
 
 /**
+ * Adds a new cart to the current MailChimp store.
+ *
+ * @param string $cart_id
+ *  The cart ID.
+ * @param array $customer
+ *  Associative array of customer information.
+ *  - id (string): A unique identifier for the customer.
+ * @param array $cart
+ *  Associative array of cart information.
+ *  - currency_code (string): The three-letter ISO 4217 currency code.
+ *  - order_total (float): The total for the order.
+ *  - lines (array): An array of the order's line items.
+ *
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#create-post_ecommerce_stores_store_id_carts
+ */
+function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot add a cart without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->addCart($store_id, $cart_id, $customer, $cart);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to add a cart: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+function mailchimp_ecommerce_update_cart($order_id, $cart_id, array $customer, array $cart) {
+
+}
+
+/**
  * @param string $order_id
  *  The order ID.
  * @param array $customer
