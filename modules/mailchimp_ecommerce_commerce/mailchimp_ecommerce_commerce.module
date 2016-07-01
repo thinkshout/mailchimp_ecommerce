@@ -146,7 +146,7 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
       $line = [
         'id' => $line_item_wrapper->getIdentifier(),
         'product_id' => $line_item_wrapper->commerce_product->raw(),
-        'product_variant_id' => $line_item_wrapper->commerce_product->raw(),
+        'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
         'quantity' => (int) $line_item_wrapper->quantity->value(),
         'price' => $line_item_wrapper->commerce_unit_price->amount->value(),
       ];
