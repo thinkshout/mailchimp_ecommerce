@@ -114,7 +114,7 @@ function mailchimp_ecommerce_add_customer($customer_id, $email_address, $paramet
 
     // Pull member information to get member status.
     $memberinfo = mailchimp_get_memberinfo($list_id, $email_address, TRUE);
-    $opt_in_status = ($memberinfo->status == 'subscribed') ? TRUE : FALSE;
+    $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
@@ -149,7 +149,7 @@ function mailchimp_ecommerce_update_customer($customer_id, $email_address, $para
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
     // Pull member information to get member status.
     $memberinfo = mailchimp_get_memberinfo($list_id, $email_address, TRUE);
-    $opt_in_status = ($memberinfo['status'] == 'subscribed') ? TRUE : FALSE;
+    $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
     $mc_ecommerce->updateCustomer($store_id, $customer_id, $email_address, $opt_in_status, $parameters);
   }
   catch (Exception $e) {
