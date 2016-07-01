@@ -214,11 +214,42 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
   }
 }
 
-function mailchimp_ecommerce_update_cart($order_id, $cart_id, array $customer, array $cart) {
+/**
+ * Updates an existing cart in the current MailChimp store.
+ *
+ * @param string $cart_id
+ *  The cart ID.
+ * @param array $customer
+ *  Associative array of customer information.
+ *  - id (string): A unique identifier for the customer.
+ * @param array $cart
+ *  Associative array of cart information.
+ *  - currency_code (string): The three-letter ISO 4217 currency code.
+ *  - order_total (float): The total for the order.
+ *  - lines (array): An array of the order's line items.
+ *
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#edit-patch_ecommerce_stores_store_id_carts_cart_id
+ */
+function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot update a cart without a store ID.');
+    }
 
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to update a cart: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
 }
 
 /**
+ * Adds a new order to the current MailChimp store.
+ *
  * @param string $order_id
  *  The order ID.
  * @param array $customer
@@ -249,8 +280,37 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
   }
 }
 
-function mailchimp_ecommerce_update_order() {
+/**
+ * Updates an existing order in the current MailChimp store.
+ *
+ * @param string $order_id
+ *  The order ID.
+ * @param array $customer
+ *  Associative array of customer information.
+ *  - id (string): A unique identifier for the customer.
+ * @param array $order
+ *  Associative array of order information.
+ *  - currency_code (string): The three-letter ISO 4217 currency code.
+ *  - order_total (float): The total for the order.
+ *  - lines (array): An array of the order's line items.
+ *
+ * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#edit-patch_ecommerce_stores_store_id_orders_order_id
+ */
+function mailchimp_ecommerce_update_order($order_id, array $customer, array $order) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot update an order without a store ID.');
+    }
 
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->updateOrder($store_id, $order_id, $customer, $order);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to update an order: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
 }
 
 /**
