@@ -183,23 +183,14 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
 
 /**
  * @param string $order_id
- *   The order ID.
- * @param object $customer
- *   An object representing the order customer.
- *   See documentation link below for properties.
- * @param string $currency_code
- *   The three-letter ISO 4217 currency code.
- * @param float $order_total
- *   The total for the order.
- * @param array $line_items
- *   An array of the order’s line items.
- *   See documentation link below for properties.
+ *  The order ID.
+ * @param string $customer
+ *  The customer email address.
  * @param array $parameters
- *   Optional parameters to supply with the order.
- *
+ *  Optional parameters to supply with the order.
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#create-post_ecommerce_stores_store_id_orders
  */
-function mailchimp_ecommerce_add_order($order_id, $customer, $currency_code, $order_total, array $line_items = [], array $parameters = []) {
+function mailchimp_ecommerce_add_order($order_id, $customer, array $parameters) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -208,7 +199,7 @@ function mailchimp_ecommerce_add_order($order_id, $customer, $currency_code, $or
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->addOrder($store_id, $order_id, $customer, $currency_code, $order_total, $line_items, $parameters);
+    $mc_ecommerce->addOrder($store_id, $order_id, $customer, $parameters);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add an order: ' . $e->getMessage());
