@@ -248,6 +248,29 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
 }
 
 /**
+ * Deletes a cart in the current MailChimp store.
+ *
+ * @param string $cart_id
+ *  The cart ID.
+ */
+function mailchimp_ecommerce_delete_cart($cart_id) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot delete a cart without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->deleteCart($store_id, $cart_id);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to delete a cart: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
  * Adds a new order to the current MailChimp store.
  *
  * @param string $order_id
