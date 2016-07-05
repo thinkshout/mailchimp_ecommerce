@@ -207,7 +207,6 @@ function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
   if (isset($result['commerce_product'])) {
     $product_ids = array_keys($result['commerce_product']);
 
-    $progress = 1;
     foreach ($product_ids as $product_id) {
       $batch['operations'][] = [
         'mailchimp_ecommerce_commerce_batch_add_product',
@@ -215,8 +214,6 @@ function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
           $product_id,
         ],
       ];
-
-      $progress++;
     }
   }
 
