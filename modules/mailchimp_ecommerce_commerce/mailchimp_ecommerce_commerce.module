@@ -161,6 +161,8 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
     'lines' => $lines,
   ];
 
+  // Convert cart to order in MailChimp.
+  mailchimp_ecommerce_delete_cart($order->order_id);
   mailchimp_ecommerce_add_order($order->order_id, $customer, $order_data);
 }
 
