@@ -271,6 +271,93 @@ function mailchimp_ecommerce_delete_cart($cart_id) {
 }
 
 /**
+ * Adds a line to a cart in the current MailChimp store.
+ *
+ * @param string $cart_id
+ *   The cart ID.
+ * @param string $line_id
+ *   A unique identifier for the order line item.
+ * @param array $product
+ *   Associative array of product information.
+ *   - product_id (string) The unique identifier for the product.
+ *   - product_variant_id (string) The unique identifier for the product variant.
+ *   - quantity (int) The quantity of a cart line item.
+ *   - price (float) The price of a cart line item.
+ */
+function mailchimp_ecommerce_add_cart_line($cart_id, $line_id, $product) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot add a cart line without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->addCartLine($store_id, $cart_id, $line_id, $product);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to add a cart line: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
+ * Updates an existing line in a cart in the current MailChimp store.
+ *
+ * @param string $cart_id
+ *   The cart ID.
+ * @param string $line_id
+ *   A unique identifier for the order line item.
+ * @param array $product
+ *   Associative array of product information.
+ *   - product_id (string) The unique identifier for the product.
+ *   - product_variant_id (string) The unique identifier for the product variant.
+ *   - quantity (int) The quantity of a cart line item.
+ *   - price (float) The price of a cart line item.
+ */
+function mailchimp_ecommerce_update_cart_line($cart_id, $line_id, $product) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot update a cart line without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->updateCartLine($store_id, $cart_id, $line_id, $product);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to update a cart line: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
+ * Deletes a line in a cart in the current MailChimp store.
+ *
+ * @param string $cart_id
+ *   The cart ID.
+ * @param string $line_id
+ *   A unique identifier for the order line item.
+ */
+function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot delete a cart line without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->deleteCartLine($store_id, $cart_id, $line_id);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to delete a cart line: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
  * Adds a new order to the current MailChimp store.
  *
  * @param string $order_id
