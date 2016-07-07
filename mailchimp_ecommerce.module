@@ -25,6 +25,17 @@ function mailchimp_ecommerce_menu() {
 
   return $items;
 }
+/**
+ * Implements hook_page_build().
+ */
+function mailchimp_ecommerce_page_build(&$page) {
+  $campaign_id = isset($_GET['mc_cid']) ? check_plain($_GET['mc_cid']) : '';
+  $subscriber_id = isset($_GET['mc_eid']) ? check_plain($_GET['mc_eid']) : '';
+  if ($campaign_id && $subscriber_id) {
+    $_SESSION['mc_cid'] =  $campaign_id;
+    $_SESSION['mc_eid'] = $subscriber_id;
+  }
+}
 
 /**
  * Return information about the store from the supplied id.
