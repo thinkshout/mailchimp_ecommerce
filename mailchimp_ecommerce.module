@@ -651,6 +651,18 @@ function mailchimp_ecommerce_get_store_id() {
 }
 
 /**
+ * Gets the campaign ID from the current user's session.
+ *
+ * @return string
+ *   The campaign ID.
+ */
+function mailchimp_ecommerce_get_campaign_id() {
+  $campaign_id = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
+
+  return $campaign_id;
+}
+
+/**
  * Determines if a MailChimp eCommerce integration is enabled.
  *
  * @return bool
