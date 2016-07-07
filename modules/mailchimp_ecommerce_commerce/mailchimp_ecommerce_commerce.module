@@ -44,13 +44,15 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
       $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
       $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
-  $parameters = [
+  $customer = [
+    'id' => $user->uid,
+    'email_address' => $user->mail,
     'first_name' => $first_name,
     'last_name' => $last_name,
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  mailchimp_ecommerce_add_customer($user->uid, $user->mail, $parameters);
+  mailchimp_ecommerce_add_customer($customer);
 }
 
 /**
@@ -162,7 +164,7 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
   ];
 
   // Convert cart to order in MailChimp.
-  mailchimp_ecommerce_delete_cart($order->order_id);
+  //mailchimp_ecommerce_delete_cart($order->order_id);
   mailchimp_ecommerce_add_order($order->order_id, $customer, $order_data);
 }
 
