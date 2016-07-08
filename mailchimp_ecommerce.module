@@ -138,6 +138,29 @@ function mailchimp_ecommerce_add_customer($customer) {
 }
 
 /**
+ * Read a customer from Mailchimp.
+ *
+ * @param string $customer_id
+ *  Unique id of customer.
+ */
+function mailchimp_ecommerce_get_customer($customer_id) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot delete a customer without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $mc_ecommerce->getCustomer($store_id, $customer_id);
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+}
+
+/**
  * Update a customer record in Mailchimp.
  *
  * @param string $customer_id

@@ -52,7 +52,11 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  mailchimp_ecommerce_add_customer($customer);
+  if (mailchimp_ecommerce_get_customer($user->uid)) {
+    mailchimp_ecommerce_update_customer($customer);
+  } else {
+    mailchimp_ecommerce_add_customer($customer);
+  }
 }
 
 /**
