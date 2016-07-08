@@ -79,13 +79,15 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
     $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
 
-  $parameters = [
+  $customer = [
+    'id' => $customer_profile->profile_id,
+    'email_address' => $user->mail,
     'first_name' => $first_name,
     'last_name' => $last_name,
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  mailchimp_ecommerce_update_customer($customer_profile->profile_id, $user->mail, $parameters);
+  mailchimp_ecommerce_update_customer($customer);
 }
 
 /**
