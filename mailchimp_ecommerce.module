@@ -688,10 +688,11 @@ function mailchimp_ecommerce_get_campaign_id() {
 
   // Check to see if this is a valid MailChimp campaign.
   try {
-    if (isset($campaign_id) && $mc_ecommerce->getCampaign($campaign_id)) {
-
-      return $campaign_id;
+    if (isset($campaign_id)) {
+      $campaign_id = $mc_ecommerce->getCampaign($campaign_id);
     }
+
+    return $campaign_id;
   }
   catch (Exception $e) {
     if ($e->getCode() == 404) {
