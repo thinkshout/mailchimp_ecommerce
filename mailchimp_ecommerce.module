@@ -683,7 +683,27 @@ function mailchimp_ecommerce_get_store_id() {
 function mailchimp_ecommerce_get_campaign_id() {
   $campaign_id = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
 
-  return $campaign_id;
+  /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+  $mc_ecommerce = mailchimp_get_api_object('MailchimpCampaigns');
+
+  // Check to see if this is a valid MailChimp campaign.
+  try {
+    if (isset($campaign_id) && $mc_ecommerce->getCampaign($campaign_id)) {
+
+      return $campaign_id;
+    }
+  }
+  catch (Exception $e) {
+    if ($e->getCode() == 404) {
+
+      // Store doesn't exist; no need to log an error.
+      return NULL;
+    }
+    else {
+      mailchimp_ecommerce_log_error_message('Unable to get campaign: ' . $e->getMessage());
+      drupal_set_message($e->getMessage(), 'error');
+    }
+  }
 }
 
 /**
