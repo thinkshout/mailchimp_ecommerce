@@ -267,3 +267,8 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
 
   return $address;
 }
+
+function mailchimp_ecommerce_commerce_commerce_line_item_update($entity) {
+
+}
+
