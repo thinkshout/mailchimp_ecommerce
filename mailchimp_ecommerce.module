@@ -105,12 +105,8 @@ function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
 /**
  * Add a new customer to Mailchimp.
  *
- * @param string $customer_id
- *  The unique ID you assign to the user.
- * @param string $email_address
- *  Email address of the user.
- * @param array $parameters
- *  Optional parameters.
+ * @param array $customer
+ *  Array of customer fields
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
  */
 function mailchimp_ecommerce_add_customer($customer) {
@@ -165,12 +161,8 @@ function mailchimp_ecommerce_get_customer($customer_id) {
 /**
  * Update a customer record in Mailchimp.
  *
- * @param string $customer_id
- *  The Unique ID of the customer you are updating.
- * @param string $email_address
- *  The customer email address.
- * @param array $parameters
- *  Optional parameters.
+ * @param array $customer
+ *  Array of customer fields.
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
  */
 function mailchimp_ecommerce_update_customer($customer) {
@@ -184,9 +176,9 @@ function mailchimp_ecommerce_update_customer($customer) {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
     // Pull member information to get member status.
-    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_status'], TRUE);
+    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
     $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
-    $mc_ecommerce->updateCustomer($customer);
+    $mc_ecommerce->updateCustomer($store_id, $customer);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a customer: ' . $e->getMessage());
