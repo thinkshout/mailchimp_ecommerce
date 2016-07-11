@@ -187,15 +187,12 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
  * Implements hook_commerce_order_presave().
  */
 function mailchimp_ecommerce_commerce_order_presave($order) {
+  $order = _mailchimp_ecommerce_build_order($order);
   if ($order->is_new) {
-    $order = _mailchimp_ecommerce_build_order($order);
     mailchimp_ecommerce_add_cart($order->order_id, $order['customer'], $$order['order_data']);
   } else {
-
+    mailchimp_ecommerce_update_cart($order->order_id, $order['customer'], $$order['order_data']);
   }
-}
-function mailchimp_ecommerce_commerce_commerce_line_item_update($entity) {
-  dpm('line item updated');
 }
 
 /**
