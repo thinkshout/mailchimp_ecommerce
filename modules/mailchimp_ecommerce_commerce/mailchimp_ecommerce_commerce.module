@@ -112,11 +112,12 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  * Implements hook_commerce_checkout_complete().
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
-  $order = _mailchimp_ecommerce_build_order($order);
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
 
   // Convert cart to order in MailChimp.
   mailchimp_ecommerce_delete_cart($order->order_id);
-  mailchimp_ecommerce_add_order($order->order_id, $order['customer'], $$order['order_data']);
+  mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
 }
 
 /**
@@ -187,13 +188,18 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
  * Implements hook_commerce_order_presave().
  */
 function mailchimp_ecommerce_commerce_order_presave($order) {
-  $order = _mailchimp_ecommerce_build_order($order);
-  if ($order->is_new) {
-    mailchimp_ecommerce_add_cart($order->order_id, $order['customer'], $$order['order_data']);
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
+
+  // Order is new, but skipping the first call to presave, so that we have line items.
+  if ($order->created == $order->changed && !$order->is_new) {
+    mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   } else {
-    mailchimp_ecommerce_update_cart($order->order_id, $order['customer'], $$order['order_data']);
+    mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   }
 }
+
+
 
 /**
  * Parses an address from a Commerce customer profile.
@@ -235,15 +241,14 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  * @return object
  *   Order object in a MailChimp-friendly format.
  */
-function _mailchimp_ecommerce_build_order($order) {
-  $user = user_load($order->uid);
+function _mailchimp_ecommerce_commerce_build_order($wrapper) {
+  $user = user_load($wrapper->uid->raw());
   $currency_code = '';
   $order_total = '';
   $billing_address = [];
   $lines = [];
   $order = [];
 
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
   if (isset($wrapper->commerce_order_total->currency_code)) {
     $currency_code = $wrapper->commerce_order_total->currency_code->value();
   }
@@ -252,7 +257,7 @@ function _mailchimp_ecommerce_build_order($order) {
   }
   if (isset($wrapper->commerce_customer_billing->commerce_customer_address)) {
     $commerce_billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
-    if ($commerce_billing_address['organisation_name'] == null) {
+    if (empty($commerce_billing_address['organisation_name'])) {
       $commerce_billing_address['organisation_name'] = '';
     }
 
@@ -292,8 +297,7 @@ function _mailchimp_ecommerce_build_order($order) {
     'billing_address' => $billing_address,
     'lines' => $lines,
   ];
-  $order = ['customer' => $customer, 'order_data' => $order_data];
 
-  return $order;
+  return ['customer' => $customer, 'order_data' => $order_data];
 }
 
