@@ -112,65 +112,11 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  * Implements hook_commerce_checkout_complete().
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
-  $user = user_load($order->uid);
-  $currency_code = '';
-  $order_total = '';
-  $billing_address = [];
-  $lines = [];
-
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  if (isset($wrapper->commerce_order_total->currency_code)) {
-    $currency_code = $wrapper->commerce_order_total->currency_code->value();
-  }
-  if (isset($wrapper->commerce_order_total->amount)) {
-    $order_total = $wrapper->commerce_order_total->amount->value();
-  }
-  if (isset($wrapper->commerce_customer_billing->commerce_customer_address)) {
-    $commerce_billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
-    if ($commerce_billing_address['organisation_name'] == null) {
-      $commerce_billing_address['organisation_name'] = '';
-    }
-
-    $billing_address = [
-      'name' => $commerce_billing_address['name_line'],
-      'address1' => $commerce_billing_address['thoroughfare'],
-      'address2' => $commerce_billing_address['premise'],
-      'city' => $commerce_billing_address['locality'],
-      'province_code' => $commerce_billing_address['administrative_area'],
-      'postal_code' => $commerce_billing_address['postal_code'],
-      'country_code' => $commerce_billing_address['country'],
-      'company' => $commerce_billing_address['organisation_name'],
-    ];
-  }
-
-  foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-    if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
-      $products[] = $line_item_wrapper->commerce_product;
-      $line = [
-        'id' => $line_item_wrapper->getIdentifier(),
-        'product_id' => $line_item_wrapper->commerce_product->raw(),
-        'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
-        'quantity' => (int) $line_item_wrapper->quantity->value(),
-        'price' => $line_item_wrapper->commerce_unit_price->amount->value(),
-      ];
-      $lines[] = $line;
-    }
-  }
-
-  $customer = [
-    'id' => $user->uid,
-  ];
-
-  $order_data = [
-    'currency_code' => $currency_code,
-    'order_total' => $order_total,
-    'billing_address' => $billing_address,
-    'lines' => $lines,
-  ];
+  $order = _mailchimp_ecommerce_build_order($order);
 
   // Convert cart to order in MailChimp.
-  //mailchimp_ecommerce_delete_cart($order->order_id);
-  mailchimp_ecommerce_add_order($order->order_id, $customer, $order_data);
+  mailchimp_ecommerce_delete_cart($order->order_id);
+  mailchimp_ecommerce_add_order($order->order_id, $order['customer'], $$order['order_data']);
 }
 
 /**
@@ -238,6 +184,21 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
 }
 
 /**
+ * Implements hook_commerce_order_presave().
+ */
+function mailchimp_ecommerce_commerce_order_presave($order) {
+  if ($order->is_new) {
+    $order = _mailchimp_ecommerce_build_order($order);
+    mailchimp_ecommerce_add_cart($order->order_id, $order['customer'], $$order['order_data']);
+  } else {
+
+  }
+}
+function mailchimp_ecommerce_commerce_commerce_line_item_update($entity) {
+  dpm('line item updated');
+}
+
+/**
  * Parses an address from a Commerce customer profile.
  *
  * @param object $customer_profile_wrapper
@@ -268,7 +229,74 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
   return $address;
 }
 
-function mailchimp_ecommerce_commerce_commerce_line_item_update($entity) {
+/**
+ * Builds a MailChimp order from a Commerce order.
+ *
+ * @param object $customer_order
+ *   Commerce order object.
+ *
+ * @return object
+ *   Order object in a MailChimp-friendly format.
+ */
+function _mailchimp_ecommerce_build_order($order) {
+  $user = user_load($order->uid);
+  $currency_code = '';
+  $order_total = '';
+  $billing_address = [];
+  $lines = [];
+  $order = [];
 
+  $wrapper = entity_metadata_wrapper('commerce_order', $order);
+  if (isset($wrapper->commerce_order_total->currency_code)) {
+    $currency_code = $wrapper->commerce_order_total->currency_code->value();
+  }
+  if (isset($wrapper->commerce_order_total->amount)) {
+    $order_total = $wrapper->commerce_order_total->amount->value();
+  }
+  if (isset($wrapper->commerce_customer_billing->commerce_customer_address)) {
+    $commerce_billing_address = $wrapper->commerce_customer_billing->commerce_customer_address->value();
+    if ($commerce_billing_address['organisation_name'] == null) {
+      $commerce_billing_address['organisation_name'] = '';
+    }
+
+    $billing_address = [
+      'name' => $commerce_billing_address['name_line'],
+      'address1' => $commerce_billing_address['thoroughfare'],
+      'address2' => $commerce_billing_address['premise'],
+      'city' => $commerce_billing_address['locality'],
+      'province_code' => $commerce_billing_address['administrative_area'],
+      'postal_code' => $commerce_billing_address['postal_code'],
+      'country_code' => $commerce_billing_address['country'],
+      'company' => $commerce_billing_address['organisation_name'],
+    ];
+  }
+
+  foreach ($wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+      $products[] = $line_item_wrapper->commerce_product;
+      $line = [
+        'id' => $line_item_wrapper->getIdentifier(),
+        'product_id' => $line_item_wrapper->commerce_product->raw(),
+        'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
+        'quantity' => (int) $line_item_wrapper->quantity->value(),
+        'price' => $line_item_wrapper->commerce_unit_price->amount->value(),
+      ];
+      $lines[] = $line;
+    }
+  }
+
+  $customer = [
+    'id' => $user->uid,
+  ];
+
+  $order_data = [
+    'currency_code' => $currency_code,
+    'order_total' => $order_total,
+    'billing_address' => $billing_address,
+    'lines' => $lines,
+  ];
+  $order = ['customer' => $customer, 'order_data' => $order_data];
+
+  return $order;
 }
 
