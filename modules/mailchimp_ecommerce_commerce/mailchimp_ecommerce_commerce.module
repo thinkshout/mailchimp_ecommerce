@@ -185,16 +185,69 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
 }
 
 /**
+ * Implements hook_default_rules_configuration().
+ */
+function mailchimp_ecommerce_commerce_default_rules_configuration() {
+  $rules = array();
+
+  // Add a reaction rule to display the default Add to Cart message.
+  $rule = rules_reaction_rule();
+
+  $rule->label = t('Send cart to MailChimp');
+  $rule->tags = array('Commerce Cart');
+  $rule->active = TRUE;
+
+  $rule
+    ->event('commerce_cart_product_add')
+    ->event('commerce_cart_product_remove')
+    ->action('mailchimp_ecommerce_commerce_send_cart', array(
+      'commerce_order:select' => 'commerce-order',
+    ));
+
+  $rules['mailchimp_ecommerce_commerce_send_cart'] = $rule;
+
+  return $rules;
+}
+
+/**
+ * Implements hook_rules_action_info().
+ */
+function mailchimp_ecommerce_commerce_rules_action_info() {
+  $actions = array();
+
+  $actions['mailchimp_ecommerce_commerce_send_cart'] = array(
+    'label' => t('Send a cart to MailChimp'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Order to send'),
+      ),
+    ),
+    'group' => t('Commerce Order'),
+    'callbacks' => array(
+      'execute' => '_mailchimp_ecommerce_commerce_send_cart',
+    ),
+  );
+
+  return $actions;
+}
+
+/**
  * Implements hook_commerce_order_presave().
  */
-function mailchimp_ecommerce_commerce_order_presave($order) {
+function _mailchimp_ecommerce_commerce_send_cart($order) {
+  if (empty($order->commerce_line_items)) {
+
+    // Last line item has been deleted, remove the cart because you can't save an empty cart in MailChimp.
+    mailchimp_ecommerce_delete_cart($order->order_id);
+  }
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
   $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
 
-  // Order is new, but skipping the first call to presave, so that we have line items.
-  if ($order->created == $order->changed && !$order->is_new) {
+  if ($order->created == $order->changed) {
     mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
-  } else {
+  }
+  else {
     mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   }
 }
