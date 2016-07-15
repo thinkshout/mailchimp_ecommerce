@@ -700,18 +700,18 @@ function mailchimp_ecommerce_get_store_id() {
 function mailchimp_ecommerce_get_campaign_id() {
   $campaign_id = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
 
-  /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
-  $mc_ecommerce = mailchimp_get_api_object('MailchimpCampaigns');
+  /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
+  $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
 
   // Check to see if this is a valid MailChimp campaign.
   try {
     if (isset($campaign_id)) {
-      $campaign_id = $mc_ecommerce->getCampaign($campaign_id);
+      $campaign_id = $mc_campaigns->getCampaign($campaign_id);
     }
   }
   catch (Exception $e) {
     if ($e->getCode() == 404) {
-      // Store doesn't exist; no need to log an error.
+      // Campaign doesn't exist; no need to log an error.
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get campaign: ' . $e->getMessage());
