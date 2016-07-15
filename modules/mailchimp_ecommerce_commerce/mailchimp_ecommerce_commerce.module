@@ -40,9 +40,10 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
   if (isset($customer_profile_wrapper->commerce_customer_address->first_name) &&
-      isset($customer_profile_wrapper->commerce_customer_address->last_name)) {
-      $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
-      $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
+    isset($customer_profile_wrapper->commerce_customer_address->last_name)
+  ) {
+    $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
+    $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
   $customer = [
     'id' => $user->uid,
@@ -54,7 +55,8 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
 
   if (mailchimp_ecommerce_get_customer($user->uid)) {
     mailchimp_ecommerce_update_customer($customer);
-  } else {
+  }
+  else {
     mailchimp_ecommerce_add_customer($customer);
   }
 
@@ -83,7 +85,8 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
   if (isset($customer_profile_wrapper->commerce_customer_address->first_name) &&
-    isset($customer_profile_wrapper->commerce_customer_address->last_name)) {
+    isset($customer_profile_wrapper->commerce_customer_address->last_name)
+  ) {
     $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
     $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
@@ -271,7 +274,6 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
 }
 
 
-
 /**
  * Parses an address from a Commerce customer profile.
  *
@@ -285,11 +287,12 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
   $address = [];
 
   if (isset($customer_profile_wrapper->commerce_customer_address->thoroughfare) &&
-      isset($customer_profile_wrapper->commerce_customer_address->premise) &&
-      isset($customer_profile_wrapper->commerce_customer_address->locality) &&
-      isset($customer_profile_wrapper->commerce_customer_address->administrative_area) &&
-      isset($customer_profile_wrapper->commerce_customer_address->postal_code) &&
-      isset($customer_profile_wrapper->commerce_customer_address->country)) {
+    isset($customer_profile_wrapper->commerce_customer_address->premise) &&
+    isset($customer_profile_wrapper->commerce_customer_address->locality) &&
+    isset($customer_profile_wrapper->commerce_customer_address->administrative_area) &&
+    isset($customer_profile_wrapper->commerce_customer_address->postal_code) &&
+    isset($customer_profile_wrapper->commerce_customer_address->country)
+  ) {
     $address = (object) [
       'address1' => $customer_profile_wrapper->commerce_customer_address->thoroughfare->value(),
       'address2' => $customer_profile_wrapper->commerce_customer_address->premise->value(),

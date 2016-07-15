@@ -25,13 +25,14 @@ function mailchimp_ecommerce_menu() {
 
   return $items;
 }
+
 /**
  * Implements hook_page_build().
  */
 function mailchimp_ecommerce_page_build(&$page) {
   $campaign_id = isset($_GET['mc_cid']) ? check_plain($_GET['mc_cid']) : '';
   if ($campaign_id) {
-    $_SESSION['mc_cid'] =  $campaign_id;
+    $_SESSION['mc_cid'] = $campaign_id;
   }
 }
 
@@ -728,7 +729,7 @@ function mailchimp_ecommerce_is_enabled() {
  * @return string
  *  The List ID.
  */
-function mailchimp_ecommerce_get_list_id(){
+function mailchimp_ecommerce_get_list_id() {
   return variable_get('mailchimp_ecommerce_list_id', '');
 }
 
