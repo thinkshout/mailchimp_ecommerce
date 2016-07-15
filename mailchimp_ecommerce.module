@@ -140,6 +140,9 @@ function mailchimp_ecommerce_add_customer($customer) {
  *
  * @param string $customer_id
  *  Unique id of customer.
+ *
+ * @return object
+ *   MailChimp customer object.
  */
 function mailchimp_ecommerce_get_customer($customer_id) {
   try {
