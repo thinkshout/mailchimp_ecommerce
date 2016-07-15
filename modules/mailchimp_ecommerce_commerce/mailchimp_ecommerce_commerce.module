@@ -60,7 +60,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     mailchimp_ecommerce_add_customer($customer);
   }
 
-  // Update the order with the customer information
+  // Update the order with the customer information.
   $order_id = $customer_profile->entity_context['entity_id'];
   $order = commerce_order_load($order_id);
 
@@ -77,7 +77,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   if (!mailchimp_ecommerce_is_enabled()) {
     return;
   }
-  $parameters = [];
   $first_name = '';
   $last_name = '';
   $user = user_load($customer_profile->uid);
@@ -101,7 +100,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
 
   mailchimp_ecommerce_update_customer($customer);
 
-  // Update the order with the customer information
+  // Update the order with the customer information.
   $order_id = $customer_profile->entity_context['entity_id'];
   $order = commerce_order_load($order_id);
 
@@ -258,8 +257,8 @@ function mailchimp_ecommerce_commerce_rules_action_info() {
  */
 function _mailchimp_ecommerce_commerce_send_cart($order) {
   if (empty($order->commerce_line_items)) {
-
-    // Last line item has been deleted, remove the cart because you can't save an empty cart in MailChimp.
+    // Last line item has been deleted, remove the cart because you can't save
+    // an empty cart in MailChimp.
     mailchimp_ecommerce_delete_cart($order->order_id);
   }
   $wrapper = entity_metadata_wrapper('commerce_order', $order);
@@ -272,7 +271,6 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
     mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   }
 }
-
 
 /**
  * Parses an address from a Commerce customer profile.

@@ -12,8 +12,8 @@ function mailchimp_ecommerce_menu() {
   $items = array();
 
   $items['admin/config/services/mailchimp/ecommerce'] = array(
-    'title' => t('eCommerce'),
-    'description' => t('Configure MailChimp eCommerce.'),
+    'title' => 'eCommerce',
+    'description' => 'Configure MailChimp eCommerce.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_ecommerce_admin_settings'),
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -40,30 +40,36 @@ function mailchimp_ecommerce_page_build(&$page) {
  * Return information about the store from the supplied id.
  *
  * @param string $store_id
+ *   The ID of the store.
+ *
  * @return object
+ *   MailChimp store object.
  */
 function mailchimp_ecommerce_get_store($store_id) {
+  $store = NULL;
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    return $mc_ecommerce->getStore($store_id);
+    $store = $mc_ecommerce->getStore($store_id);
   }
   catch (Exception $e) {
     if ($e->getCode() == 404) {
       // Store doesn't exist; no need to log an error.
-      return NULL;
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get store: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
   }
+
+  return $store;
 }
 
 /**
  * Add a new store to Mailchimp.
  *
  * @param string $store_id
+ *   The ID of the store.
  * @param array $store
  *   Associative array of store information.
  *   - list_id (string) The id for the list associated with the store.
@@ -89,9 +95,11 @@ function mailchimp_ecommerce_add_store($store_id, $store) {
  * Update a store name or currency code.
  *
  * @param string $store_id
+ *   The ID of the store.
  * @param string $name
+ *   The name of the store.
  * @param string $currency_code
- *  The three-letter ISO 4217 code.
+ *   The three-letter ISO 4217 code.
  */
 function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
   try {
@@ -109,7 +117,8 @@ function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
  * Add a new customer to Mailchimp.
  *
  * @param array $customer
- *  Array of customer fields
+ *   Array of customer fields.
+ *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
  */
 function mailchimp_ecommerce_add_customer($customer) {
@@ -140,12 +149,13 @@ function mailchimp_ecommerce_add_customer($customer) {
  * Read a customer from Mailchimp.
  *
  * @param string $customer_id
- *  Unique id of customer.
+ *   Unique id of customer.
  *
  * @return object
  *   MailChimp customer object.
  */
 function mailchimp_ecommerce_get_customer($customer_id) {
+  $customer = NULL;
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -168,7 +178,8 @@ function mailchimp_ecommerce_get_customer($customer_id) {
  * Update a customer record in Mailchimp.
  *
  * @param array $customer
- *  Array of customer fields.
+ *   Array of customer fields.
+ *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
  */
 function mailchimp_ecommerce_update_customer($customer) {
@@ -196,7 +207,7 @@ function mailchimp_ecommerce_update_customer($customer) {
  * Delete a customer from Mailchimp.
  *
  * @param string $customer_id
- *  Unique id of customer.
+ *   Unique id of customer.
  */
 function mailchimp_ecommerce_delete_customer($customer_id) {
   try {
@@ -219,15 +230,15 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
  * Adds a new cart to the current MailChimp store.
  *
  * @param string $cart_id
- *  The cart ID.
+ *   The cart ID.
  * @param array $customer
- *  Associative array of customer information.
- *  - id (string): A unique identifier for the customer.
+ *   Associative array of customer information.
+ *   - id (string): A unique identifier for the customer.
  * @param array $cart
- *  Associative array of cart information.
- *  - currency_code (string): The three-letter ISO 4217 currency code.
- *  - order_total (float): The total for the order.
- *  - lines (array): An array of the order's line items.
+ *   Associative array of cart information.
+ *   - currency_code (string): The three-letter ISO 4217 currency code.
+ *   - order_total (float): The total for the order.
+ *   - lines (array): An array of the order's line items.
  *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#create-post_ecommerce_stores_store_id_carts
  */
@@ -255,15 +266,15 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
  * Updates an existing cart in the current MailChimp store.
  *
  * @param string $cart_id
- *  The cart ID.
+ *   The cart ID.
  * @param array $customer
- *  Associative array of customer information.
- *  - id (string): A unique identifier for the customer.
+ *   Associative array of customer information.
+ *   - id (string): A unique identifier for the customer.
  * @param array $cart
- *  Associative array of cart information.
- *  - currency_code (string): The three-letter ISO 4217 currency code.
- *  - order_total (float): The total for the order.
- *  - lines (array): An array of the order's line items.
+ *   Associative array of cart information.
+ *   - currency_code (string): The three-letter ISO 4217 currency code.
+ *   - order_total (float): The total for the order.
+ *   - lines (array): An array of the order's line items.
  *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#edit-patch_ecommerce_stores_store_id_carts_cart_id
  */
@@ -288,7 +299,7 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
  * Deletes a cart in the current MailChimp store.
  *
  * @param string $cart_id
- *  The cart ID.
+ *   The cart ID.
  */
 function mailchimp_ecommerce_delete_cart($cart_id) {
   try {
@@ -317,7 +328,7 @@ function mailchimp_ecommerce_delete_cart($cart_id) {
  * @param array $product
  *   Associative array of product information.
  *   - product_id (string) The unique identifier for the product.
- *   - product_variant_id (string) The unique identifier for the product variant.
+ *   - product_variant_id (string) The unique identifier for the variant.
  *   - quantity (int) The quantity of a cart line item.
  *   - price (float) The price of a cart line item.
  */
@@ -348,7 +359,7 @@ function mailchimp_ecommerce_add_cart_line($cart_id, $line_id, $product) {
  * @param array $product
  *   Associative array of product information.
  *   - product_id (string) The unique identifier for the product.
- *   - product_variant_id (string) The unique identifier for the product variant.
+ *   - product_variant_id (string) The unique identifier for the variant.
  *   - quantity (int) The quantity of a cart line item.
  *   - price (float) The price of a cart line item.
  */
@@ -398,15 +409,15 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
  * Adds a new order to the current MailChimp store.
  *
  * @param string $order_id
- *  The order ID.
+ *   The order ID.
  * @param array $customer
- *  Associative array of customer information.
- *  - id (string): A unique identifier for the customer.
+ *   Associative array of customer information.
+ *   - id (string): A unique identifier for the customer.
  * @param array $order
- *  Associative array of order information.
- *  - currency_code (string): The three-letter ISO 4217 currency code.
- *  - order_total (float): The total for the order.
- *  - lines (array): An array of the order's line items.
+ *   Associative array of order information.
+ *   - currency_code (string): The three-letter ISO 4217 currency code.
+ *   - order_total (float): The total for the order.
+ *   - lines (array): An array of the order's line items.
  *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#create-post_ecommerce_stores_store_id_orders
  */
@@ -435,15 +446,15 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
  * Updates an existing order in the current MailChimp store.
  *
  * @param string $order_id
- *  The order ID.
+ *   The order ID.
  * @param array $customer
- *  Associative array of customer information.
- *  - id (string): A unique identifier for the customer.
+ *   Associative array of customer information.
+ *   - id (string): A unique identifier for the customer.
  * @param array $order
- *  Associative array of order information.
- *  - currency_code (string): The three-letter ISO 4217 currency code.
- *  - order_total (float): The total for the order.
- *  - lines (array): An array of the order's line items.
+ *   Associative array of order information.
+ *   - currency_code (string): The three-letter ISO 4217 currency code.
+ *   - order_total (float): The total for the order.
+ *   - lines (array): An array of the order's line items.
  *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#edit-patch_ecommerce_stores_store_id_orders_order_id
  */
@@ -489,7 +500,7 @@ function mailchimp_ecommerce_update_order($order_id, array $customer, array $ord
  * @param string $sku
  *   The product SKU.
  * @param float $price
- *   The product price
+ *   The product price.
  */
 function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $price) {
   try {
@@ -564,7 +575,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param string $sku
  *   The product SKU.
  * @param float $price
- *   The product price
+ *   The product price.
  */
 function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $price) {
   try {
@@ -617,7 +628,7 @@ function mailchimp_ecommerce_delete_product($product_id) {
  *
  * @param string $product_id
  *   Unique ID of the product.
- * @param $product_variant_id
+ * @param string $product_variant_id
  *   ID of the product variant.
  *   Can be identical to $product_id for single products.
  */
@@ -664,7 +675,7 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $product_varian
  * Generates a unique ID used to identify a store integration to MailChimp.
  *
  * @return string
- *  The unique store ID.
+ *   The unique store ID.
  */
 function mailchimp_ecommerce_generate_store_id() {
   return uniqid();
@@ -697,20 +708,18 @@ function mailchimp_ecommerce_get_campaign_id() {
     if (isset($campaign_id)) {
       $campaign_id = $mc_ecommerce->getCampaign($campaign_id);
     }
-
-    return $campaign_id;
   }
   catch (Exception $e) {
     if ($e->getCode() == 404) {
-
       // Store doesn't exist; no need to log an error.
-      return NULL;
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get campaign: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
   }
+
+  return $campaign_id;
 }
 
 /**
@@ -727,7 +736,7 @@ function mailchimp_ecommerce_is_enabled() {
  * Get the List ID being used.
  *
  * @return string
- *  The List ID.
+ *   The List ID.
  */
 function mailchimp_ecommerce_get_list_id() {
   return variable_get('mailchimp_ecommerce_list_id', '');
@@ -739,9 +748,9 @@ function mailchimp_ecommerce_get_list_id() {
  * This is used if Drupal Commerce is not available.
  *
  * @return array
+ *   Array of currency codes.
  */
 function mailchimp_ecommerce_get_currency_codes() {
-
   $currencyfile = drupal_get_path('module', 'mailchimp_ecommerce') . '/' . 'currency-codes-iso4217.xml';
   $currencydata = simplexml_load_file($currencyfile);
   $json_string = json_encode($currencydata);

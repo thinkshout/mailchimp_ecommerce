@@ -64,8 +64,8 @@ function mailchimp_ecommerce_admin_settings() {
 
   // @TODO Make this item go away with AJAX if the Drupal commerce box is checked.
   $list_options_currency = array(
-      '' => '-- Select --',
-    ) + mailchimp_ecommerce_get_currency_codes();
+    '' => '-- Select --',
+  ) + mailchimp_ecommerce_get_currency_codes();
   $form['mailchimp_ecommerce_currency'] = array(
     '#type' => 'select',
     '#options' => $list_options_currency,
