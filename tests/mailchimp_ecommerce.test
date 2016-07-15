@@ -1,0 +1,72 @@
+<?php
+/**
+ * @file
+ * Test class and methods for the Mailchimp eCommerce module.
+ */
+
+class MailchimpEcommerceTestCase extends DrupalWebTestCase {
+
+  /**
+   * Returns info displayed in the test interface.
+   *
+   * @return array
+   *   Formatted as specified by simpletest.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'MailChimp eCommerce',
+      'description' => 'Test MailChimp eCommerce functionality.',
+      'group' => 'MailChimp',
+    );
+  }
+
+  /**
+   * Pre-test setup function.
+   *
+   * Enables dependencies.
+   * Sets the mailchimp_api_key to the test-mode key.
+   * Sets test mode to TRUE.
+   */
+  protected function setUp() {
+    $this->profile = drupal_get_profile();
+
+    // Enable modules required for the test.
+    $enabled_modules = array(
+      'entity',
+      'libraries',
+      'mailchimp',
+      'mailchimp_ecommerce',
+    );
+
+    parent::setUp($enabled_modules);
+
+    variable_set('mailchimp_api_key', 'MAILCHIMP_TEST_API_KEY');
+    variable_set('mailchimp_test_mode', TRUE);
+  }
+
+  /**
+   * Post-test function.
+   *
+   * Sets test mode to FALSE.
+   */
+  protected function tearDown() {
+    parent::tearDown();
+
+    variable_del('mailchimp_test_mode');
+  }
+
+  /**
+   * Tests adding of a store to MailChimp.
+   */
+  public function testAddStore() {
+
+  }
+
+  /**
+   * Tests adding an order to MailChimp.
+   */
+  public function testAddOrder() {
+
+  }
+
+}
