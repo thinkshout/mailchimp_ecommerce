@@ -63,18 +63,20 @@ function mailchimp_ecommerce_get_store($store_id) {
  * Add a new store to Mailchimp.
  *
  * @param string $store_id
- * @param string $list_id
- * @param string $name
- * @param string $currency_code
- *  The three-letter ISO 4217 code.
+ * @param array $store
+ *   Associative array of store information.
+ *   - list_id (string) The id for the list associated with the store.
+ *   - name (string) The name of the store.
+ *   - currency_code (string) The three-letter ISO 4217 code for the currency
+ *     that the store accepts.
  */
-function mailchimp_ecommerce_add_store($store_id, $list_id, $name, $currency_code) {
+function mailchimp_ecommerce_add_store($store_id, $store) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $store = $mc_ecommerce->addStore($store_id, $list_id, $name, $currency_code);
+    $mc_store = $mc_ecommerce->addStore($store_id, $store);
 
-    module_invoke_all('mailchimp_ecommerce_add_store', $store);
+    module_invoke_all('mailchimp_ecommerce_add_store', $mc_store);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a new store: ' . $e->getMessage());

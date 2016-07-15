@@ -99,10 +99,13 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
       $existing_store = mailchimp_ecommerce_get_store($store_id);
 
       if (empty($existing_store)) {
-        mailchimp_ecommerce_add_store($store_id,
-          isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
-          $form_state['values']['mailchimp_ecommerce_store_name'],
-          $currency);
+        $store = [
+          'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
+          'name' => $form_state['values']['mailchimp_ecommerce_store_name'],
+          'currency_code' => $currency,
+        ];
+
+        mailchimp_ecommerce_add_store($store_id, $store);
       }
       else {
         mailchimp_ecommerce_update_store($store_id,
