@@ -56,17 +56,45 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding of a store to MailChimp.
+   * Tests adding a store to MailChimp.
    */
   public function testAddStore() {
+    // Should pass.
+  }
 
+  /**
+   * Tests adding a store to MailChimp with no store ID.
+   */
+  public function testAddStoreNoId() {
+    // Should fail.
+  }
+
+  /**
+   * Tests adding a customer to MailChimp.
+   */
+  public function testAddCustomer() {
+    // Should pass.
+  }
+
+  /**
+   * Tests adding a customer to MailChimp with no email address.
+   */
+  public function testAddCustomerNoEmail() {
+    // Should fail.
   }
 
   /**
    * Tests adding an order to MailChimp.
    */
   public function testAddOrder() {
+    // Should pass.
+  }
 
+  /**
+   * Tests adding an order to MailChimp with no line items.
+   */
+  public function testAddOrderNoLineItems() {
+    // Should fail.
   }
 
 }
