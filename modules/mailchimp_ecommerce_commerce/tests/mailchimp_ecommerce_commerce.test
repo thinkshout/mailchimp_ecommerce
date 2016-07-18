@@ -85,10 +85,25 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a store to MailChimp with no store ID.
+   * Tests adding a store to MailChimp with no list.
    */
-  public function testAddStoreNoId() {
-    // Action should fail.
+  public function testAddStoreNoList() {
+    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
+    $this->drupalLogin($admin);
+
+    $edit = array();
+
+    $edit['mailchimp_ecommerce_integration'] = 'commerce';
+    $edit['mailchimp_ecommerce_store_name'] = "Freddie's Merchandise";
+    $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
+    $edit['mailchimp_ecommerce_currency'] = 'USD';
+
+    $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));
+
+    $this->assertNoText(t("The configuration options have been saved."), 'The text "The configuration options have been
+    saved." should not appear on the page that adds a store.');
+    $this->assertText(t("Store List field is required."), 'The text "Store List field is required." should appear on the
+    page, indicating a form validation error.');
   }
 
   /**
