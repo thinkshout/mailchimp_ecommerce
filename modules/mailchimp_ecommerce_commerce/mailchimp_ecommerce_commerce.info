@@ -3,4 +3,7 @@ description = Integrates Drupal Commerce with MailChimp eCommerce.
 package = MailChimp
 core = 7.x
 
+dependencies[] = commerce
 dependencies[] = mailchimp_ecommerce
+
+files[] = tests/mailchimp_ecommerce_commerce.test
