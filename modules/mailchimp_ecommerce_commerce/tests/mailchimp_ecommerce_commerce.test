@@ -67,9 +67,21 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp.
    */
   public function testAddStore() {
-    // Should pass.
-    $this->drupalLogin($this->admin);
+    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
+    $this->drupalLogin($admin);
+
+    $edit = array();
+
+    $edit['mailchimp_ecommerce_integration'] = 'commerce';
+    $edit['mailchimp_ecommerce_store_name'] = "Freddie's Merchandise";
+    $edit['mailchimp_ecommerce_list_id'] = '57afe96172';
+    $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
+    $edit['mailchimp_ecommerce_currency'] = 'USD';
+
     $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));
+
+    $this->assertText(t("The configuration options have been saved."), 'The text "The configuration options have been
+    saved." appears on the page that adds a store.');
   }
 
   /**
