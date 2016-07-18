@@ -36,8 +36,11 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'entity',
       'libraries',
       'mailchimp',
+      'mailchimp_activity',
+      'mailchimp_campaign',
       'mailchimp_ecommerce',
-      'mailchimp_ecommerce_commerce'
+      'mailchimp_ecommerce_commerce',
+      'mailchimp_signup'
     );
 
     $this->admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
