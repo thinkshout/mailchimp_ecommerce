@@ -107,6 +107,20 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Tests adding a product to MailChimp.
+   */
+  public function testAddProduct() {
+    // Should pass.
+  }
+
+  /**
+   * Tests adding a product to MailChimp with no product variants.
+   */
+  public function testAddProductNoVariants() {
+    // Action should fail.
+  }
+
+  /**
    * Tests adding a customer to MailChimp.
    */
   public function testAddCustomer() {
@@ -145,20 +159,6 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding an order to MailChimp with no line items.
    */
   public function testAddOrderNoLineItems() {
-    // Action should fail.
-  }
-
-  /**
-   * Tests adding a product to MailChimp.
-   */
-  public function testAddProduct() {
-    // Should pass.
-  }
-
-  /**
-   * Tests adding a product to MailChimp with no product variants.
-   */
-  public function testAddProductNoVariants() {
     // Action should fail.
   }
 
