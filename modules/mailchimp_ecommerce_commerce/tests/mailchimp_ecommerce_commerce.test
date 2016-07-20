@@ -112,6 +112,20 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddProduct() {
     // Should pass.
+    $admin = $this->drupalCreateUser(array('administer site configuration', 'configure store', 'administer commerce_product entities'));
+    $this->drupalLogin($admin);
+
+    $edit = array();
+
+    $edit['sku'] = 'Jokes002';
+    $edit['title'] = "Freddie's Jokes Volume 2";
+    $edit['commerce_price[und][0][amount]'] = 5;
+    $edit['status'] = 1;
+
+    $this->drupalPost('admin/commerce/products/add/product', $edit, t('Save product'));
+
+    $this->assertText(t("Product saved."), 'The text "Product saved." should appear on the
+    page, indicating a product was added successfully.');
   }
 
   /**
