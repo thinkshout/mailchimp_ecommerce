@@ -111,6 +111,20 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddCustomer() {
     // Should pass.
+//    $customer = [
+//      'id' => '001',
+//      'email_address' => 'sarah@example.com',
+//      'first_name' => 'Sarah',
+//      'last_name' => 'Connor'
+//    ];
+//    mailchimp_ecommerce_add_customer($customer);
+//    $new_customer = mailchimp_ecommerce_get_customer($customer['id']);
+//    var_dump($new_customer);
+//
+//    $this->assertEqual($new_customer['id'], $customer['id']);
+//    $this->assertEqual($new_customer['email_address'], $customer['email_address']);
+//    $this->assertEqual($new_customer['first_name'], $customer['first_name']);
+//    $this->assertEqual($new_customer['last_name'], $customer['last_name']);
   }
 
   /**
