@@ -33,6 +33,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     // Enable modules required for the test.
     $enabled_modules = array(
       'commerce',
+      'commerce_product_ui',
       'entity',
       'libraries',
       'mailchimp',
