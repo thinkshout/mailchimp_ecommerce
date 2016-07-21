@@ -20,9 +20,9 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
   /**
    * Non-admin account used in tests.
    *
-   * @var object $customer
+   * @var object $user
    */
-  private $customer;
+  private $user;
 
   /**
    * Returns info displayed in the test interface.
@@ -62,8 +62,13 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'mailchimp_signup',
     );
 
-    $this->admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
-    $this->customer = $this->drupalCreateUser(array('anonymous user'));
+    $this->admin = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'configure store',
+      'administer commerce_product entities',
+    ));
+
+    $this->user = $this->drupalCreateUser(array('anonymous user'));
 
     parent::setUp($enabled_modules);
 
@@ -86,13 +91,12 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp.
    */
   public function testAddStore() {
-    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
-    $this->drupalLogin($admin);
+    $this->drupalLogin($this->admin);
 
     $edit = array();
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
-    $edit['mailchimp_ecommerce_store_name'] = "Freddie's Merchandise";
+    $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
     $edit['mailchimp_ecommerce_list_id'] = '57afe96172';
     $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
     $edit['mailchimp_ecommerce_currency'] = 'USD';
@@ -106,8 +110,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp with no list.
    */
   public function testAddStoreNoList() {
-    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
-    $this->drupalLogin($admin);
+    $this->drupalLogin($this->admin);
 
     $edit = array();
 
@@ -126,13 +129,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a product to MailChimp.
    */
   public function testAddProduct() {
-    // Should pass.
-    $admin = $this->drupalCreateUser(array(
-      'administer site configuration',
-      'configure store',
-      'administer commerce_product entities',
-    ));
-    $this->drupalLogin($admin);
+    $this->drupalLogin($this->admin);
 
     $edit = array();
 
