@@ -11,20 +11,6 @@
 class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
 
   /**
-   * Admin account used in tests.
-   *
-   * @var object $admin
-   */
-  private $admin;
-
-  /**
-   * Non-admin account used in tests.
-   *
-   * @var object $customer
-   */
-  private $customer;
-
-  /**
    * Returns info displayed in the test interface.
    *
    * @return array
@@ -62,9 +48,6 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'mailchimp_signup',
     );
 
-    $this->admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
-    $this->customer = $this->drupalCreateUser(array('anonymous user'));
-
     parent::setUp($enabled_modules);
 
     variable_set('mailchimp_api_key', 'MAILCHIMP_TEST_API_KEY');
@@ -92,7 +75,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     $edit = array();
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
-    $edit['mailchimp_ecommerce_store_name'] = "Freddie's Merchandise";
+    $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
     $edit['mailchimp_ecommerce_list_id'] = '57afe96172';
     $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
     $edit['mailchimp_ecommerce_currency'] = 'USD';
