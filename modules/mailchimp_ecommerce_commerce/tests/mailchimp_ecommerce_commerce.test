@@ -1,10 +1,28 @@
 <?php
+
 /**
  * @file
- * Test class and methods for the Mailchimp eCommerce commerce module.
+ * Test class and methods for the Mailchimp eCommerce Commerce module.
  */
 
+/**
+ * Tests for MailChimp eCommerce integration with Drupal Commerce.
+ */
 class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
+
+  /**
+   * Admin account used in tests.
+   *
+   * @var object $admin
+   */
+  private $admin;
+
+  /**
+   * Non-admin account used in tests.
+   *
+   * @var object $customer
+   */
+  private $customer;
 
   /**
    * Returns info displayed in the test interface.
@@ -14,8 +32,8 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'MailChimp eCommerce commerce',
-      'description' => 'Test MailChimp eCommerce commerce functionality.',
+      'name' => 'MailChimp eCommerce Commerce',
+      'description' => 'Test MailChimp eCommerce integration with Drupal Commerce.',
       'group' => 'MailChimp',
     );
   }
@@ -41,7 +59,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'mailchimp_campaign',
       'mailchimp_ecommerce',
       'mailchimp_ecommerce_commerce',
-      'mailchimp_signup'
+      'mailchimp_signup',
     );
 
     $this->admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
@@ -81,8 +99,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
 
     $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));
 
-    $this->assertText(t("The configuration options have been saved."), 'The text "The configuration options have been
-    saved." appears on the page that adds a store.');
+    $this->assertText(t('The configuration options have been saved.'), 'The text "The configuration options have been saved." appears on the page that adds a store.');
   }
 
   /**
@@ -95,16 +112,14 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     $edit = array();
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
-    $edit['mailchimp_ecommerce_store_name'] = "Freddie's Merchandise";
+    $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
     $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
     $edit['mailchimp_ecommerce_currency'] = 'USD';
 
     $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));
 
-    $this->assertNoText(t("The configuration options have been saved."), 'The text "The configuration options have been
-    saved." should not appear on the page that adds a store.');
-    $this->assertText(t("Store List field is required."), 'The text "Store List field is required." should appear on the
-    page, indicating a form validation error.');
+    $this->assertNoText(t('The configuration options have been saved.'), 'The text "The configuration options have been saved." should not appear on the page that adds a store.');
+    $this->assertText(t('Store List field is required.'), 'The text "Store List field is required." should appear on the page, indicating a form validation error.');
   }
 
   /**
@@ -112,20 +127,23 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddProduct() {
     // Should pass.
-    $admin = $this->drupalCreateUser(array('administer site configuration', 'configure store', 'administer commerce_product entities'));
+    $admin = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'configure store',
+      'administer commerce_product entities',
+    ));
     $this->drupalLogin($admin);
 
     $edit = array();
 
     $edit['sku'] = 'Jokes002';
-    $edit['title'] = "Freddie's Jokes Volume 2";
+    $edit['title'] = 'Freddie\'s Jokes Volume 2';
     $edit['commerce_price[und][0][amount]'] = 5;
     $edit['status'] = 1;
 
     $this->drupalPost('admin/commerce/products/add/product', $edit, t('Save product'));
 
-    $this->assertText(t("Product saved."), 'The text "Product saved." should appear on the
-    page, indicating a product was added successfully.');
+    $this->assertText(t('Product saved.'), 'The text "Product saved." should appear on the page, indicating a product was added successfully.');
   }
 
   /**
