@@ -68,7 +68,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'administer commerce_product entities',
     ));
 
-    $this->user = $this->drupalCreateUser(array('anonymous user'));
+    $this->user = $this->drupalCreateUser(array('access content'));
 
     parent::setUp($enabled_modules);
 
