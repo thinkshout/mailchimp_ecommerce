@@ -47,6 +47,8 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
 
     variable_set('mailchimp_api_key', 'MAILCHIMP_TEST_API_KEY');
     variable_set('mailchimp_test_mode', TRUE);
+
+    variable_set('mailchimp_ecommerce_store_id', 1);
   }
 
   /**
@@ -58,6 +60,8 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
     parent::tearDown();
 
     variable_del('mailchimp_test_mode');
+
+    variable_del('mailchimp_ecommerce_store_id');
   }
 
   /**
@@ -84,14 +88,72 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
    * Tests adding an order to MailChimp.
    */
   public function testAddOrder() {
-    // Should pass.
+    $store_id = 1;
+    $order_id = 1;
+    $customer = [
+      'id' => 1,
+      'email_address' => 'testuser@example.com',
+      'first_name' => 'Test',
+      'last_name' => 'User',
+    ];
+    $order = [
+      'currency_code' => 'USD',
+      'order_total' => 29.98,
+      'lines' => [
+        (object) [
+          'id' => 1,
+          'product_id' => 11,
+          'product_variant_id' => 11,
+          'quantity' => 1,
+          'price' => 9.99,
+        ],
+        'lines' => [
+          (object) [
+            'id' => 2,
+            'product_id' => 12,
+            'product_variant_id' => 12,
+            'quantity' => 1,
+            'price' => 19.99,
+          ],
+        ],
+      ],
+    ];
+
+    mailchimp_ecommerce_add_order($order_id, $customer, $order);
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $saved_order = $mc_ecommerce->getOrder($store_id, $order_id);
+
+    $this->assertEqual($saved_order->id, $order_id);
+    $this->assertEqual($saved_order->currency_code, $order['currency_code']);
+    $this->assertEqual($saved_order->order_total, $order['order_total']);
   }
 
   /**
    * Tests adding an order to MailChimp with no line items.
    */
   public function testAddOrderNoLineItems() {
-    // Action should fail.
+    $store_id = 1;
+    $order_id = 1;
+    $customer = [
+      'id' => 1,
+      'email_address' => 'testuser@example.com',
+      'first_name' => 'Test',
+      'last_name' => 'User',
+    ];
+    $order = [
+      'currency_code' => 'USD',
+      'order_total' => 19.99,
+    ];
+
+    mailchimp_ecommerce_add_order($order_id, $customer, $order);
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $saved_order = $mc_ecommerce->getOrder($store_id, $order_id);
+
+    $this->assertNull($saved_order);
   }
 
 }
