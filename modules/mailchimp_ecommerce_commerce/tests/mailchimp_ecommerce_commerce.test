@@ -164,18 +164,4 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     // Action should fail.
   }
 
-  /**
-   * Tests adding an order to MailChimp.
-   */
-  public function testAddOrder() {
-    // Should pass.
-  }
-
-  /**
-   * Tests adding an order to MailChimp with no line items.
-   */
-  public function testAddOrderNoLineItems() {
-    // Action should fail.
-  }
-
 }
