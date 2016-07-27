@@ -1,0 +1,103 @@
+<?php
+
+/**
+ * @file
+ * Test class and methods for the Mailchimp eCommerce module.
+ */
+
+/**
+ * Tests for MailChimp eCommerce core integration.
+ */
+class MailchimpEcommerceTestCase extends DrupalWebTestCase {
+
+  /**
+   * Returns info displayed in the test interface.
+   *
+   * @return array
+   *   Formatted as specified by simpletest.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'MailChimp eCommerce',
+      'description' => 'Test MailChimp eCommerce core integration.',
+      'group' => 'MailChimp',
+    );
+  }
+
+  /**
+   * Pre-test setup function.
+   *
+   * Enables dependencies.
+   * Sets the mailchimp_api_key to the test-mode key.
+   * Sets test mode to TRUE.
+   */
+  protected function setUp() {
+    $this->profile = drupal_get_profile();
+
+    // Enable modules required for the test.
+    $enabled_modules = array(
+      'commerce',
+      'entity',
+      'libraries',
+      'mailchimp',
+      'mailchimp_ecommerce',
+    );
+
+    parent::setUp($enabled_modules);
+
+    variable_set('mailchimp_api_key', 'MAILCHIMP_TEST_API_KEY');
+    variable_set('mailchimp_test_mode', TRUE);
+  }
+
+  /**
+   * Post-test function.
+   *
+   * Sets test mode to FALSE.
+   */
+  protected function tearDown() {
+    parent::tearDown();
+
+    variable_del('mailchimp_test_mode');
+  }
+
+  /**
+   * Tests adding a store to MailChimp.
+   */
+  public function testAddStore() {
+    $edit['mailchimp_ecommerce_integration'] = 'commerce';
+    $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
+    $edit['mailchimp_ecommerce_list_id'] = '57afe96172';
+    $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
+    $edit['mailchimp_ecommerce_currency'] = 'USD';
+
+    $store_id = 1;
+    $store = array(
+      'list_id' => '57afe96172',
+      'name' => 'Freddie\'s Merchandise',
+      'currency_code' => 'USD',
+    );
+
+    mailchimp_ecommerce_add_store($store_id, $store);
+
+    $saved_store = mailchimp_ecommerce_get_store($store_id);
+
+    $this->assertEqual($saved_store->id, $store_id);
+    $this->assertEqual($saved_store->name, $store['name']);
+    $this->assertEqual($saved_store->currency_code, $store['currency_code']);
+  }
+
+  /**
+   * Tests adding an order to MailChimp.
+   */
+  public function testAddOrder() {
+    // Should pass.
+  }
+
+  /**
+   * Tests adding an order to MailChimp with no line items.
+   */
+  public function testAddOrderNoLineItems() {
+    // Action should fail.
+  }
+
+}

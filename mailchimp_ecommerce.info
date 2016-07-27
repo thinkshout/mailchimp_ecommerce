@@ -5,3 +5,5 @@ core = 7.x
 
 dependencies[] = mailchimp
 dependencies[] = mailchimp_lists
+
+files[] = tests/mailchimp_ecommerce.test
