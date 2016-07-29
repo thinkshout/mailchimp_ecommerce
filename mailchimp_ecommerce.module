@@ -698,15 +698,17 @@ function mailchimp_ecommerce_get_store_id() {
  *   The campaign ID.
  */
 function mailchimp_ecommerce_get_campaign_id() {
-  $campaign_id = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
+  $session_campaign = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
+  $campaign_id = '';
 
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
   $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
 
   // Check to see if this is a valid MailChimp campaign.
   try {
-    if (isset($campaign_id)) {
-      $campaign_id = $mc_campaigns->getCampaign($campaign_id);
+    if (!empty($session_campaign)) {
+      $campaign = $mc_campaigns->getCampaign($session_campaign);
+      $campaign_id = $campaign->id;
     }
   }
   catch (Exception $e) {
