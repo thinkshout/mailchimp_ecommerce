@@ -324,7 +324,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
     $currency_code = $order_wrapper->commerce_order_total->currency_code->value();
   }
   if (isset($order_wrapper->commerce_order_total->amount)) {
-    $order_total = $order_wrapper->commerce_order_total->amount->value();
+    $order_total =  commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
   }
   if (isset($order_wrapper->commerce_customer_billing->commerce_customer_address)) {
     $commerce_billing_address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
@@ -352,7 +352,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
         'product_id' => $line_item_wrapper->commerce_product->raw(),
         'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
         'quantity' => (int) $line_item_wrapper->quantity->value(),
-        'price' =>  commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $product_wrapper->commerce_price->currency_code->value()),
+        'price' =>  commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $line_item_wrapper->commerce_unit_price->currency_code->value()),
       ];
       $lines[] = $line;
     }
