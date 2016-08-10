@@ -366,6 +366,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
     'currency_code' => $currency_code,
     'order_total' => $order_total,
     'billing_address' => $billing_address,
+    'processed_at_foreign' => date('c'),
     'lines' => $lines,
   ];
 
