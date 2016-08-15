@@ -98,7 +98,12 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  mailchimp_ecommerce_update_customer($customer);
+  if (mailchimp_ecommerce_get_customer($user->uid)) {
+    mailchimp_ecommerce_update_customer($customer);
+  }
+  else {
+    mailchimp_ecommerce_add_customer($customer);
+  }
 
   // Update the order with the customer information.
   $order_id = $customer_profile->entity_context['entity_id'];
