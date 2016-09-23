@@ -38,8 +38,9 @@ function mailchimp_ecommerce_admin_settings() {
   }
 
   if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
+    $existing_store_id = variable_get('mailchimp_ecommerce_list_id');
     $form['mailchimp_ecommerce_list_id_existing'] = array(
-      '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . variable_get('mailchimp_ecommerce_list_id'),
+      '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . $list_options[$existing_store_id],
     );
   }
   else {
