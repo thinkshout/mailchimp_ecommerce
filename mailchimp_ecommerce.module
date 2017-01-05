@@ -248,6 +248,11 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
     if (empty($store_id)) {
       throw new Exception('Cannot add a cart without a store ID.');
     }
+    if (!mailchimp_ecommerce_validate_customer($customer)) {
+      // A user not existing in the store's MailChimp list is not an error, so
+      // don't throw an exception.
+      return;
+    }
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
       $cart['campaign_id'] = $campaign_id;
@@ -732,6 +737,19 @@ function mailchimp_ecommerce_get_campaign_id() {
  */
 function mailchimp_ecommerce_is_enabled() {
   return (variable_get('mailchimp_ecommerce_integration', '') !== '');
+}
+
+/**
+ * Determines if customer data is valid.
+ *
+ * @param array $customer
+ *   Array of customer data.
+ *
+ * @return bool
+ *   TRUE if customer data is valid.
+ */
+function mailchimp_ecommerce_validate_customer(array $customer) {
+  return (isset($customer['id']) && !empty($customer['id']));
 }
 
 /**
