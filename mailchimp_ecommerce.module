@@ -205,6 +205,10 @@ function mailchimp_ecommerce_update_customer($customer) {
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
     // Pull member information to get member status.
     $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
+    if (empty($memberinfo) || !isset($memberinfo->status)) {
+      // Cannot update a customer with no list member.
+      return;
+    }
     $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
     $mc_ecommerce->updateCustomer($store_id, $customer);
   }
@@ -442,6 +446,11 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
       throw new Exception('Cannot add an order without a store ID.');
+    }
+    if (!mailchimp_ecommerce_validate_customer($customer)) {
+      // A user not existing in the store's MailChimp list is not an error, so
+      // don't throw an exception.
+      return;
     }
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
