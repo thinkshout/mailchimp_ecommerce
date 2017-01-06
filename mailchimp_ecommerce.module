@@ -472,9 +472,6 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
  *
  * @param string $order_id
  *   The order ID.
- * @param array $customer
- *   Associative array of customer information.
- *   - id (string): A unique identifier for the customer.
  * @param array $order
  *   Associative array of order information.
  *   - currency_code (string): The three-letter ISO 4217 currency code.
@@ -483,7 +480,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
  *
  * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#edit-patch_ecommerce_stores_store_id_orders_order_id
  */
-function mailchimp_ecommerce_update_order($order_id, array $customer, array $order) {
+function mailchimp_ecommerce_update_order($order_id, array $order) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -492,7 +489,7 @@ function mailchimp_ecommerce_update_order($order_id, array $customer, array $ord
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateOrder($store_id, $order_id, $customer, $order);
+    $mc_ecommerce->updateOrder($store_id, $order_id, $order);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update an order: ' . $e->getMessage());
