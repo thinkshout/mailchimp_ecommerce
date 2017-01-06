@@ -9,5 +9,5 @@
  * Implements hook_uninstall().
  */
 function mailchimp_ecommerce_commerce_uninstall() {
-  variable_del('mailchimp_ecommerce_commerce_store_id');
+  variable_del('mailchimp_ecommerce_store_id');
 }
