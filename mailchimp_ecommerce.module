@@ -333,8 +333,13 @@ function mailchimp_ecommerce_delete_cart($cart_id) {
     $mc_ecommerce->deleteCart($store_id, $cart_id);
   }
   catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to delete a cart: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    if ($e->getCode() == 404) {
+      // Cart doesn't exist; no need to log an error.
+    }
+    else {
+      mailchimp_ecommerce_log_error_message('Unable to delete a cart: ' . $e->getMessage());
+      drupal_set_message($e->getMessage(), 'error');
+    }
   }
 }
 
