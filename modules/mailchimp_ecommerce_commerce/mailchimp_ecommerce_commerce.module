@@ -60,14 +60,16 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     mailchimp_ecommerce_add_customer($customer);
   }
 
-  // Update the order with the customer information.
-  $order_id = $customer_profile->entity_context['entity_id'];
-  $order = commerce_order_load($order_id);
+  // Update the order with the customer information, if customer profile exists.
+  if (isset($customer_profile->entity_context['entity_id']) && !empty($customer_profile->entity_context['entity_id'])) {
+    $order_id = $customer_profile->entity_context['entity_id'];
+    $order = commerce_order_load($order_id);
 
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
+    $wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
 
-  mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+  }
 }
 
 /**
