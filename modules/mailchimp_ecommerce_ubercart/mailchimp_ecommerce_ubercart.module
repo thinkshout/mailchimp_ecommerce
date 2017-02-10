@@ -4,3 +4,15 @@
  * @file
  * Integrates Ubercart with MailChimp eCommerce.
  */
+
+// TODO: Implement mailchimp_ecommerce_add_customer()
+// TODO: Implement mailchimp_ecommerce_update_customer()
+// TODO: Implement mailchimp_ecommerce_delete_customer()
+// TODO: Implement mailchimp_ecommerce_get_customer()
+// TODO: Implement mailchimp_ecommerce_add_cart()
+// TODO: Implement mailchimp_ecommerce_update_cart()
+// TODO: Implement mailchimp_ecommerce_delete_cart()
+// TODO: Implement mailchimp_ecommerce_add_order()
+// TODO: Implement mailchimp_ecommerce_add_product()
+// TODO: Implement mailchimp_ecommerce_update_product()
+// TODO: Implement mailchimp_ecommerce_delete_product_variant()
