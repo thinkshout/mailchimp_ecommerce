@@ -5,6 +5,23 @@
  * Integrates Ubercart with MailChimp eCommerce.
  */
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_alter(&$form, &$form_state) {
+  $form['mailchimp_ecommerce_integration']['#options']['ubercart'] = t('Ubercart');
+
+  // Add submit handler as first element in submit array.
+  array_unshift($form['#submit'], 'mailchimp_ecommerce_ubercart_integration_admin_settings_submit');
+}
+
+/**
+ * Submit handler for the MailChimp eCommerce settings form.
+ */
+function mailchimp_ecommerce_ubercart_integration_admin_settings_submit($form, &$form_state) {
+  // TODO: Create store ID.
+}
+
 // TODO: Implement mailchimp_ecommerce_add_customer()
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
