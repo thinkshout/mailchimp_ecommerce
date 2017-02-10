@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * MailChimp eCommerce Ubercart install and update hooks.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function mailchimp_ecommerce_ubercart_uninstall() {
+  // TODO: Clean up any variables set.
+}
