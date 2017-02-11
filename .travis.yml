@@ -48,7 +48,7 @@ install:
 - drupal-ti install
 before_script:
 - drupal-ti before_script
-- drupal-ti --include before.sh
+- drupal-ti --include tests/mailchimp-ecommerce-before.sh
 script:
 - drupal-ti script
 after_script:
