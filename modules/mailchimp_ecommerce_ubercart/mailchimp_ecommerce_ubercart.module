@@ -30,6 +30,28 @@ function mailchimp_ecommerce_ubercart_integration_admin_settings_submit($form, &
 // TODO: Implement mailchimp_ecommerce_update_cart()
 // TODO: Implement mailchimp_ecommerce_delete_cart()
 // TODO: Implement mailchimp_ecommerce_add_order()
-// TODO: Implement mailchimp_ecommerce_add_product()
+
+/**
+ * Implements hook_node_insert().
+ */
+function mailchimp_ecommerce_ubercart_node_insert($node) {
+  if ($node->type == 'product') {
+    $node_wrapper = entity_metadata_wrapper('node', $node);
+
+    // Create a corresponding MailChimp product.
+    $product_id = $node_wrapper->nid->value();
+    $node_wrapper->model->value();
+    $product_variant_id = $node_wrapper->model->value();
+    $sku = $node_wrapper->model->value();
+    $title = $node_wrapper->title->value();
+    $description = (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '';
+    $price = $node_wrapper->sell_price->value();
+    // TODO: Ubercart product types.
+    $type = '';
+
+    mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $price);
+  }
+}
+
 // TODO: Implement mailchimp_ecommerce_update_product()
 // TODO: Implement mailchimp_ecommerce_delete_product_variant()
