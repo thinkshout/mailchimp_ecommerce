@@ -67,8 +67,8 @@ function mailchimp_ecommerce_admin_settings() {
 
   $list_options = [
     '' => '-- Select --',
-    'TRUE' => 'Normal Subscriber',
-    'FALSE' => 'Transactional Subscriber',
+    1 => 'Normal Subscriber',
+    0 => 'Transactional Subscriber',
   ];
 
   $form['mailchimp_ecommerce_opt_in'] = [
@@ -120,6 +120,13 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
       }
       else {
         $currency = $form_state['values']['mailchimp_ecommerce_currency'];
+      }
+      // Save value as boolean.
+      if ($form_state['values']['mailchimp_ecommerce_opt_in_status'] == 1) {
+        variable_set('mailchimp_ecommerce_opt_in_status', TRUE);
+      }
+      else {
+        variable_set('mailchimp_ecommerce_opt_in_status', FALSE);
       }
 
       // Determine if a store is being created or updated.

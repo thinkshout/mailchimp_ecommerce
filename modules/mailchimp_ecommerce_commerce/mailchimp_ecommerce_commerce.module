@@ -348,7 +348,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
   }
   // Pull optin status
   $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
-  if (is_null($optinstatus) || empty($optinstatus)) {
+  if (empty($optinstatus)) {
     watchdog('mailchimp_ecommerce', t('Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.'), [], WATCHDOG_ERROR);
     throw new Exception('Optin Status is not set in the MailChimp Ecommerce Module');
   }
