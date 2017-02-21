@@ -431,6 +431,35 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
 }
 
 /**
+ * Gets an order from the current MailChimp store.
+ *
+ * @param string $order_id
+ *   The order ID.
+ *
+ * @return object
+ *   The order.
+ */
+function mailchimp_ecommerce_get_order($order_id) {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot get an order without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $order = $mc_ecommerce->getOrder($store_id, $order_id);
+    return $order;
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+
+  return NULL;
+}
+
+/**
  * Adds a new order to the current MailChimp store.
  *
  * @param string $order_id
