@@ -86,6 +86,64 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
   return $product;
 }
 
+/**
+ * Implements hook_uc_order().
+ */
+function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
+  $mc_order = _mailchimp_ecommerce_ubercart_build_order($order);
+
+  // Create or update cart.
+  if ($order->order_status == 'in_checkout') {
+    if ($order->created == $order->modified) {
+      mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+    else {
+      mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+  }
+}
+
+/**
+ * Builds a MailChimp order from an Ubercart order.
+ *
+ * @param UcOrder $order
+ *   The Ubercart order.
+ *
+ * @return object
+ *   Order object in a MailChimp-friendly format.
+ */
+function _mailchimp_ecommerce_ubercart_build_order($order) {
+  $user = user_load($order->uid);
+  $currency_code = $order->currency;
+  $order_total = '';
+  $lines = [];
+
+  $billing_address = [
+    'name' => $order->billing_first_name . ' ' . $order->billing_last_name,
+    'address1' => $order->billing_street1,
+    'address2' => $order->billing_street2,
+    'city' => $order->billing_city,
+    'province_code' => '',
+    'postal_code' => $order->billing_postal_code,
+    'country_code' => $order->billing_country,
+    'company' => $order->billing_company,
+  ];
+
+  $customer = [
+    'id' => $user->uid,
+  ];
+
+  $order_data = [
+    'currency_code' => $currency_code,
+    'order_total' => $order_total,
+    'billing_address' => $billing_address,
+    'processed_at_foreign' => date('c'),
+    'lines' => $lines,
+  ];
+
+  return ['customer' => $customer, 'order_data' => $order_data];
+}
+
 // TODO: Implement mailchimp_ecommerce_add_customer()
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
