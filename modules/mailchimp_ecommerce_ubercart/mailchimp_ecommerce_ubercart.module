@@ -92,13 +92,31 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
   $mc_order = _mailchimp_ecommerce_ubercart_build_order($order);
 
-  // Create or update cart.
-  if ($order->order_status == 'in_checkout') {
-    if ($order->created == $order->modified) {
+  if ($op == 'new') {
+    if ($order->order_status == 'in_checkout') {
+      // Create new cart in MailChimp.
       mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
     else {
+      // Create new order in MailChimp.
+      mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+  }
+  elseif ($op == 'save') {
+    if ($order->order_status == 'in_checkout') {
+      // Update cart in MailChimp.
       mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+    else {
+      if (!empty(mailchimp_ecommerce_get_order($order->order_id))) {
+        // Update existing order in MailChimp.
+        mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
+      }
+      else {
+        // Convert cart to order in MailChimp.
+        mailchimp_ecommerce_delete_cart($order->order_id);
+        mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      }
     }
   }
 }
@@ -148,8 +166,6 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
 // TODO: Implement mailchimp_ecommerce_get_customer()
-// TODO: Implement mailchimp_ecommerce_add_cart()
-// TODO: Implement mailchimp_ecommerce_update_cart()
 // TODO: Implement mailchimp_ecommerce_delete_cart()
 // TODO: Implement mailchimp_ecommerce_add_order()
 // TODO: Implement mailchimp_ecommerce_delete_product_variant()
