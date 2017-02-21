@@ -146,6 +146,20 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
     'company' => $order->billing_company,
   ];
 
+  if (!empty($order->products)) {
+    foreach ($order->products as $product) {
+      $line = [
+        'id' => $product->order_product_id,
+        'product_id' => $product->nid,
+        'product_variant_id' => $product->model,
+        'quantity' => (int) $product->qty,
+        'price' => $product->price,
+      ];
+
+      $lines[] = $line;
+    }
+  }
+
   $customer = [
     'id' => $order->uid,
   ];
