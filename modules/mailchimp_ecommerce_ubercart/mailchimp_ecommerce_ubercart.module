@@ -131,7 +131,6 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
  *   Order object in a MailChimp-friendly format.
  */
 function _mailchimp_ecommerce_ubercart_build_order($order) {
-  $user = user_load($order->uid);
   $currency_code = $order->currency;
   $order_total = '';
   $lines = [];
@@ -148,7 +147,7 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
   ];
 
   $customer = [
-    'id' => $user->uid,
+    'id' => $order->uid,
   ];
 
   $order_data = [
