@@ -94,6 +94,7 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
 
   if ($op == 'new') {
     if ($order->order_status == 'in_checkout') {
+      // TODO: Create new customer.
       // Create new cart in MailChimp.
       mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
@@ -179,6 +180,4 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
 // TODO: Implement mailchimp_ecommerce_get_customer()
-// TODO: Implement mailchimp_ecommerce_delete_cart()
-// TODO: Implement mailchimp_ecommerce_add_order()
 // TODO: Implement mailchimp_ecommerce_delete_product_variant()
