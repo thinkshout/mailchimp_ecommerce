@@ -9,7 +9,7 @@ For more information about eCommerce 360, please see:
 http://kb.mailchimp.com/integrations/other-integrations/about-ecommerce360
 
 ## Dependencies
-  * MailChimp: http://drupal.org/project/mailchimp
+  * MailChimp: https://www.drupal.org/project/mailchimp
   * Commerce: https://www.drupal.org/project/commerce
 
 ## Installation Notes

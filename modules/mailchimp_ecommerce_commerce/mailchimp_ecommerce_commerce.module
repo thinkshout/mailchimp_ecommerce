@@ -6,26 +6,6 @@
  */
 
 /**
- * Implements hook_form_FORM_ID_alter().
- */
-function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_alter(&$form, &$form_state) {
-  $form['mailchimp_ecommerce_integration']['#options']['commerce'] = t('Drupal Commerce');
-
-  // Add submit handler as first element in submit array.
-  array_unshift($form['#submit'], 'mailchimp_ecommerce_commerce_integration_admin_settings_submit');
-}
-
-/**
- * Submit handler for the MailChimp eCommerce settings form.
- */
-function mailchimp_ecommerce_commerce_integration_admin_settings_submit($form, &$form_state) {
-  if (variable_get('mailchimp_ecommerce_store_id', NULL) == NULL) {
-    $store_id = mailchimp_ecommerce_generate_store_id();
-    variable_set('mailchimp_ecommerce_store_id', $store_id);
-  }
-}
-
-/**
  * Implements hook_commerce_customer_profile_insert().
  */
 function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer_profile) {
@@ -215,21 +195,21 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
  * Implements hook_default_rules_configuration().
  */
 function mailchimp_ecommerce_commerce_default_rules_configuration() {
-  $rules = array();
+  $rules = [];
 
   // Add a reaction rule to display the default Add to Cart message.
   $rule = rules_reaction_rule();
 
   $rule->label = t('Send cart to MailChimp');
-  $rule->tags = array('Commerce Cart');
+  $rule->tags = ['Commerce Cart'];
   $rule->active = TRUE;
 
   $rule
     ->event('commerce_cart_product_add')
     ->event('commerce_cart_product_remove')
-    ->action('mailchimp_ecommerce_commerce_send_cart', array(
+    ->action('mailchimp_ecommerce_commerce_send_cart', [
       'commerce_order:select' => 'commerce-order',
-    ));
+    ]);
 
   $rules['mailchimp_ecommerce_commerce_send_cart'] = $rule;
 
@@ -240,21 +220,21 @@ function mailchimp_ecommerce_commerce_default_rules_configuration() {
  * Implements hook_rules_action_info().
  */
 function mailchimp_ecommerce_commerce_rules_action_info() {
-  $actions = array();
+  $actions = [];
 
-  $actions['mailchimp_ecommerce_commerce_send_cart'] = array(
+  $actions['mailchimp_ecommerce_commerce_send_cart'] = [
     'label' => t('Send a cart to MailChimp'),
-    'parameter' => array(
-      'commerce_order' => array(
+    'parameter' => [
+      'commerce_order' => [
         'type' => 'commerce_order',
         'label' => t('Order to send'),
-      ),
-    ),
+      ],
+    ],
     'group' => t('Commerce Order'),
-    'callbacks' => array(
+    'callbacks' => [
       'execute' => '_mailchimp_ecommerce_commerce_send_cart',
-    ),
-  );
+    ],
+  ];
 
   return $actions;
 }
@@ -319,11 +299,13 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  *
  * @return object
  *   Order object in a MailChimp-friendly format.
+ *
+ * @throws Exception
+ *   Throws an exception if Opt In Status is not set.
  */
 function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
   $user = user_load($order_wrapper->uid->raw());
-  $currency_code = '';
-  $order_total = '';
+  $customer = [];
   $billing_address = [];
   $lines = [];
 
@@ -331,7 +313,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
     $currency_code = $order_wrapper->commerce_order_total->currency_code->value();
   }
   if (isset($order_wrapper->commerce_order_total->amount)) {
-    $order_total =  commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
+    $order_total = commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
   }
   if (isset($order_wrapper->commerce_customer_billing->commerce_customer_address)) {
     $commerce_billing_address = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
@@ -359,16 +341,25 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
         'product_id' => $line_item_wrapper->commerce_product->raw(),
         'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
         'quantity' => (int) $line_item_wrapper->quantity->value(),
-        'price' =>  commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $line_item_wrapper->commerce_unit_price->currency_code->value()),
+        'price' => commerce_currency_amount_to_decimal($line_item_wrapper->commerce_unit_price->amount->value(), $line_item_wrapper->commerce_unit_price->currency_code->value()),
       ];
       $lines[] = $line;
     }
   }
-
+  // Pull optin status
+  $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
+  if (empty($optinstatus)) {
+    watchdog('mailchimp_ecommerce', t('Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.'), [], WATCHDOG_ERROR);
+    throw new Exception('Optin Status is not set in the MailChimp Ecommerce Module');
+  }
+  // Customer parameters used in the 'customer' portions of the API wrapper.
   $customer = [
     'id' => $user->uid,
+    'email_address' => $user->mail,
+    'opt_in_status' => $optinstatus,
   ];
 
+  // Order paramaters that are used as the 'cart' portions of the API wrapper.
   $order_data = [
     'currency_code' => $currency_code,
     'order_total' => $order_total,
