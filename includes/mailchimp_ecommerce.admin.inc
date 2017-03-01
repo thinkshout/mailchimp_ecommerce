@@ -52,6 +52,7 @@ function mailchimp_ecommerce_admin_settings() {
     '#type' => 'select',
     '#options' => $list_options_currency,
     '#title' => t('Store Currency Code'),
+    '#required' => TRUE,
     '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
   ];
 
