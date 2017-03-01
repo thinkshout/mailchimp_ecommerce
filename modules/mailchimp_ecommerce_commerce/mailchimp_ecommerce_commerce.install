@@ -11,3 +11,10 @@
 function mailchimp_ecommerce_commerce_uninstall() {
   variable_del('mailchimp_ecommerce_store_id');
 }
+
+/**
+ * Delete unused variable
+ */
+function mailchimp_ecommerce_commerce_update_7001() {
+  variable_del('mailchimp_ecommerce_integration');
+}
