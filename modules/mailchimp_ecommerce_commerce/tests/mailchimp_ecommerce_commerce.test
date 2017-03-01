@@ -77,7 +77,6 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
     $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
     $edit['mailchimp_ecommerce_list_id'] = '57afe96172';
-    $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
     $edit['mailchimp_ecommerce_currency'] = 'USD';
 
     $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));
@@ -96,7 +95,6 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
     $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
-    $edit['mailchimp_ecommere_commerce_default_currency'] = '1';
     $edit['mailchimp_ecommerce_currency'] = 'USD';
 
     $this->drupalPost('admin/config/services/mailchimp/ecommerce', $edit, t('Save configuration'));

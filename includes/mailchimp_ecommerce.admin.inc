@@ -45,15 +45,6 @@ function mailchimp_ecommerce_admin_settings() {
     ];
   }
 
-  if (module_exists('commerce')) {
-    $form['mailchimp_ecommere_commerce_default_currency'] = [
-      '#type' => 'checkbox',
-      '#title' => t('Use Commerce Default Currency'),
-      '#description' => t('Drupal Commerce was detected as being installed. Check this box to use the default currency of Commerce'),
-      '#default_value' => variable_get('mailchimp_ecommere_commerce_default_currency', ''),
-    ];
-  }
-
   $list_options_currency = [
     '' => '-- Select --',
   ] + mailchimp_ecommerce_get_currency_codes();
@@ -113,13 +104,8 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   }
 
   if ($store_id != NULL) {
-    // Detect if Commerce is installed and use the default currency.
-    if (!empty($form_state['values']['mailchimp_ecommere_commerce_default_currency'])) {
-      $currency = commerce_default_currency();
-    }
-    else {
-      $currency = $form_state['values']['mailchimp_ecommerce_currency'];
-    }
+    $currency = $form_state['values']['mailchimp_ecommerce_currency'];
+
     // Save value as boolean.
     if ($form_state['values']['mailchimp_ecommerce_opt_in_status'] == 1) {
       variable_set('mailchimp_ecommerce_opt_in_status', TRUE);

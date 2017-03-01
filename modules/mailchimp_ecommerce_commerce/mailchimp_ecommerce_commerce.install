@@ -18,3 +18,10 @@ function mailchimp_ecommerce_commerce_uninstall() {
 function mailchimp_ecommerce_commerce_update_7001() {
   variable_del('mailchimp_ecommerce_integration');
 }
+
+/**
+ * Delete unused default currency variable.
+ */
+function mailchimp_ecommerce_update_7002() {
+  variable_del('mailchimp_ecommere_commerce_default_currency');
+}
