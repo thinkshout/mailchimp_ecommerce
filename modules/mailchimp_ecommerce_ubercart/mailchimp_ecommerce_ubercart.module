@@ -19,7 +19,10 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
  * Submit handler for the MailChimp eCommerce settings form.
  */
 function mailchimp_ecommerce_ubercart_integration_admin_settings_submit($form, &$form_state) {
-  // TODO: Create store ID.
+  if (variable_get('mailchimp_ecommerce_store_id', NULL) == NULL) {
+    $store_id = mailchimp_ecommerce_generate_store_id();
+    variable_set('mailchimp_ecommerce_store_id', $store_id);
+  }
 }
 
 /**
