@@ -346,10 +346,10 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
       $lines[] = $line;
     }
   }
-  // Pull optin status
+  // Pull optin status.
   $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
   if (empty($optinstatus)) {
-    watchdog('mailchimp_ecommerce', t('Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.'), [], WATCHDOG_ERROR);
+    watchdog('mailchimp_ecommerce', 'Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.', [], WATCHDOG_ERROR);
     throw new Exception('Optin Status is not set in the MailChimp Ecommerce Module');
   }
   // Customer parameters used in the 'customer' portions of the API wrapper.
