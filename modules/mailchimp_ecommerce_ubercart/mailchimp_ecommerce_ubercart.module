@@ -81,9 +81,9 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
  * Implements hook_uc_order().
  */
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
-  $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
-
   if ($op == 'new') {
+    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
     if ($order->order_status == 'in_checkout') {
       // Ubercart doesn't create an entity for a customer, so we create
       // a customer in MailChimp at the same time as the cart.
@@ -98,6 +98,8 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     }
   }
   elseif ($op == 'save') {
+    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
     if ($order->order_status == 'in_checkout') {
       // Update cart in MailChimp.
       mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
