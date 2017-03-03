@@ -132,8 +132,8 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 
   $billing_address = mailchimp_ecommerce_ubercart_parse_billing_address($order);
 
-  $billing_address['name'] = $order->billing_first_name . ' ' . $order->billing_last_name;
-  $billing_address['company'] = $order->billing_company;
+  $billing_address->name = $order->billing_first_name . ' ' . $order->billing_last_name;
+  $billing_address->company = $order->billing_company;
 
   if (!empty($order->products)) {
     foreach ($order->products as $product) {
