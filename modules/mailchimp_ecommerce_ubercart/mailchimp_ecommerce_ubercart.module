@@ -81,7 +81,7 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
  * Implements hook_uc_order().
  */
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
-  $mc_order = _mailchimp_ecommerce_ubercart_build_order($order);
+  $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
   if ($op == 'new') {
     if ($order->order_status == 'in_checkout') {
@@ -125,21 +125,15 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
  * @return object
  *   Order object in a MailChimp-friendly format.
  */
-function _mailchimp_ecommerce_ubercart_build_order($order) {
+function mailchimp_ecommerce_ubercart_build_order($order) {
   $currency_code = $order->currency;
   $order_total = '';
   $lines = [];
 
-  $billing_address = [
-    'name' => $order->billing_first_name . ' ' . $order->billing_last_name,
-    'address1' => $order->billing_street1,
-    'address2' => $order->billing_street2,
-    'city' => $order->billing_city,
-    'province_code' => '',
-    'postal_code' => $order->billing_postal_code,
-    'country_code' => $order->billing_country,
-    'company' => $order->billing_company,
-  ];
+  $billing_address = mailchimp_ecommerce_ubercart_parse_billing_address($order);
+
+  $billing_address['name'] = $order->billing_first_name . ' ' . $order->billing_last_name;
+  $billing_address['company'] = $order->billing_company;
 
   if (!empty($order->products)) {
     foreach ($order->products as $product) {
@@ -157,6 +151,10 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
 
   $customer = [
     'id' => $order->uid,
+    'email_address' => $order->primary_email,
+    'first_name' => $order->billing_first_name,
+    'last_name' => $order->billing_last_name,
+    'address' => mailchimp_ecommerce_ubercart_parse_billing_address($order),
   ];
 
   $order_data = [
@@ -168,6 +166,28 @@ function _mailchimp_ecommerce_ubercart_build_order($order) {
   ];
 
   return ['customer' => $customer, 'order_data' => $order_data];
+}
+
+/**
+ * Parses a billing address from an Ubercart order.
+ *
+ * @param object $order
+ *   The Ubercart order.
+ *
+ * @return object
+ *   An address object formatted for use with MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
+  $address = (object) [
+    'address1' => $order->billing_street1,
+    'address2' => $order->billing_street2,
+    'city' => $order->billing_city,
+    'province_code' => $order->billing_zone,
+    'postal_code' => $order->billing_postal_code,
+    'country_code' => $order->billing_country,
+  ];
+
+  return $address;
 }
 
 // TODO: Implement mailchimp_ecommerce_update_customer()
