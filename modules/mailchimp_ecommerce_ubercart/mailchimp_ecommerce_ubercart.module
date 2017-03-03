@@ -180,13 +180,17 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
  *   An address object formatted for use with MailChimp.
  */
 function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
+  $country = uc_get_country_data(array('country_id' => $order->billing_country));
+  $country_code = (isset($country[0])) ? $country[0]['country_iso_code_3'] : '';
+  $province_code = uc_get_zone_code($order->billing_zone);
+
   $address = (object) [
     'address1' => $order->billing_street1,
     'address2' => $order->billing_street2,
     'city' => $order->billing_city,
-    'province_code' => $order->billing_zone,
+    'province_code' => ($province_code !== FALSE) ? $province_code : '',
     'postal_code' => $order->billing_postal_code,
-    'country_code' => $order->billing_country,
+    'country_code' => $country_code,
   ];
 
   return $address;
