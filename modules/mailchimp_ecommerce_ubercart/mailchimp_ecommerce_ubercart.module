@@ -52,6 +52,18 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
 }
 
 /**
+ * Implements hook_node_delete().
+ */
+function mailchimp_ecommerce_ubercart_node_delete($node) {
+  if ($node->type == 'product') {
+    // Delete the corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    mailchimp_ecommerce_delete_product_variant($product['id'], $product['variant_id']);
+  }
+}
+
+/**
  * Gets MailChimp product values from an Ubercart product node.
  *
  * @param object $node
