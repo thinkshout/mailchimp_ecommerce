@@ -211,4 +211,3 @@ function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
 // TODO: Implement mailchimp_ecommerce_get_customer()
-// TODO: Implement mailchimp_ecommerce_delete_product_variant()
