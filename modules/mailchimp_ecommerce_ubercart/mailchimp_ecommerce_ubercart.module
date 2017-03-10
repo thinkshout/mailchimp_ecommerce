@@ -64,6 +64,54 @@ function mailchimp_ecommerce_ubercart_node_delete($node) {
 }
 
 /**
+ * Implements hook_mailchimp_ecommerce_add_store().
+ */
+function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
+  // Add existing Ubercart products to MailChimp.
+  $batch = [
+    'title' => t('Adding products to MailChimp'),
+    'operations' => [],
+  ];
+
+  $products = node_load_multiple([], [
+    'type' => 'product',
+  ]);
+
+  if (!empty($products)) {
+    $product_ids = array_keys($products);
+
+    foreach ($product_ids as $product_id) {
+      $batch['operations'][] = [
+        'mailchimp_ecommerce_ubercart_batch_add_product',
+        [
+          $product_id,
+        ],
+      ];
+    }
+  }
+
+  batch_set($batch);
+}
+
+/**
+ * Batch callback used to add a product to MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) {
+  $node = node_load($product_id);
+
+  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+  mailchimp_ecommerce_add_product(
+    $product['id'],
+    $product['variant_id'],
+    $product['title'],
+    $product['description'],
+    $product['type'],
+    $product['sku'],
+    $product['price']);
+}
+
+/**
  * Gets MailChimp product values from an Ubercart product node.
  *
  * @param object $node
