@@ -147,7 +147,13 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     if ($order->order_status == 'in_checkout') {
       // Ubercart doesn't create an entity for a customer, so we create
       // a customer in MailChimp at the same time as the cart.
-      mailchimp_ecommerce_add_customer($mc_order['customer']);
+
+      if (mailchimp_ecommerce_get_customer($order->uid)) {
+        mailchimp_ecommerce_update_customer($mc_order['customer']);
+      }
+      else {
+        mailchimp_ecommerce_add_customer($mc_order['customer']);
+      }
 
       // Create new cart in MailChimp.
       mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
@@ -213,9 +219,17 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
     }
   }
 
+  // Pull optin status.
+  $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
+  if (empty($optinstatus)) {
+    watchdog('mailchimp_ecommerce', 'Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.', [], WATCHDOG_ERROR);
+    throw new Exception('Optin Status is not set in the MailChimp Ecommerce Module');
+  }
+
   $customer = [
     'id' => $order->uid,
     'email_address' => $order->primary_email,
+    'opt_in_status' => $optinstatus,
     'first_name' => $order->billing_first_name,
     'last_name' => $order->billing_last_name,
     'address' => mailchimp_ecommerce_ubercart_parse_billing_address($order),
