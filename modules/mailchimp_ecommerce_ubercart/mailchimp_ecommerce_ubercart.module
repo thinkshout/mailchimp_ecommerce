@@ -197,6 +197,8 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
   $billing_address->name = $order->billing_first_name . ' ' . $order->billing_last_name;
   $billing_address->company = $order->billing_company;
 
+  $order_total = uc_order_get_total($order);
+
   if (!empty($order->products)) {
     foreach ($order->products as $product) {
       $line = [
