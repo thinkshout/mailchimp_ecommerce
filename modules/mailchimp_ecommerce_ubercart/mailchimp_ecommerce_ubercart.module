@@ -205,10 +205,11 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 
   $order_total = uc_order_get_total($order);
 
-  if (!empty($order->products)) {
-    foreach ($order->products as $product) {
+  $products = uc_cart_get_contents();
+  if (!empty($products)) {
+    foreach ($products as $product) {
       $line = [
-        'id' => $product->order_product_id,
+        'id' => $product->cart_item_id,
         'product_id' => $product->nid,
         'product_variant_id' => $product->model,
         'quantity' => (int) $product->qty,
