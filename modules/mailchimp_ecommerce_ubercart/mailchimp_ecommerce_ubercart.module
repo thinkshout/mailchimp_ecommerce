@@ -172,15 +172,18 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     }
     else {
       if (!empty(mailchimp_ecommerce_get_order($order->order_id))) {
+
         // Update existing order in MailChimp.
         mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
       }
-      else {
-        // Convert cart to order in MailChimp.
-        mailchimp_ecommerce_delete_cart($order->order_id);
-        mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
-      }
     }
+  }
+  elseif ($op == 'submit') {
+    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
+    // Convert cart to order in MailChimp.
+    mailchimp_ecommerce_delete_cart($order->order_id);
+    mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   }
 }
 
