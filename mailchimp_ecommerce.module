@@ -23,6 +23,16 @@ function mailchimp_ecommerce_menu() {
     'weight' => 20,
   );
 
+  $items['admin/config/services/mailchimp/ecommerce/products'] = array(
+    'title' => 'Products',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailchimp_ecommerce_admin_settings'),
+    'access callback' => TRUE,
+    'file' => 'includes/mailchimp_ecommerce.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+
   return $items;
 }
 
@@ -725,6 +735,32 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $product_varian
     mailchimp_ecommerce_log_error_message('Unable to delete product variant: ' . $e->getMessage());
     drupal_set_message($e->getMessage(), 'error');
   }
+}
+
+/**
+ * Gets the total number of products in the MailChimp store.
+ *
+ * @return object
+ *   The products data.
+ */
+function mailchimp_ecommerce_get_total_products() {
+  try {
+    $store_id = mailchimp_ecommerce_get_store_id();
+    if (empty($store_id)) {
+      throw new Exception('Cannot get product count without a store ID.');
+    }
+
+    /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+    $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+    $products = $mc_ecommerce->getProducts($store_id, ['count' => 0]);
+    return $products->total_items;
+  }
+  catch (Exception $e) {
+    mailchimp_ecommerce_log_error_message('Unable to get product count: ' . $e->getMessage());
+    drupal_set_message($e->getMessage(), 'error');
+  }
+
+  return NULL;
 }
 
 /**

@@ -53,13 +53,36 @@ function mailchimp_ecommerce_admin_settings() {
     '#options' => $list_options_currency,
     '#title' => t('Store Currency Code'),
     '#required' => TRUE,
-    '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
   ];
 
   $list_options = [
     '' => '-- Select --',
     1 => 'Normal Subscriber',
     0 => 'Transactional Subscriber',
+  ];
+
+  $form['mailchimp_ecommerce_products'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Store Products'),
+    '#collapsible' => FALSE,
+  ];
+
+  // Display number of products in MailChimp store vs Drupal store.
+  $mc_product_count = mailchimp_ecommerce_get_total_products();
+
+  $form['mailchimp_ecommerce_products']['mc_count'] = [
+    '#markup' => '<p>' . t('!count products have been synced to MailChimp.', ['!count' => $mc_product_count]) . '</p>',
+  ];
+
+  // Number of products in Drupal is provided by a form_alter hook in each
+  // shopping cart submodule. Left blank here.
+  $form['mailchimp_ecommerce_products']['drupal_count'] = [
+    '#markup' => '',
+  ];
+
+  $form['mailchimp_ecommerce_products']['sync'] = [
+    '#type' => 'checkbox',
+    '#title' => 'Sync products',
   ];
 
   $form['mailchimp_ecommerce_opt_in'] = [
