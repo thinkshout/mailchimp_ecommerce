@@ -9,6 +9,6 @@ mailchimp_ecommerce.settings:
     mailchimp_ecommerce_opt_in_status:
       type: string
     mailchimp_ecommerce_store_id:
-      type: 'NULL'
+      type: string
     mailchimp_ecommerce_integration:
       type: string

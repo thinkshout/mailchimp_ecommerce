@@ -65,10 +65,6 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     }
 
     if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'))) {
-      // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/mailchimp_ecommerce.settings.yml and config/schema/mailchimp_ecommerce.schema.yml.
       $existing_store_id = \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id');
       $form['mailchimp_ecommerce_list_id_existing'] = [
         '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . $list_options[$existing_store_id]
@@ -153,10 +149,6 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       $existing_store = mailchimp_ecommerce_get_store($store_id);
 
       if (empty($existing_store)) {
-        // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/mailchimp_ecommerce.settings.yml and config/schema/mailchimp_ecommerce.schema.yml.
         $store = [
           'list_id' => !$form_state->getValue(['mailchimp_ecommerce_list_id']) ? $form_state->getValue(['mailchimp_ecommerce_list_id']) : \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'),
           'name' => $form_state->getValue(['mailchimp_ecommerce_store_name']),
