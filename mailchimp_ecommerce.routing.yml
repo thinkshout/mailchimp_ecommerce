@@ -1,6 +1,8 @@
 mailchimp_ecommerce.admin_settings:
-  path: /admin/config/services/mailchimp/ecommerce
+  path: 'admin/config/services/mailchimp/ecommerce'
   defaults:
-    _title: eCommerce
-    _form: \Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceAdminSettings
-  requirements: {  }
+    _title: 'eCommerce'
+    _form: '\Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceAdminSettings'
+  requirements:
+    _permission: 'administer mailchimp'
+    _mailchimp_configuration_access_check: 'TRUE'
