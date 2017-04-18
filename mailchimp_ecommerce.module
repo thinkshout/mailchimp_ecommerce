@@ -30,7 +30,7 @@ function mailchimp_ecommerce_menu() {
  * Implements hook_page_build().
  */
 function mailchimp_ecommerce_page_build(&$page) {
-  $campaign_id = isset($_GET['mc_cid']) ? check_plain($_GET['mc_cid']) : '';
+  $campaign_id = isset($_GET['mc_cid']) ? \Drupal\Component\Utility\Html::escape($_GET['mc_cid']) : '';
   if ($campaign_id) {
     $_SESSION['mc_cid'] = $campaign_id;
   }
@@ -83,7 +83,7 @@ function mailchimp_ecommerce_add_store($store_id, $store) {
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
     $mc_store = $mc_ecommerce->addStore($store_id, $store);
 
-    module_invoke_all('mailchimp_ecommerce_add_store', $mc_store);
+    \Drupal::moduleHandler()->invokeAll('mailchimp_ecommerce_add_store', [$mc_store]);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a new store: ' . $e->getMessage());
@@ -744,7 +744,7 @@ function mailchimp_ecommerce_generate_store_id() {
  *   The store ID.
  */
 function mailchimp_ecommerce_get_store_id() {
-  return variable_get('mailchimp_ecommerce_store_id', NULL);
+  return \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id');
 }
 
 /**
@@ -754,7 +754,7 @@ function mailchimp_ecommerce_get_store_id() {
  *   The campaign ID.
  */
 function mailchimp_ecommerce_get_campaign_id() {
-  $session_campaign = isset($_SESSION['mc_cid']) ? check_plain($_SESSION['mc_cid']) : '';
+  $session_campaign = isset($_SESSION['mc_cid']) ? \Drupal\Component\Utility\Html::escape($_SESSION['mc_cid']) : '';
   $campaign_id = '';
 
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
@@ -787,7 +787,7 @@ function mailchimp_ecommerce_get_campaign_id() {
  *   TRUE if an integration is enabled.
  */
 function mailchimp_ecommerce_is_enabled() {
-  return (variable_get('mailchimp_ecommerce_integration', '') !== '');
+  return (\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_integration') !== '');
 }
 
 /**
@@ -810,7 +810,7 @@ function mailchimp_ecommerce_validate_customer(array $customer) {
  *   The List ID.
  */
 function mailchimp_ecommerce_get_list_id() {
-  return variable_get('mailchimp_ecommerce_list_id', '');
+  return \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id');
 }
 
 /**
@@ -843,8 +843,8 @@ function mailchimp_ecommerce_get_currency_codes() {
  */
 function mailchimp_ecommerce_log_error_message($message) {
   if (function_exists('watchdog')) {
-    watchdog('mailchimp_ecommerce', '%message', array(
+    \Drupal::logger('mailchimp_ecommerce')->error('%message', array(
       '%message' => $message,
-    ), WATCHDOG_ERROR);
+    ));
   }
 }

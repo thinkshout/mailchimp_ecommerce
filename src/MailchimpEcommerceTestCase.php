@@ -1,9 +1,5 @@
 <?php
-
-/**
- * @file
- * Test class and methods for the Mailchimp eCommerce module.
- */
+namespace Drupal\mailchimp_ecommerce;
 
 /**
  * Tests for MailChimp eCommerce core integration.

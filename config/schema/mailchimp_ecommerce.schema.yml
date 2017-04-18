@@ -1,0 +1,14 @@
+mailchimp_ecommerce.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    mailchimp_ecommerce_store_name:
+      type: string
+    mailchimp_ecommerce_list_id:
+      type: string
+    mailchimp_ecommerce_opt_in_status:
+      type: string
+    mailchimp_ecommerce_store_id:
+      type: 'NULL'
+    mailchimp_ecommerce_integration:
+      type: string

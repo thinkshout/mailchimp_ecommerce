@@ -1,0 +1,4 @@
+mailchimp_ecommerce.admin_settings:
+  route_name: mailchimp_ecommerce.admin_settings
+  title: eCommerce
+  weight: 20

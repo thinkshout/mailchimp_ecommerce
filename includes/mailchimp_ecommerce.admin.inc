@@ -16,7 +16,7 @@ function mailchimp_ecommerce_admin_settings() {
     '#type' => 'textfield',
     '#title' => t('Store Name'),
     '#required' => TRUE,
-    '#default_value' => variable_get('mailchimp_ecommerce_store_name', ''),
+    '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_name'),
     '#description' => t('The name of your store as it should appear in your MailChimp account.'),
   ];
 
@@ -29,8 +29,12 @@ function mailchimp_ecommerce_admin_settings() {
     $list_options[$list_id] = $list->name;
   }
 
-  if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
-    $existing_store_id = variable_get('mailchimp_ecommerce_list_id');
+  if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'))) {
+    // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/mailchimp_ecommerce.settings.yml and config/schema/mailchimp_ecommerce.schema.yml.
+$existing_store_id = \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id');
     $form['mailchimp_ecommerce_list_id_existing'] = [
       '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . $list_options[$existing_store_id],
     ];
@@ -41,7 +45,7 @@ function mailchimp_ecommerce_admin_settings() {
       '#title' => t('Store List'),
       '#required' => TRUE,
       '#options' => $list_options,
-      '#default_value' => variable_get('mailchimp_ecommerce_list_id', ''),
+      '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'),
     ];
   }
 
@@ -76,7 +80,7 @@ function mailchimp_ecommerce_admin_settings() {
      the users will be added as "transactional" users. Transactional users
      cannot be changed via the MailChimp UI. Changing the status of a 
      "transactional" user call only be accomplished via the API. For additional
-     information, please read the') . ' ' . l(t('MailChimp Documentation.'), 'http://developer.mailchimp.com/documentation/mailchimp/guides/getting-started-with-ecommerce/#about-subscribers-and-customers', ['external' => TRUE]),
+     information, please read the') . ' ' . \Drupal::l(t('MailChimp Documentation.'), \Drupal\Core\Url::fromUri('http://developer.mailchimp.com/documentation/mailchimp/guides/getting-started-with-ecommerce/#about-subscribers-and-customers')),
   ];
 
   $form['mailchimp_ecommerce_opt_in']['mailchimp_ecommerce_opt_in_status'] = [
@@ -84,7 +88,7 @@ function mailchimp_ecommerce_admin_settings() {
     '#title' => t('Opt-In Status For Customers'),
     '#required' => TRUE,
     '#options' => $list_options,
-    '#default_value' => variable_get('mailchimp_ecommerce_opt_in_status', ''),
+    '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_opt_in_status'),
     '#description' => t('Choose your opt-in status before using this module.'),
   ];
 
@@ -98,10 +102,10 @@ function mailchimp_ecommerce_admin_settings() {
  * Submit handler for the MailChimp eCommerce form.
  */
 function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
-  $store_id = variable_get('mailchimp_ecommerce_store_id', NULL);
-  if (variable_get('mailchimp_ecommerce_store_id', NULL) == NULL) {
+  $store_id = \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id');
+  if (\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id') == NULL) {
     $store_id = mailchimp_ecommerce_generate_store_id();
-    variable_set('mailchimp_ecommerce_store_id', $store_id);
+    \Drupal::configFactory()->getEditable('mailchimp_ecommerce.settings')->set('mailchimp_ecommerce_store_id', $store_id)->save();
   }
 
   if ($store_id != NULL) {
@@ -109,18 +113,22 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
 
     // Save value as boolean.
     if ($form_state['values']['mailchimp_ecommerce_opt_in_status'] == 1) {
-      variable_set('mailchimp_ecommerce_opt_in_status', TRUE);
+      \Drupal::configFactory()->getEditable('mailchimp_ecommerce.settings')->set('mailchimp_ecommerce_opt_in_status', TRUE)->save();
     }
     else {
-      variable_set('mailchimp_ecommerce_opt_in_status', FALSE);
+      \Drupal::configFactory()->getEditable('mailchimp_ecommerce.settings')->set('mailchimp_ecommerce_opt_in_status', FALSE)->save();
     }
 
     // Determine if a store is being created or updated.
     $existing_store = mailchimp_ecommerce_get_store($store_id);
 
     if (empty($existing_store)) {
-      $store = [
-        'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
+      // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/mailchimp_ecommerce.settings.yml and config/schema/mailchimp_ecommerce.schema.yml.
+$store = [
+        'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'),
         'name' => $form_state['values']['mailchimp_ecommerce_store_name'],
         'currency_code' => $currency,
       ];

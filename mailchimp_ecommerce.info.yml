@@ -1,0 +1,9 @@
+name: 'MailChimp eCommerce'
+description: 'Integrates Drupal-based shopping carts with MailChimp eCommerce.'
+package: MailChimp
+core: 8.x
+php: '5.5'
+dependencies:
+  - mailchimp
+  - mailchimp_lists
+type: module
