@@ -23,7 +23,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
 
   $first_name = '';
   $last_name = '';
-  $user = user_load($customer_profile->uid);
+  $user = \Drupal::entityManager()->getStorage('user')->load($customer_profile->uid);
 
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
@@ -69,7 +69,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   }
   $first_name = '';
   $last_name = '';
-  $user = user_load($customer_profile->uid);
+  $user = \Drupal::entityManager()->getStorage('user')->load($customer_profile->uid);
 
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
@@ -312,7 +312,7 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  *   Throws an exception if Opt In Status is not set.
  */
 function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
-  $user = user_load($order_wrapper->uid->raw());
+  $user = \Drupal::entityManager()->getStorage('user')->load($order_wrapper->uid->raw());
   $customer = [];
   $billing_address = [];
   $lines = [];
@@ -355,9 +355,14 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
     }
   }
   // Pull optin status.
-  $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
+  // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $optinstatus = variable_get('mailchimp_ecommerce_opt_in_status', NULL);
+
   if (empty($optinstatus)) {
-    watchdog('mailchimp_ecommerce', 'Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.', [], WATCHDOG_ERROR);
+    \Drupal::logger('mailchimp_ecommerce')->error('Optin Status has not been set. See admin/config/services/mailchimp/ecommerce.', []);
     throw new Exception('Optin Status is not set in the MailChimp Ecommerce Module');
   }
   // Customer parameters used in the 'customer' portions of the API wrapper.
