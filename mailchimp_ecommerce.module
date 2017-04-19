@@ -6,27 +6,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function mailchimp_ecommerce_menu() {
-  $items = array();
-
-  $items['admin/config/services/mailchimp/ecommerce'] = array(
-    'title' => 'eCommerce',
-    'description' => 'Configure MailChimp eCommerce.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('mailchimp_ecommerce_admin_settings'),
-    'access callback' => 'mailchimp_apikey_ready_access',
-    'access arguments' => array('administer mailchimp'),
-    'file' => 'includes/mailchimp_ecommerce.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 20,
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_page_build().
  */
 function mailchimp_ecommerce_page_build(&$page) {
