@@ -1,0 +1,5 @@
+services:
+  mailchimp_ecommerce_commerce.route_subscriber:
+    class: '\Drupal\mailchimp_ecommerce_commerce\Routing\RouteSubscriber'
+    tags:
+      - { name: event_subscriber }

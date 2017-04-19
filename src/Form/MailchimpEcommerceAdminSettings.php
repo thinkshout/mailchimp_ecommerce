@@ -45,6 +45,9 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     return ['mailchimp_ecommerce.settings'];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $form['mailchimp_ecommerce_notice'] = [
       '#markup' => t('This page will allow you to create a store. Once created, you cannot change the list associated with the store.')
