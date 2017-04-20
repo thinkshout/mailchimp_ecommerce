@@ -4,7 +4,7 @@ services:
     tags:
       - { name: event_subscriber }
 
-  product_event_subscriber:
+  mailchimp_ecommerce_commerce.product_event_subscriber:
     class: '\Drupal\mailchimp_ecommerce_commerce\EventSubscriber\ProductEventSubscriber'
     tags:
       - { name: event_subscriber }
