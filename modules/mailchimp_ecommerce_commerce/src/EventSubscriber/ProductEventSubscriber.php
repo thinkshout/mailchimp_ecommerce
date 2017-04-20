@@ -33,8 +33,20 @@ class ProductEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after saving a new product.
    */
   public function productInsert(ProductEvent $event) {
-    // TODO: Send product data to MailChimp.
     $product = $event->getProduct();
+
+    $product_id = $product->get('product_id')->value;
+    $product_variant_id = '';
+    $title = $product->get('title')->value;
+    $description = $product->get('body')->value;
+    // TODO: Get product type.
+    $type = '';
+    // TODO: Get product SKU.
+    $sku = '';
+    // TODO: Get product price.
+    $price = 0;
+
+    $this->product_handler->addProduct($product_id, $product_variant_id, $title, $description, $type, $sku, $price);
   }
 
   /**

@@ -128,16 +128,6 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 }
 
 /**
- * Implements hook_commerce_product_insert().
- */
-//function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
-//  $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
-//  $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
-//  // TODO: Get product description from product display, if available.
-//  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $price);
-//}
-
-/**
  * Implements hook_commerce_product_update().
  */
 //function mailchimp_ecommerce_commerce_commerce_product_update($product) {
