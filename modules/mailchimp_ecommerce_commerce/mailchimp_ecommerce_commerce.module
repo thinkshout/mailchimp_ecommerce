@@ -163,9 +163,8 @@ function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
     'operations' => [],
   ];
 
-  $query = new EntityFieldQuery();
-  $result = $query->entityCondition('entity_type', 'commerce_product')
-    ->execute();
+  $query = \Drupal::entityQuery('commerce_product');
+  $result = $query->execute();
 
   if (isset($result['commerce_product'])) {
     $product_ids = array_keys($result['commerce_product']);

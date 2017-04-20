@@ -168,4 +168,3 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
   }
 
 }
-?>
