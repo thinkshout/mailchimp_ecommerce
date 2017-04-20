@@ -1,0 +1,3 @@
+services:
+  mailchimp_ecommerce.product_handler:
+    class: '\Drupal\mailchimp_ecommerce\ProductHandler'
