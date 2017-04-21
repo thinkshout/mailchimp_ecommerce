@@ -1,3 +1,9 @@
 services:
+  mailchimp_ecommerce.order_handler:
+    class: '\Drupal\mailchimp_ecommerce\OrderHandler'
+
   mailchimp_ecommerce.product_handler:
     class: '\Drupal\mailchimp_ecommerce\ProductHandler'
+
+  mailchimp_ecommerce.store_handler:
+    class: '\Drupal\mailchimp_ecommerce\StoreHandler'
