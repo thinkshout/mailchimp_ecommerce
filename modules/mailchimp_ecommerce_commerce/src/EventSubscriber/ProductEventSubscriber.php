@@ -50,11 +50,26 @@ class ProductEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Respond to event fired after updating an existing product.
+   */
+  public function productUpdate(ProductEvent $event) {
+
+  }
+
+  /**
+   * Respond to event fired after deleting a product.
+   */
+  public function productDelete(ProductEvent $event) {
+
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    // TODO: Add product update / delete events.
     $events[ProductEvents::PRODUCT_INSERT][] = ['productInsert'];
+    $events[ProductEvents::PRODUCT_UPDATE][] = ['productUpdate'];
+    $events[ProductEvents::PRODUCT_DELETE][] = ['productDelete'];
 
     return $events;
   }
