@@ -18,9 +18,9 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
   /**
    * The Store Context Interface.
    *
-   * @var \Drupal\commerce_store\StoreContextInterface $storeContext
+   * @var \Drupal\commerce_store\StoreContextInterface $store_context
    */
-  private $storeContext;
+  private $store_context;
 
   /**
    * MailchimpEcommerceCommerceAdminSettings constructor.
@@ -33,7 +33,7 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
   public function __construct(ConfigFactoryInterface $config_factory, StoreContextInterface $store_context) {
     parent::__construct($config_factory);
 
-    $this->storeContext = $store_context;
+    $this->store_context = $store_context;
   }
 
   /**
@@ -54,7 +54,7 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
 
     // This is the currently active store according to Drupal Commerce.
     // Commerce allows multiple stores in D8 - may need to consider that here.
-    $store = $this->storeContext->getStore();
+    $store = $this->store_context->getStore();
 
     if (!empty($store)) {
       // Set default currency code for the MailChimp store.

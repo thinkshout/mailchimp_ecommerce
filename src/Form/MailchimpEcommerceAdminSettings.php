@@ -7,11 +7,45 @@
 
 namespace Drupal\mailchimp_ecommerce\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\mailchimp_ecommerce\StoreHandlerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MailchimpEcommerceAdminSettings extends ConfigFormBase {
+
+  /**
+   * The Store Handler Interface.
+   *
+   * @var \Drupal\mailchimp_ecommerce\StoreHandler $store_handler
+   */
+  private $store_handler;
+
+  /**
+   * MailchimpEcommerceAdminSettings constructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The Config Factory Interface.
+   * @param \Drupal\mailchimp_ecommerce\StoreHandlerInterface $store_handler
+   *   The Store Handler Interface.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, StoreHandlerInterface $store_handler) {
+    parent::__construct($config_factory);
+
+    $this->store_handler = $store_handler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('mailchimp_ecommerce.store_handler')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -50,8 +84,8 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    */
   public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
     $form['mailchimp_ecommerce_notice'] = [
-      '#markup' => t('This page will allow you to create a store. Once created, you cannot change the list associated with the store.')
-      ];
+      '#markup' => t('This page will allow you to create a store. Once created, you cannot change the list associated with the store.'),
+    ];
     $form['mailchimp_ecommerce_store_name'] = [
       '#type' => 'textfield',
       '#title' => t('Store Name'),
@@ -70,8 +104,8 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id'))) {
       $existing_store_id = \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_list_id');
       $form['mailchimp_ecommerce_list_id_existing'] = [
-        '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . $list_options[$existing_store_id]
-        ];
+        '#markup' => t('Once created, the list cannot be changed for a given store. This store is connected to the list named') . ' ' . $list_options[$existing_store_id],
+      ];
     }
     else {
       $form['mailchimp_ecommerce_list_id'] = [
@@ -112,8 +146,8 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
      the users will be added as "transactional" users. Transactional users
      cannot be changed via the MailChimp UI. Changing the status of a 
      "transactional" user call only be accomplished via the API. For additional
-     information, please read the') . ' ' . \Drupal::l(t('MailChimp Documentation.'), \Drupal\Core\Url::fromUri('http://developer.mailchimp.com/documentation/mailchimp/guides/getting-started-with-ecommerce/#about-subscribers-and-customers'))
-      ];
+     information, please read the') . ' ' . \Drupal::l(t('MailChimp Documentation.'), \Drupal\Core\Url::fromUri('http://developer.mailchimp.com/documentation/mailchimp/guides/getting-started-with-ecommerce/#about-subscribers-and-customers')),
+    ];
 
     $form['mailchimp_ecommerce_opt_in']['mailchimp_ecommerce_opt_in_status'] = [
       '#type' => 'select',
@@ -149,7 +183,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       }
 
       // Determine if a store is being created or updated.
-      $existing_store = mailchimp_ecommerce_get_store($store_id);
+      $existing_store = $this->store_handler->getStore($store_id);
 
       if (empty($existing_store)) {
         $store = [
@@ -158,10 +192,11 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
           'currency_code' => $currency,
         ];
 
-        mailchimp_ecommerce_add_store($store_id, $store);
+        $this->store_handler->addStore($store_id, $store);
       }
       else {
-        mailchimp_ecommerce_update_store($store_id, $form_state->getValue(['mailchimp_ecommerce_store_name']), $currency);
+
+        $this->store_handler->updateStore($store_id, $form_state->getValue(['mailchimp_ecommerce_store_name']), $currency);
       }
     }
 
