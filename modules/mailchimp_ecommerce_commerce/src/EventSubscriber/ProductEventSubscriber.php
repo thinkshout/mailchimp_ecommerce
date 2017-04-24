@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce_commerce\EventSubscriber;
 
+use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Event\ProductEvent;
 use Drupal\commerce_product\Event\ProductEvents;
 use Drupal\mailchimp_ecommerce\ProductHandler;
@@ -36,17 +37,35 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     $product = $event->getProduct();
 
     $product_id = $product->get('product_id')->value;
-    $product_variant_id = '';
     $title = $product->get('title')->value;
     $description = $product->get('body')->value;
     // TODO: Get product type.
     $type = '';
-    // TODO: Get product SKU.
-    $sku = '';
-    // TODO: Get product price.
-    $price = 0;
 
-    $this->product_handler->addProduct($product_id, $product_variant_id, $title, $description, $type, $sku, $price);
+    $variants = [];
+
+    $product_variations = $product->get('variations')->getValue();
+    if (!empty($product_variations)) {
+      foreach ($product_variations as $variation_data) {
+        /** @var ProductVariation $product_variation */
+        $product_variation = ProductVariation::load($variation_data['target_id']);
+
+        $variant = [
+          'id' => $product_variation->id(),
+          'title' => $product_variation->getTitle(),
+          'sku' => $product_variation->getSku(),
+          // Product variations contain a currency code, but MailChimp requires
+          // store currency to be set at the point when the store is created, so
+          // the variation currency is ignored here.
+          // TODO: Make sure the user knows this through a form hint.
+          'price' => $product_variation->getPrice()->getNumber(),
+        ];
+
+        $variants[] = $variant;
+      }
+    }
+
+    $this->product_handler->addProduct($product_id, $title, $description, $type, $variants);
   }
 
   /**
