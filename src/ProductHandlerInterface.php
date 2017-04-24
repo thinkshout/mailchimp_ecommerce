@@ -20,21 +20,18 @@ interface ProductHandlerInterface {
    *
    * @param string $product_id
    *   Unique ID of the product.
-   * @param string $product_variant_id
-   *   ID of the product variant.
-   *   May be identical to $product_id for single products.
    * @param string $title
    *   The product title.
    * @param string $description
    *   The product description.
    * @param string $type
    *   The product type.
-   * @param string $sku
-   *   The product SKU.
-   * @param float $price
-   *   The product price.
+   * @param array $variants
+   *   An array of product variants. Structure defined in documentation below.
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/products/#create-post_ecommerce_stores_store_id_products
    */
-  public function addProduct($product_id, $product_variant_id, $title, $description, $type, $sku, $price);
+  public function addProduct($product_id, $title, $description, $type, $variants);
 
   /**
    * Updates an existing product in MailChimp.
