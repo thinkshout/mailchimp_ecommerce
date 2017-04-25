@@ -81,12 +81,23 @@ class ProductEventSubscriber implements EventSubscriberInterface {
         /** @var ProductVariation $product_variation */
         $product_variation = ProductVariation::load($variation_data['target_id']);
 
-        // TODO: Check MailChimp for existing variant. If not found, create.
-        $this->product_handler->updateProduct($product_id,
-          $product_variation->id(),
-          $product_variation->getTitle(),
-          $product_variation->getSku(),
-          $product_variation->getPrice()->getNumber());
+        $existing_variant = $this->product_handler->getProductVariant($product_id, $product_variation->id());
+        if ($existing_variant == NULL) {
+          // Create a new product variant.
+          $this->product_handler->addProductVariant($product_id,
+            $product_variation->id(),
+            $product_variation->getTitle(),
+            $product_variation->getSku(),
+            $product_variation->getPrice()->getNumber());
+        }
+        else {
+          // Update the existing product variant.
+          $this->product_handler->updateProduct($product_id,
+            $product_variation->id(),
+            $product_variation->getTitle(),
+            $product_variation->getSku(),
+            $product_variation->getPrice()->getNumber());
+        }
       }
     }
   }

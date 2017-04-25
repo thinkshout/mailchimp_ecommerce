@@ -26,7 +26,7 @@ class ProductHandler implements ProductHandlerInterface {
       ]);
     }
     catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to update product: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to add product: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
   }
@@ -78,20 +78,52 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
+  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price) {
+    try {
+      $store_id = mailchimp_ecommerce_get_store_id();
+      if (empty($store_id)) {
+        throw new \Exception('Cannot add a product variant without a store ID.');
+      }
+
+      /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+      $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+      $mc_ecommerce->addProductVariant($store_id, $product_id, [
+        'id' => $product_variant_id,
+        'title' => $title,
+        'sku' => $sku,
+        'price' => $price,
+      ]);
+    }
+    catch (\Exception $e) {
+      mailchimp_ecommerce_log_error_message('Unable to add product variant: ' . $e->getMessage());
+      drupal_set_message($e->getMessage(), 'error');
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function getProductVariant($product_id, $product_variant_id) {
     $product_variant = NULL;
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
-        throw new \Exception('Cannot delete a product without a store ID.');
+        throw new \Exception('Cannot get a product variant without a store ID.');
       }
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
       $product_variant = $mc_ecommerce->getProductVariant($store_id, $product_id, $product_variant_id);
+
+      // MailChimp will return a product variant object even if the variant
+      // doesn't exist. Checking for an empty SKU is a reliable way to
+      // determine if a product variant doesn't exist in MailChimp.
+      if (empty($product_variant->sku)) {
+        return NULL;
+      }
     }
     catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to delete product: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to get product variant: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
 

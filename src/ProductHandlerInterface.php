@@ -63,6 +63,22 @@ interface ProductHandlerInterface {
   public function deleteProduct($product_id);
 
   /**
+   * Adds a new product variant to MailChimp.
+   *
+   * @param string $product_id
+   *   Unique ID of the product.
+   * @param string $product_variant_id
+   *   ID of the product variant.
+   * @param string $title
+   *   The product title.
+   * @param string $sku
+   *   The product SKU.
+   * @param float $price
+   *   The product price.
+   */
+  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price);
+
+  /**
    * Gets a product variant from MailChimp.
    *
    * @param string $product_id
