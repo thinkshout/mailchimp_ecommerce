@@ -34,21 +34,21 @@ class CartEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after adding a cart item.
    */
   public function cartAdd(CartEntityAddEvent $event) {
-
+    // TODO: Process item addition to cart.
   }
 
   /**
    * Respond to event fired after updating a cart item.
    */
   public function cartItemUpdate(CartOrderItemRemoveEvent $event) {
-
+    // TODO: Process item update in cart.
   }
 
   /**
    * Respond to event fired after removing a cart item.
    */
   public function cartItemRemove(CartOrderItemRemoveEvent $event) {
-
+    // TODO: Process item removal from cart.
   }
 
   /**

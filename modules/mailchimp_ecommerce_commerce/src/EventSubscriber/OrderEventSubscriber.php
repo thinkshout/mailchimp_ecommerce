@@ -33,14 +33,14 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after saving a new order.
    */
   public function orderInsert(OrderEvent $event) {
-
+    // TODO: Process order creation.
   }
 
   /**
    * Respond to event fired after updating an existing order.
    */
   public function orderUpdate(OrderEvent $event) {
-
+    // TODO: Process order update.
   }
 
   /**

@@ -39,8 +39,7 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     $product_id = $product->get('product_id')->value;
     $title = $product->get('title')->value;
     $description = $product->get('body')->value;
-    // TODO: Get product type.
-    $type = '';
+    $type = $product->get('type')->value;
 
     $variants = [];
 
@@ -72,14 +71,30 @@ class ProductEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after updating an existing product.
    */
   public function productUpdate(ProductEvent $event) {
+    $product = $event->getProduct();
 
+    $product_id = $product->get('product_id')->value;
+
+    $product_variations = $product->get('variations')->getValue();
+    if (!empty($product_variations)) {
+      foreach ($product_variations as $variation_data) {
+        /** @var ProductVariation $product_variation */
+        $product_variation = ProductVariation::load($variation_data['target_id']);
+
+        $this->product_handler->updateProduct($product_id,
+          $product_variation->id(),
+          $product_variation->getTitle(),
+          $product_variation->getSku(),
+          $product_variation->getPrice()->getNumber());
+      }
+    }
   }
 
   /**
    * Respond to event fired after deleting a product.
    */
   public function productDelete(ProductEvent $event) {
-
+    // TODO: Process deleted product.
   }
 
   /**
