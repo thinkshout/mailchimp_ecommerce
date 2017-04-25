@@ -63,6 +63,19 @@ interface ProductHandlerInterface {
   public function deleteProduct($product_id);
 
   /**
+   * Gets a product variant from MailChimp.
+   *
+   * @param string $product_id
+   *   Unique ID of the product.
+   * @param string $product_variant_id
+   *   ID of the product variant.
+   *
+   * @return object
+   *   MailChimp product variant object.
+   */
+  public function getProductVariant($product_id, $product_variant_id);
+
+  /**
    * Deletes a product variant in MailChimp.
    *
    * Automatically deletes the product if the only product variant is removed.

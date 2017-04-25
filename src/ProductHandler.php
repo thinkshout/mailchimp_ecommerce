@@ -78,6 +78,29 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
+  public function getProductVariant($product_id, $product_variant_id) {
+    $product_variant = NULL;
+    try {
+      $store_id = mailchimp_ecommerce_get_store_id();
+      if (empty($store_id)) {
+        throw new \Exception('Cannot delete a product without a store ID.');
+      }
+
+      /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+      $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+      $product_variant = $mc_ecommerce->getProductVariant($store_id, $product_id, $product_variant_id);
+    }
+    catch (\Exception $e) {
+      mailchimp_ecommerce_log_error_message('Unable to delete product: ' . $e->getMessage());
+      drupal_set_message($e->getMessage(), 'error');
+    }
+
+    return $product_variant;
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function deleteProductVariant($product_id, $product_variant_id) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
