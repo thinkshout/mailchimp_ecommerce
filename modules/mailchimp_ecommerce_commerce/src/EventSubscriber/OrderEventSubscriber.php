@@ -2,8 +2,11 @@
 
 namespace Drupal\mailchimp_ecommerce_commerce\EventSubscriber;
 
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderEvents;
+use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\OrderHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,13 +23,23 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   private $order_handler;
 
   /**
+   * The Cart Handler.
+   *
+   * @var \Drupal\mailchimp_ecommerce\CartHandler
+   */
+  private $cart_handler;
+
+  /**
    * OrderEventSubscriber constructor.
    *
    * @param \Drupal\mailchimp_ecommerce\OrderHandler $order_handler
    *   The Order Handler.
+   * @param \Drupal\mailchimp_ecommerce\CartHandler $cart_handler
+   *   The Cart Handler.
    */
-  public function __construct(OrderHandler $order_handler) {
+  public function __construct(OrderHandler $order_handler, CartHandler $cart_handler) {
     $this->order_handler = $order_handler;
+    $this->cart_handler = $cart_handler;
   }
 
   /**
@@ -44,11 +57,36 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Respond to event fired after assigning an anonymous order to a user.
+   */
+  public function orderAssign(OrderAssignEvent $event) {
+    /** @var Order $order */
+    $order = $this->order_handler->buildOrder($event->getOrder());
+
+    // An anomymous user has logged in or created an account after populating
+    // a cart with items. This is the first point we can send this cart to
+    // MailChimp as we are now able to get the user's email address.
+    $account = $event->getAccount();
+
+    $customer = [
+      'id' => $account->id(),
+      'email_address' => $account->getEmail(),
+      // TODO: Get opt_in_status from settings.
+      'opt_in_status' => '',
+    ];
+
+    // MailChimp considers any order to be a cart until the order is complete.
+    // This order is created as a cart in MailChimp when assigned to the user.
+    $this->cart_handler->addCart($order->id(), $customer, $order);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     $events[OrderEvents::ORDER_INSERT][] = ['orderInsert'];
     $events[OrderEvents::ORDER_UPDATE][] = ['orderUpdate'];
+    $events[OrderEvents::ORDER_ASSIGN][] = ['orderAssign'];
 
     return $events;
   }

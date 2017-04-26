@@ -1,6 +1,9 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
+use Mailchimp\MailchimpAPIException;
 
 /**
  * Order handler.
@@ -77,6 +80,57 @@ class OrderHandler implements OrderHandlerInterface {
       mailchimp_ecommerce_log_error_message('Unable to update an order: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
+  }
+
+  /**
+   * Returns customer and order data formatted for use with MailChimp.
+   *
+   * @param \Drupal\commerce_order\Entity\Order $order
+   *   The Commerce Order.
+   *
+   * @return array
+   *   Array of order data.
+   */
+  public function buildOrder(Order $order) {
+    // TODO: Get billing address from $order->billing_profile when available.
+    $billing_address = [
+      'name' => '',
+      'address1' => '',
+      'address2' => '',
+      'city' => '',
+      'province_code' => '',
+      'postal_code' => '',
+      'country_code' => '',
+      'company' => '',
+    ];
+
+    $order_items = $order->getItems();
+
+    $lines = [];
+
+    /** @var OrderItem $order_item */
+    foreach ($order_items as $order_item) {
+      $line = [
+        'id' => $order_item->id(),
+        'product_id' => $order_item->getPurchasedEntityId(),
+        // TODO: Figure out how to differentiate between product and variant ID here.
+        'product_variant_id' => $order_item->getPurchasedEntityId(),
+        'quantity' => (int) $order_item->getQuantity(),
+        'price' => $order_item->getUnitPrice(),
+      ];
+
+      $lines[] = $line;
+    }
+
+    $order_data = [
+      'currency_code' => $order->getTotalPrice()->getCurrencyCode(),
+      'order_total' => $order->getTotalPrice()->getNumber(),
+      'billing_address' => $billing_address,
+      'processed_at_foreign' => date('c'),
+      'lines' => $lines,
+    ];
+
+    return $order_data;
   }
 
 }
