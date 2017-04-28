@@ -69,7 +69,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    */
   public function orderAssign(OrderAssignEvent $event) {
     /** @var \Drupal\commerce_order\Entity\Order $order */
-    $order = $this->order_handler->buildOrder($event->getOrder());
+    $order = $event->getOrder();
 
     // An anonymous user has logged in or created an account after populating
     // a cart with items. This is the first point we can send this cart to
@@ -87,7 +87,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
-    $this->cart_handler->addCart($order->id(), $customer, $order);
+    $order_data = $this->order_handler->buildOrder($event->getOrder());
+    $this->cart_handler->addCart($order->id(), $customer, $order_data);
   }
 
   /**
