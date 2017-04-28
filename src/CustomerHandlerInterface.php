@@ -26,7 +26,7 @@ interface CustomerHandlerInterface {
    *
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/customers/#create-post_ecommerce_stores_store_id_customers
    */
-  public function addCustomer($customer);
+  public function addOrUpdateCustomer($customer);
 
   /**
    * Update a customer record in Mailchimp.

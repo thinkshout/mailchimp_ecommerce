@@ -116,7 +116,7 @@ class OrderHandler implements OrderHandlerInterface {
         // TODO: Figure out how to differentiate between product and variant ID here.
         'product_variant_id' => $order_item->getPurchasedEntityId(),
         'quantity' => (int) $order_item->getQuantity(),
-        'price' => $order_item->getUnitPrice(),
+        'price' => $order_item->getUnitPrice()->getNumber(),
       ];
 
       $lines[] = $line;

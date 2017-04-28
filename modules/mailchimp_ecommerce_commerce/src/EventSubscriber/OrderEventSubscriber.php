@@ -80,10 +80,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       'id' => $account->id(),
       'email_address' => $account->getEmail(),
       // TODO: Get opt_in_status from settings.
-      'opt_in_status' => '',
+      'opt_in_status' => TRUE,
     ];
 
-    $this->customer_handler->addCustomer($customer);
+    $this->customer_handler->addOrUpdateCustomer($customer);
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.

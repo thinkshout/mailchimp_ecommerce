@@ -38,13 +38,13 @@ class CustomerHandler implements CustomerHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addCustomer($customer) {
+  public function addOrUpdateCustomer($customer) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       $list_id = mailchimp_ecommerce_get_list_id();
 
       if (empty($store_id)) {
-        throw new \Exception('Cannot add a customer without a store ID.');
+        throw new \Exception('Cannot add or update a customer without a store ID.');
       }
 
       // Pull member information to get member status.
@@ -61,44 +61,24 @@ class CustomerHandler implements CustomerHandlerInterface {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
-      $existing_customer = $mc_ecommerce->getCustomer($store_id, $customer['id']);
-      if (!empty($existing_customer)) {
-        $mc_ecommerce->updateCustomer($store_id, $customer);
+      try {
+        if (!empty($mc_ecommerce->getCustomer($store_id, $customer['id']))) {
+          $mc_ecommerce->updateCustomer($store_id, $customer);
+        }
       }
-      else {
-        $mc_ecommerce->addCustomer($store_id, $customer);
+      catch (\Exception $e) {
+        if ($e->getCode() == 404) {
+          // Customer doesn't exist; add a new customer.
+          $mc_ecommerce->addCustomer($store_id, $customer);
+        }
+        else {
+          // An actual error occurred; pass on the exception.
+          throw new \Exception($e->getMessage(), $e->getCode(), $e);
+        }
       }
     }
     catch (\Exception $e) {
       mailchimp_ecommerce_log_error_message('Unable to add a customer: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
-    }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function updateCustomer($customer) {
-    try {
-      $store_id = mailchimp_ecommerce_get_store_id();
-      $list_id = mailchimp_ecommerce_get_list_id();
-      if (empty($store_id)) {
-        throw new \Exception('Cannot update a customer without a store ID.');
-      }
-
-      /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
-      $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      // Pull member information to get member status.
-      $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
-      if (empty($memberinfo) || !isset($memberinfo->status)) {
-        // Cannot update a customer with no list member.
-        return;
-      }
-      $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
-      $mc_ecommerce->updateCustomer($store_id, $customer);
-    }
-    catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to update a customer: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
   }
