@@ -60,7 +60,14 @@ class CustomerHandler implements CustomerHandlerInterface {
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_ecommerce->addCustomer($store_id, $customer);
+
+      $existing_customer = $mc_ecommerce->getCustomer($store_id, $customer['id']);
+      if (!empty($existing_customer)) {
+        $mc_ecommerce->updateCustomer($store_id, $customer);
+      }
+      else {
+        $mc_ecommerce->addCustomer($store_id, $customer);
+      }
     }
     catch (\Exception $e) {
       mailchimp_ecommerce_log_error_message('Unable to add a customer: ' . $e->getMessage());
