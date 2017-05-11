@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce_commerce\EventSubscriber;
 
+use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderEvents;
@@ -61,7 +62,23 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after updating an existing order.
    */
   public function orderUpdate(OrderEvent $event) {
-    // TODO: Process order update.
+    /** @var \Drupal\commerce_order\Entity\Order $order */
+    $order = $event->getOrder();
+    $original_order = Order::load($order->id());
+
+    $order_state = $order->get('state')->value;
+    //$original_order_state = $original_order->get('original');
+
+    // On order completion, replace cart in MailChimp with order.
+    // TODO: Only perform action the first time an order has 'completed' status.
+    if ($order_state == 'completed') {
+      $this->cart_handler->deleteCart($order->id());
+
+      $customer = [];
+      $order = $this->order_handler->buildOrder($order);
+
+      $this->order_handler->addOrder($order->id(), $customer, $order);
+    }
   }
 
   /**
