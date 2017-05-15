@@ -75,9 +75,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $this->cart_handler->deleteCart($order->id());
 
       $customer = [];
-      $order = $this->order_handler->buildOrder($order);
+      $order_data = $this->order_handler->buildOrder($order);
 
-      $this->order_handler->addOrder($order->id(), $customer, $order);
+      $this->order_handler->addOrder($order->id(), $customer, $order_data);
     }
   }
 
