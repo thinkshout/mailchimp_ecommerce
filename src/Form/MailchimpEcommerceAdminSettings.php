@@ -166,7 +166,6 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     ];
 
     $settings_form = parent::buildForm($form, $form_state);
-    //$settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
     return $settings_form;
   }
