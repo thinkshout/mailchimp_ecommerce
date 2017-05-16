@@ -144,10 +144,9 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 //}
 
 /**
- * Implements hook_mailchimp_ecommerce_add_store().
+ * Begins a batch process to add existing Commerce products to MailChimp.
  */
-function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
-  // Add existing Drupal Commerce products to MailChimp.
+function mailchimp_ecommerce_commerce_batch_add_existing_products() {
   $batch = [
     'title' => t('Adding products to MailChimp'),
     'operations' => [],
@@ -156,8 +155,8 @@ function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
   $query = \Drupal::entityQuery('commerce_product');
   $result = $query->execute();
 
-  if (isset($result['commerce_product'])) {
-    $product_ids = array_keys($result['commerce_product']);
+  if (!empty($result)) {
+    $product_ids = array_keys($result);
 
     foreach ($product_ids as $product_id) {
       $batch['operations'][] = [
@@ -176,8 +175,19 @@ function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
  * Batch callback used to add a product to MailChimp.
  */
 function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) {
-  $product = commerce_product_load($product_id);
-  mailchimp_ecommerce_commerce_commerce_product_insert($product);
+  /** @var Drupal\commerce_product\Entity\Product $product */
+  $product = \Drupal\commerce_product\Entity\Product::load($product_id);
+
+  $title = $product->get('title')->value;
+  $description = $product->get('body')->value;
+  $type = $product->get('type')->value;
+
+  /** @var \Drupal\mailchimp_ecommerce\ProductHandler $product_handler */
+  $product_handler = \Drupal::service('mailchimp_ecommerce.product_handler');
+
+  $variants = $product_handler->buildProductVariants($product);
+
+  $product_handler->addProduct($product_id, $title, $description, $type, $variants);
 }
 
 /**

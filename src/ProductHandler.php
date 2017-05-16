@@ -2,6 +2,9 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\commerce_product\Entity\Product;
+use Drupal\commerce_product\Entity\ProductVariation;
+
 /**
  * Product handler.
  */
@@ -170,6 +173,50 @@ class ProductHandler implements ProductHandlerInterface {
       mailchimp_ecommerce_log_error_message('Unable to delete product variant: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
+  }
+
+  /**
+   * Returns product variant data formatted for use with MailChimp.
+   *
+   * @param \Drupal\commerce_product\Entity\Product $product
+   *   The Commerce Product.
+   *
+   * @return array
+   *   Array of product variant data.
+   */
+  public function buildProductVariants(Product $product) {
+    $variants = [];
+
+    $product_variations = $product->get('variations')->getValue();
+    if (!empty($product_variations)) {
+      foreach ($product_variations as $variation_data) {
+        /** @var ProductVariation $product_variation */
+        $product_variation = ProductVariation::load($variation_data['target_id']);
+
+        $variant = [
+          'id' => $product_variation->id(),
+          'title' => $product_variation->getTitle(),
+          'sku' => $product_variation->getSku(),
+        ];
+
+        $price = $product_variation->getPrice();
+        if (!empty($price)) {
+          $variant['price'] = $price->getNumber();
+        }
+        else {
+          $variant['price'] = 0;
+        }
+
+        // Product variations contain a currency code, but MailChimp requires
+        // store currency to be set at the point when the store is created, so
+        // the variation currency is ignored here.
+        // TODO: Make sure the user knows this through a form hint.
+
+        $variants[] = $variant;
+      }
+    }
+
+    return $variants;
   }
 
 }
