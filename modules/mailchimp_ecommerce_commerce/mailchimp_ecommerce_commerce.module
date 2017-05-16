@@ -40,9 +40,9 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
   /** @var Drupal\commerce_product\Entity\Product $product */
   $product = \Drupal\commerce_product\Entity\Product::load($product_id);
 
-  $title = $product->get('title')->value;
-  $description = $product->get('body')->value;
-  $type = $product->get('type')->value;
+  $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
+  $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
+  $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
 
   /** @var \Drupal\mailchimp_ecommerce\ProductHandler $product_handler */
   $product_handler = \Drupal::service('mailchimp_ecommerce.product_handler');
