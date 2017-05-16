@@ -39,9 +39,9 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     $product = $event->getProduct();
 
     $product_id = $product->get('product_id')->value;
-    $title = $product->get('title')->value;
-    $description = $product->get('body')->value;
-    $type = $product->get('type')->value;
+    $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
+    $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
+    $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
 
     $variants = $this->product_handler->buildProductVariants($product);
 

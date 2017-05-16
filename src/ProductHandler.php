@@ -23,7 +23,7 @@ class ProductHandler implements ProductHandlerInterface {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
-      $mc_ecommerce->addProduct($store_id, $product_id, $title, $variants, [
+      $mc_ecommerce->addProduct($store_id, (string) $product_id, $title, $variants, [
         'description' => $description,
         'type' => $type,
       ]);
