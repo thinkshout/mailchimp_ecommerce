@@ -44,6 +44,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    *   The Order Handler.
    * @param \Drupal\mailchimp_ecommerce\CartHandler $cart_handler
    *   The Cart Handler.
+   * @param \Drupal\mailchimp_ecommerce\CustomerHandler $customer_handler
+   *   The Customer Handler.
    */
   public function __construct(OrderHandler $order_handler, CartHandler $cart_handler, CustomerHandler $customer_handler) {
     $this->order_handler = $order_handler;
@@ -55,24 +57,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after saving a new order.
    */
   public function orderInsert(OrderEvent $event) {
-    /** @var \Drupal\commerce_order\Entity\Order $order */
-    $order = $event->getOrder();
 
-    // Process order for existing users.
-    $account = $order->getCustomer();
-
-    if (!empty($account)) {
-      $customer = $this->customer_handler->buildCustomer($account);
-
-      $this->customer_handler->addOrUpdateCustomer($customer);
-
-      // MailChimp considers any order to be a cart until the order is complete.
-      // This order is created as a cart in MailChimp when assigned to the user.
-      $order_data = $this->order_handler->buildOrder($event->getOrder());
-      $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
-    }
-
-    // TODO: Process order for guests with no user.
   }
 
   /**

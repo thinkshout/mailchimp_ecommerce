@@ -6,7 +6,7 @@ services:
 
   mailchimp_ecommerce_commerce.cart_event_subscriber:
     class: '\Drupal\mailchimp_ecommerce_commerce\EventSubscriber\CartEventSubscriber'
-    arguments: ['@mailchimp_ecommerce.cart_handler']
+    arguments: ['@mailchimp_ecommerce.cart_handler', '@mailchimp_ecommerce.order_handler', '@mailchimp_ecommerce.customer_handler']
     tags:
       - { name: event_subscriber }
 
