@@ -59,7 +59,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order = $event->getOrder();
 
     // Process order for existing users.
-    $account = $event->getAccount();
+    $account = $order->getCustomer();
 
     if (!empty($account)) {
       $customer = $this->customer_handler->buildCustomer($account);
@@ -69,8 +69,6 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       // MailChimp considers any order to be a cart until the order is complete.
       // This order is created as a cart in MailChimp when assigned to the user.
       $order_data = $this->order_handler->buildOrder($event->getOrder());
-      $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
-
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
 

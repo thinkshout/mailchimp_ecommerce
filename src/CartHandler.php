@@ -32,7 +32,9 @@ class CartHandler implements CartHandlerInterface {
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
       try {
-        $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
+        if (!empty($mc_ecommerce->getCart($store_id, $cart_id))) {
+          $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
+        }
       }
       catch (\Exception $e) {
         if ($e->getCode() == 404) {

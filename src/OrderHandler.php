@@ -117,12 +117,15 @@ class OrderHandler implements OrderHandlerInterface {
     }
 
     $order_data = [
-      'currency_code' => $order->getTotalPrice()->getCurrencyCode(),
-      'order_total' => $order->getTotalPrice()->getNumber(),
       'billing_address' => $billing_address,
       'processed_at_foreign' => date('c'),
       'lines' => $lines,
     ];
+
+    if (!empty($order->getTotalPrice())) {
+      $order_data['currency_code'] = $order->getTotalPrice()->getCurrencyCode();
+      $order_data['order_total'] = $order->getTotalPrice()->getNumber();
+    }
 
     return $order_data;
   }
