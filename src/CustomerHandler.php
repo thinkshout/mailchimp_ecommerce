@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Customer handler.
@@ -101,6 +102,20 @@ class CustomerHandler implements CustomerHandlerInterface {
       mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function buildCustomer($account) {
+    $customer = [
+      'id' => $account->id(),
+      'email_address' => $account->getEmail(),
+      // TODO: Get opt_in_status from settings.
+      'opt_in_status' => TRUE,
+    ];
+
+    return $customer;
   }
 
 }

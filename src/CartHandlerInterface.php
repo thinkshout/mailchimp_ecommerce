@@ -8,7 +8,7 @@ namespace Drupal\mailchimp_ecommerce;
 interface CartHandlerInterface {
 
   /**
-   * Adds a new cart to the current MailChimp store.
+   * Adds or updates a cart in the current MailChimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -23,25 +23,7 @@ interface CartHandlerInterface {
    *
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#create-post_ecommerce_stores_store_id_carts
    */
-  public function addCart($cart_id, array $customer, array $cart);
-
-  /**
-   * Updates an existing cart in the current MailChimp store.
-   *
-   * @param string $cart_id
-   *   The cart ID.
-   * @param array $customer
-   *   Associative array of customer information.
-   *   - id (string): A unique identifier for the customer.
-   * @param array $cart
-   *   Associative array of cart information.
-   *   - currency_code (string): The three-letter ISO 4217 currency code.
-   *   - order_total (float): The total for the order.
-   *   - lines (array): An array of the order's line items.
-   *
-   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#edit-patch_ecommerce_stores_store_id_carts_cart_id
-   */
-  public function updateCart($cart_id, array $customer, array $cart);
+  public function addOrUpdateCart($cart_id, array $customer, array $cart);
 
   /**
    * Deletes a cart in the current MailChimp store.

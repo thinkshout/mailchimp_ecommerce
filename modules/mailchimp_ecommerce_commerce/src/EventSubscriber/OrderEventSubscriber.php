@@ -55,7 +55,26 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after saving a new order.
    */
   public function orderInsert(OrderEvent $event) {
-    // TODO: Process order creation.
+    /** @var \Drupal\commerce_order\Entity\Order $order */
+    $order = $event->getOrder();
+
+    // Process order for existing users.
+    $account = $event->getAccount();
+
+    if (!empty($account)) {
+      $customer = $this->customer_handler->buildCustomer($account);
+
+      $this->customer_handler->addOrUpdateCustomer($customer);
+
+      // MailChimp considers any order to be a cart until the order is complete.
+      // This order is created as a cart in MailChimp when assigned to the user.
+      $order_data = $this->order_handler->buildOrder($event->getOrder());
+      $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
+
+      $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
+    }
+
+    // TODO: Process order for guests with no user.
   }
 
   /**
@@ -93,19 +112,14 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // MailChimp as we are now able to get the user's email address.
     $account = $event->getAccount();
 
-    $customer = [
-      'id' => $account->id(),
-      'email_address' => $account->getEmail(),
-      // TODO: Get opt_in_status from settings.
-      'opt_in_status' => TRUE,
-    ];
+    $customer = $this->customer_handler->buildCustomer($account);
 
     $this->customer_handler->addOrUpdateCustomer($customer);
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
     $order_data = $this->order_handler->buildOrder($event->getOrder());
-    $this->cart_handler->addCart($order->id(), $customer, $order_data);
+    $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
   }
 
   /**

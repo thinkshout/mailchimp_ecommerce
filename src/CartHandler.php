@@ -10,7 +10,7 @@ class CartHandler implements CartHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addCart($cart_id, array $customer, array $cart) {
+  public function addOrUpdateCart($cart_id, array $customer, array $cart) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -21,36 +21,32 @@ class CartHandler implements CartHandlerInterface {
         // don't throw an exception.
         return;
       }
-      $campaign_id = mailchimp_ecommerce_get_campaign_id();
-      if (!empty($campaign_id)) {
-        $cart['campaign_id'] = $campaign_id;
-      }
+
+      // TODO: Get Campaign ID.
+      // $campaign_id = mailchimp_ecommerce_get_campaign_id();
+      // if (!empty($campaign_id)) {
+      // $cart['campaign_id'] = $campaign_id;
+      // }
+
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_ecommerce->addCart($store_id, $cart_id, $customer, $cart);
+
+      try {
+        $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
+      }
+      catch (\Exception $e) {
+        if ($e->getCode() == 404) {
+          // Cart doesn't exist; add a new cart.
+          $mc_ecommerce->addCart($store_id, $cart_id, $customer, $cart);
+        }
+        else {
+          // An actual error occurred; pass on the exception.
+          throw new \Exception($e->getMessage(), $e->getCode(), $e);
+        }
+      }
     }
     catch (\Exception $e) {
       mailchimp_ecommerce_log_error_message('Unable to add a cart: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
-    }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function updateCart($cart_id, array $customer, array $cart) {
-    try {
-      $store_id = mailchimp_ecommerce_get_store_id();
-      if (empty($store_id)) {
-        throw new \Exception('Cannot update a cart without a store ID.');
-      }
-
-      /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
-      $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
-    }
-    catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to update a cart: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
   }

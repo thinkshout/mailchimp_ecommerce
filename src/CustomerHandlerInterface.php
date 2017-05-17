@@ -36,4 +36,15 @@ interface CustomerHandlerInterface {
    */
   public function deleteCustomer($customer_id);
 
+  /**
+   * Returns customer data formatted for use with MailChimp.
+   *
+   * @param object $account
+   *   The user's Drupal account.
+   *
+   * @return array
+   *   Array of customer data.
+   */
+  public function buildCustomer($account);
+
 }

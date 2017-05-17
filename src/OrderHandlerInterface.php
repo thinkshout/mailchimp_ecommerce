@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
+use Drupal\commerce_order\Entity\Order;
 
 /**
  * Interface for the Order handler.
@@ -50,5 +51,16 @@ interface OrderHandlerInterface {
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/orders/#edit-patch_ecommerce_stores_store_id_orders_order_id
    */
   public function updateOrder($order_id, array $order);
+
+  /**
+   * Returns customer and order data formatted for use with MailChimp.
+   *
+   * @param \Drupal\commerce_order\Entity\Order $order
+   *   The Commerce Order.
+   *
+   * @return array
+   *   Array of order data.
+   */
+  public function buildOrder(Order $order);
 
 }

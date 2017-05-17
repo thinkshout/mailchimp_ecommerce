@@ -83,13 +83,7 @@ class OrderHandler implements OrderHandlerInterface {
   }
 
   /**
-   * Returns customer and order data formatted for use with MailChimp.
-   *
-   * @param \Drupal\commerce_order\Entity\Order $order
-   *   The Commerce Order.
-   *
-   * @return array
-   *   Array of order data.
+   * @inheritdoc
    */
   public function buildOrder(Order $order) {
     // TODO: Get billing address from $order->billing_profile when available.
