@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the mailchimp_ecommerce module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function mailchimp_ecommerce_schema() {
+  $schema['mailchimp_ecommerce_customer'] = [
+    'description' => 'Maintains a connection between carts, orders and a MailChimp customer.',
+    'fields' => [
+      'mailchimp_customer_id' => [
+        'description' => 'Primary Key (unique ID).',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'order_id' => [
+        'description' => 'The cart or order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ],
+    ],
+    'primary key' => ['mailchimp_customer_id'],
+    'indexes' => [
+      'order_id' => ['order_id'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Install the 'mailchimp_ecommerce_customer' table schema.
+ */
+function mailchimp_ecommerce_update_8001() {
+  drupal_install_schema('mailchimp_ecommerce_customer');
+}
