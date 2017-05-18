@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
+use Drupal\commerce_order\Entity\Order;
 
 /**
  * Interface for the Customer handler.
@@ -39,12 +40,14 @@ interface CustomerHandlerInterface {
   /**
    * Returns customer data formatted for use with MailChimp.
    *
-   * @param object $account
-   *   The user's Drupal account.
+   * @param \Drupal\commerce_order\Entity\Order $order
+   *   The order to build a customer for.
+   * @param string $email_address
+   *   The email address to give this customer.
    *
    * @return array
    *   Array of customer data.
    */
-  public function buildCustomer($account);
+  public function buildCustomer(Order $order, $email_address);
 
 }

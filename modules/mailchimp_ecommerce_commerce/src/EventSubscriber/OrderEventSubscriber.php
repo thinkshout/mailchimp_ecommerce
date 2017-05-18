@@ -95,7 +95,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // MailChimp as we are now able to get the user's email address.
     $account = $event->getAccount();
 
-    $customer = $this->customer_handler->buildCustomer($account);
+    $customer = $this->customer_handler->buildCustomer($order);
 
     $this->customer_handler->addOrUpdateCustomer($customer);
 

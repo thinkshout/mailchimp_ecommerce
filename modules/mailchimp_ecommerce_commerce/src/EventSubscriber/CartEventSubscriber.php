@@ -68,7 +68,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     $account = $order->getCustomer();
 
     if (!empty($account)) {
-      $customer = $this->customer_handler->buildCustomer($account);
+      $customer = $this->customer_handler->buildCustomer($order);
 
       $this->customer_handler->addOrUpdateCustomer($customer);
 

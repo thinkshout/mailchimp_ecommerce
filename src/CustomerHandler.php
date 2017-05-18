@@ -1,12 +1,30 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\commerce_order\Entity\Order;
+use Drupal\Core\Database\Connection;
 
 /**
  * Customer handler.
  */
 class CustomerHandler implements CustomerHandlerInterface {
+
+  /**
+   * The database connection.
+   *
+   * @var Connection
+   */
+  private $database;
+
+  /**
+   * CustomerHandler constructor.
+   *
+   * @param \Drupal\Core\Database\Connection $database
+   *   The Order Handler.
+   */
+  public function __construct(Connection $database) {
+    $this->database = $database;
+  }
 
   /**
    * @inheritdoc
@@ -107,13 +125,35 @@ class CustomerHandler implements CustomerHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function buildCustomer($account) {
-    $customer = [
-      'id' => $account->id(),
-      'email_address' => $account->getEmail(),
+  public function buildCustomer(Order $order, $email_address) {
+
+    // Load an existing customer using the order ID.
+    $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
+      ->fields('c', ['mailchimp_customer_id'])
+      ->condition('order_id', $order->id());
+
+    $result = $query->execute()->fetch();
+
+    $customer_id = 0;
+    if (!empty($result)) {
+      $customer_id = $result->mailchimp_customer_id;
+    }
+
+    // Create a new customer if no customer is attached to the order.
+    if (empty($customer_id)) {
+      $customer_id = $result = $this->database->insert('mailchimp_ecommerce_customer')
+        ->fields(['order_id' => $order->id()])
+        ->execute();
+    }
+
+    $customer = [];
+    if (!empty($customer_id)) {
+      $customer['id'] = $customer_id;
+      // TODO: Get email address.
+      $customer['email_address'] = $email_address;
       // TODO: Get opt_in_status from settings.
-      'opt_in_status' => TRUE,
-    ];
+      $customer['opt_in_status'] = TRUE;
+    }
 
     return $customer;
   }
