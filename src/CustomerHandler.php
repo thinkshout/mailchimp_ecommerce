@@ -1,7 +1,7 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
-use Drupal\commerce_order\Entity\Order;
+
 use Drupal\Core\Database\Connection;
 
 /**
