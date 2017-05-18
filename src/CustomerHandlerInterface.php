@@ -40,14 +40,14 @@ interface CustomerHandlerInterface {
   /**
    * Returns customer data formatted for use with MailChimp.
    *
-   * @param \Drupal\commerce_order\Entity\Order $order
-   *   The order to build a customer for.
+   * @param int $order_id
+   *   The ID of the cart or order to build a customer for.
    * @param string $email_address
    *   The email address to give this customer.
    *
    * @return array
    *   Array of customer data.
    */
-  public function buildCustomer(Order $order, $email_address);
+  public function buildCustomer($order_id, $email_address);
 
 }

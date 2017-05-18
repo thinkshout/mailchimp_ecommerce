@@ -125,12 +125,12 @@ class CustomerHandler implements CustomerHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function buildCustomer(Order $order, $email_address) {
+  public function buildCustomer($order_id, $email_address) {
 
     // Load an existing customer using the order ID.
     $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
       ->fields('c', ['mailchimp_customer_id'])
-      ->condition('order_id', $order->id());
+      ->condition('order_id', $order_id);
 
     $result = $query->execute()->fetch();
 
@@ -142,14 +142,13 @@ class CustomerHandler implements CustomerHandlerInterface {
     // Create a new customer if no customer is attached to the order.
     if (empty($customer_id)) {
       $customer_id = $result = $this->database->insert('mailchimp_ecommerce_customer')
-        ->fields(['order_id' => $order->id()])
+        ->fields(['order_id' => $order_id])
         ->execute();
     }
 
     $customer = [];
     if (!empty($customer_id)) {
       $customer['id'] = $customer_id;
-      // TODO: Get email address.
       $customer['email_address'] = $email_address;
       // TODO: Get opt_in_status from settings.
       $customer['opt_in_status'] = TRUE;
