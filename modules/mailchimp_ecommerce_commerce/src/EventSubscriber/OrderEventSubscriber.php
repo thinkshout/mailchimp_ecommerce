@@ -71,6 +71,16 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order_state = $order->get('state')->value;
     //$original_order_state = $original_order->get('original');
 
+    if (($order->get('checkout_step')->value == 'review') && empty($order->getCustomer()->id())) {
+      $customer_email = $event->getOrder()->getEmail();
+      if (!empty($customer_email)) {
+        $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
+        $this->customer_handler->addOrUpdateCustomer($customer);
+      }
+
+      // TODO: Add customer's cart.
+    }
+
     // On order completion, replace cart in MailChimp with order.
     // TODO: Only perform action the first time an order has 'completed' status.
     if ($order_state == 'completed') {
