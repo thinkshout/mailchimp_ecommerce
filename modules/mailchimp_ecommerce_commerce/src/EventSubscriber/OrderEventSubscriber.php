@@ -99,7 +99,9 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     if ($order_state == 'completed') {
       $this->cart_handler->deleteCart($order->id());
 
-      $customer = [];
+      // Email address should always be available on checkout completion.
+      $customer_email = $order->getEmail();
+      $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
       $order_data = $this->order_handler->buildOrder($order);
 
       $this->order_handler->addOrder($order->id(), $customer, $order_data);
