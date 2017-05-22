@@ -6,6 +6,7 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderEvents;
+use Drupal\commerce_price\Price;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
 use Drupal\mailchimp_ecommerce\OrderHandler;
@@ -79,6 +80,18 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       }
 
       // TODO: Add customer's cart.
+      $order_data = $this->order_handler->buildOrder($order);
+
+      // Add cart item price to order data.
+      if (!isset($order_data['currency_code'])) {
+        /** @var Price $price */
+        $price = $event->getEntity()->getPrice();
+
+        $order_data['currency_code'] = $price->getCurrencyCode();
+        $order_data['order_total'] = $price->getNumber();
+      }
+
+      $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
 
     // On order completion, replace cart in MailChimp with order.
@@ -112,6 +125,18 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
     $order_data = $this->order_handler->buildOrder($event->getOrder());
+
+    $order_data = $this->order_handler->buildOrder($order);
+
+    // Add cart item price to order data.
+    if (!isset($order_data['currency_code'])) {
+      /** @var Price $price */
+      $price = $event->getEntity()->getPrice();
+
+      $order_data['currency_code'] = $price->getCurrencyCode();
+      $order_data['order_total'] = $price->getNumber();
+    }
+
     $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
   }
 
