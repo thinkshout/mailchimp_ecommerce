@@ -5,6 +5,7 @@ namespace Drupal\mailchimp_ecommerce_commerce\EventSubscriber;
 use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
+use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
 use Drupal\commerce_price\Price;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
@@ -92,7 +93,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
   /**
    * Respond to event fired after updating a cart item.
    */
-  public function cartItemUpdate(CartOrderItemRemoveEvent $event) {
+  public function cartItemUpdate(CartOrderItemUpdateEvent $event) {
     // TODO: Process item update in cart.
   }
 
