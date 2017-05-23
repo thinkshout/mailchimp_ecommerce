@@ -130,4 +130,20 @@ class OrderHandler implements OrderHandlerInterface {
     return $order_data;
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function buildProduct(OrderItem $order_item) {
+    $product = [
+      'id' => $order_item->id(),
+      'product_id' => $order_item->getPurchasedEntityId(),
+      // TODO: Figure out how to differentiate between product and variant ID here.
+      'product_variant_id' => $order_item->getPurchasedEntityId(),
+      'quantity' => (int) $order_item->getQuantity(),
+      'price' => $order_item->getUnitPrice()->getNumber(),
+    ];
+
+    return $product;
+  }
+
 }

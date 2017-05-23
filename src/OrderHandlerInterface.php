@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce;
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderItem;
 
 /**
  * Interface for the Order handler.
@@ -62,5 +63,16 @@ interface OrderHandlerInterface {
    *   Array of order data.
    */
   public function buildOrder(Order $order);
+
+  /**
+   * Returns product data formatted for use with MailChimp.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderItem $item
+   *   The Commerce Order Item.
+   *
+   * @return array
+   *   Array of product data.
+   */
+  public function buildProduct(OrderItem $item);
 
 }

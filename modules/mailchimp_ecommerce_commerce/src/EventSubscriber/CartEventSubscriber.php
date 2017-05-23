@@ -6,6 +6,7 @@ use Drupal\commerce_cart\Event\CartEntityAddEvent;
 use Drupal\commerce_cart\Event\CartEvents;
 use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
+use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
@@ -96,6 +97,14 @@ class CartEventSubscriber implements EventSubscriberInterface {
    */
   public function cartItemUpdate(CartOrderItemUpdateEvent $event) {
     // TODO: Process item update in cart.
+    /** @var \Drupal\commerce_order\Entity\Order $order */
+    $order = $event->getCart();
+    /** @var \Drupal\commerce_order\Entity\OrderItem $order_item */
+    $order_item = $event->getOrderItem();
+
+    $product = $this->order_handler->buildProduct($order_item);
+
+    $this->cart_handler->updateCartLine($order->id(), $order_item->id(), $product);
   }
 
   /**
