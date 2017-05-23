@@ -18,17 +18,16 @@ function mailchimp_ecommerce_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ],
-      'order_id' => [
-        'description' => 'The cart or order ID.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
+      'mail' => [
+        'description' => 'The customer email.',
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => FALSE,
       ],
     ],
     'primary key' => ['mailchimp_customer_id'],
     'indexes' => [
-      'order_id' => ['order_id'],
+      'mail' => ['mail'],
     ],
   ];
 

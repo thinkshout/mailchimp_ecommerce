@@ -130,7 +130,7 @@ class CustomerHandler implements CustomerHandlerInterface {
     // Load an existing customer using the order ID.
     $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
       ->fields('c', ['mailchimp_customer_id'])
-      ->condition('order_id', $order_id);
+      ->condition('mail', $email_address);
 
     $result = $query->execute()->fetch();
 
@@ -142,7 +142,7 @@ class CustomerHandler implements CustomerHandlerInterface {
     // Create a new customer if no customer is attached to the order.
     if (empty($customer_id)) {
       $customer_id = $result = $this->database->insert('mailchimp_ecommerce_customer')
-        ->fields(['order_id' => $order_id])
+        ->fields(['mail' => $email_address])
         ->execute();
     }
 
