@@ -68,6 +68,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     // Process order for existing users.
     $account = $order->getCustomer();
 
+    // TODO: Account for anon users with email address attached to the order.
     if (!empty($account) && !$account->isAnonymous()) {
       $customer = $this->customer_handler->buildCustomer($order->id(), $account->getEmail());
 
@@ -84,6 +85,8 @@ class CartEventSubscriber implements EventSubscriberInterface {
         $order_data['order_total'] = $price->getNumber();
       }
 
+      // TODO: Check for existing cart and use:
+      // $this->cart_handler->addCartLine().
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
   }
@@ -99,7 +102,21 @@ class CartEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after removing a cart item.
    */
   public function cartItemRemove(CartOrderItemRemoveEvent $event) {
-    // TODO: Process item removal from cart.
+    /** @var \Drupal\commerce_order\Entity\Order $order */
+    $order = $event->getCart();
+
+    $order_data = $this->order_handler->buildOrder($order);
+
+    // Add cart item price to order data.
+    if (!isset($order_data['currency_code'])) {
+      /** @var Price $price */
+      $price = $event->getOrderItem()->getTotalPrice();
+
+      $order_data['currencyCode'] = $price->getCurrencyCode();
+      $order_data['number'] = $price->getNumber();
+    }
+
+    $this->cart_handler->deleteCartLine($order->id(), $event->getOrderItem()->id());
   }
 
   /**
