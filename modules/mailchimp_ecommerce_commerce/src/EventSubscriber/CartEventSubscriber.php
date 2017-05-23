@@ -86,8 +86,6 @@ class CartEventSubscriber implements EventSubscriberInterface {
 
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
-
-    // TODO: Process order for guests with no user.
   }
 
   /**

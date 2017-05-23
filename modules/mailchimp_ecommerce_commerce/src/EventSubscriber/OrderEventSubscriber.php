@@ -6,7 +6,6 @@ use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Event\OrderAssignEvent;
 use Drupal\commerce_order\Event\OrderEvent;
 use Drupal\commerce_order\Event\OrderEvents;
-use Drupal\commerce_price\Price;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
 use Drupal\mailchimp_ecommerce\OrderHandler;
@@ -55,13 +54,6 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Respond to event fired after saving a new order.
-   */
-  public function orderInsert(OrderEvent $event) {
-
-  }
-
-  /**
    * Respond to event fired after updating an existing order.
    */
   public function orderUpdate(OrderEvent $event) {
@@ -72,14 +64,15 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $order_state = $order->get('state')->value;
     //$original_order_state = $original_order->get('original');
 
-    if (($order->get('checkout_step')->value == 'review') && empty($order->getCustomer()->id())) {
+    // Handle guest orders at the checkout review step - first time the user's
+    // email address is available.
+    if (empty($order->getCustomer()->id()) && ($order->get('checkout_step')->value == 'review')) {
       $customer_email = $event->getOrder()->getEmail();
       if (!empty($customer_email)) {
         $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
         $this->customer_handler->addOrUpdateCustomer($customer);
       }
 
-      // TODO: Add customer's cart.
       $order_data = $this->order_handler->buildOrder($order);
 
       // Add cart item price to order data.
@@ -132,7 +125,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     // Add cart item price to order data.
     if (!isset($order_data['currency_code'])) {
-      /** @var Price $price */
+      /** @var \Drupal\commerce_price\Price $price */
       $price = $event->getEntity()->getPrice();
 
       $order_data['currency_code'] = $price->getCurrencyCode();
@@ -146,7 +139,6 @@ class OrderEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[OrderEvents::ORDER_INSERT][] = ['orderInsert'];
     $events[OrderEvents::ORDER_UPDATE][] = ['orderUpdate'];
     $events[OrderEvents::ORDER_ASSIGN][] = ['orderAssign'];
 
