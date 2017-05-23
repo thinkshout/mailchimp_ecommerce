@@ -68,7 +68,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     // Process order for existing users.
     $account = $order->getCustomer();
 
-    if (!empty($account)) {
+    if (!empty($account) && !$account->isAnonymous()) {
       $customer = $this->customer_handler->buildCustomer($order->id(), $account->getEmail());
 
       $this->customer_handler->addOrUpdateCustomer($customer);
