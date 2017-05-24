@@ -1,9 +1,9 @@
 <?php
 
 namespace Drupal\mailchimp_ecommerce;
+
 use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItem;
-use Mailchimp\MailchimpAPIException;
 
 /**
  * Order handler.

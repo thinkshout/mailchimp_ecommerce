@@ -10,6 +10,49 @@ class CartHandler implements CartHandlerInterface {
   /**
    * @inheritdoc
    */
+  public function cartExists($cart_id) {
+    return (!empty($this->getCart($cart_id)));
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCart($cart_id) {
+    $cart = NULL;
+
+    try {
+      $store_id = mailchimp_ecommerce_get_store_id();
+      if (empty($store_id)) {
+        throw new \Exception('Cannot get the requested cart without a store ID.');
+      }
+
+      /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
+      $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+      try {
+        $cart = $mc_ecommerce->getCart($store_id, $cart_id);
+      }
+      catch (\Exception $e) {
+        if ($e->getCode() == 404) {
+          // Cart doesn't exist.
+        }
+        else {
+          // An actual error occurred; pass on the exception.
+          throw new \Exception($e->getMessage(), $e->getCode(), $e);
+        }
+      }
+    }
+    catch (\Exception $e) {
+      mailchimp_ecommerce_log_error_message('Unable to get the requested cart: ' . $e->getMessage());
+      drupal_set_message($e->getMessage(), 'error');
+    }
+
+    return $cart;
+  }
+
+  /**
+   * @inheritdoc
+   */
   public function addOrUpdateCart($cart_id, array $customer, array $cart) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();

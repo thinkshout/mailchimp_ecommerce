@@ -66,18 +66,32 @@ class CartEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getCart();
 
-    // Process order for existing users.
-    $account = $order->getCustomer();
+    $customer_email = $order->getEmail();
 
-    // TODO: Account for anon users with email address attached to the order.
-    if (!empty($account) && !$account->isAnonymous()) {
-      $customer = $this->customer_handler->buildCustomer($order->id(), $account->getEmail());
+    if (empty($customer_email)) {
+      // Cannot create or add an item to a cart with no customer email address.
+      return;
+    }
 
+    if ($this->cart_handler->cartExists($order->id())) {
+      // Add item to the existing cart.
+      /** @var \Drupal\commerce_order\Entity\OrderItem $order_item */
+      $order_item = $event->getOrderItem();
+
+      $product = $this->order_handler->buildProduct($order_item);
+
+      $this->cart_handler->addCartLine($order->id(), $order_item->id(), $product);
+    }
+    else {
+      // Create a new cart.
+      $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
+
+      // Update or add customer in case this is a new cart.
       $this->customer_handler->addOrUpdateCustomer($customer);
 
       $order_data = $this->order_handler->buildOrder($order);
 
-      // Add cart item price to order data.
+      // Add cart total price to order data.
       if (!isset($order_data['currency_code'])) {
         /** @var Price $price */
         $price = $event->getEntity()->getPrice();
@@ -86,8 +100,6 @@ class CartEventSubscriber implements EventSubscriberInterface {
         $order_data['order_total'] = $price->getNumber();
       }
 
-      // TODO: Check for existing cart and use:
-      // $this->cart_handler->addCartLine().
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
   }
@@ -96,7 +108,6 @@ class CartEventSubscriber implements EventSubscriberInterface {
    * Respond to event fired after updating a cart item.
    */
   public function cartItemUpdate(CartOrderItemUpdateEvent $event) {
-    // TODO: Process item update in cart.
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getCart();
     /** @var \Drupal\commerce_order\Entity\OrderItem $order_item */

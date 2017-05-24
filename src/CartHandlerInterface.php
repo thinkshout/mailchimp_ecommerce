@@ -8,6 +8,27 @@ namespace Drupal\mailchimp_ecommerce;
 interface CartHandlerInterface {
 
   /**
+   * Determines if a cart exists in MailChimp.
+   *
+   * @param string $cart_id
+   *   The cart ID.
+   *
+   * @return bool
+   *   TRUE if cart exists, FALSE otherwise.
+   */
+  public function cartExists($cart_id);
+
+  /**
+   * Gets an existing cart from the current MailChimp store.
+   *
+   * @param string $cart_id
+   *   The cart ID.
+   *
+   * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/carts/#read-get_ecommerce_stores_store_id_carts_cart_id
+   */
+  public function getCart($cart_id);
+
+  /**
    * Adds or updates a cart in the current MailChimp store.
    *
    * @param string $cart_id
