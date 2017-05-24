@@ -23,6 +23,10 @@ class RouteSubscriber extends RouteSubscriberBase {
       $route->setDefault('_form', '\Drupal\mailchimp_ecommerce_commerce\Form\MailchimpEcommerceCommerceAdminSettings');
     }
 
+    if ($route = $collection->get('mailchimp_ecommerce.sync')) {
+      $route->setDefault('_form', '\Drupal\mailchimp_ecommerce_commerce\Form\MailchimpEcommerceCommerceSync');
+    }
+
   }
 
 }

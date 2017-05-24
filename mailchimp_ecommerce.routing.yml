@@ -6,3 +6,12 @@ mailchimp_ecommerce.admin_settings:
   requirements:
     _permission: 'administer mailchimp'
     _mailchimp_configuration_access_check: 'TRUE'
+
+mailchimp_ecommerce.sync:
+  path: 'admin/config/services/mailchimp/ecommerce/sync'
+  defaults:
+    _title: 'MailChimp eCommerce Data Sync'
+    _form: '\Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceSync'
+  requirements:
+    _permission: 'administer mailchimp'
+    _mailchimp_configuration_access_check: 'TRUE'
