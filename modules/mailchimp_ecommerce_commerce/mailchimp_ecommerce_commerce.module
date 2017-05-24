@@ -53,54 +53,6 @@ function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) 
 }
 
 /**
- * Implements hook_default_rules_configuration().
- */
-function mailchimp_ecommerce_commerce_default_rules_configuration() {
-  $rules = [];
-
-  // Add a reaction rule to display the default Add to Cart message.
-  $rule = rules_reaction_rule();
-
-  $rule->label = t('Send cart to MailChimp');
-  $rule->tags = ['Commerce Cart'];
-  $rule->active = TRUE;
-
-  $rule
-    ->event('commerce_cart_product_add')
-    ->event('commerce_cart_product_remove')
-    ->action('mailchimp_ecommerce_commerce_send_cart', [
-      'commerce_order:select' => 'commerce-order',
-    ]);
-
-  $rules['mailchimp_ecommerce_commerce_send_cart'] = $rule;
-
-  return $rules;
-}
-
-/**
- * Implements hook_rules_action_info().
- */
-function mailchimp_ecommerce_commerce_rules_action_info() {
-  $actions = [];
-
-  $actions['mailchimp_ecommerce_commerce_send_cart'] = [
-    'label' => t('Send a cart to MailChimp'),
-    'parameter' => [
-      'commerce_order' => [
-        'type' => 'commerce_order',
-        'label' => t('Order to send'),
-      ],
-    ],
-    'group' => t('Commerce Order'),
-    'callbacks' => [
-      'execute' => '_mailchimp_ecommerce_commerce_send_cart',
-    ],
-  ];
-
-  return $actions;
-}
-
-/**
  * Parses an address from a Commerce customer profile.
  *
  * @param object $customer_profile_wrapper
