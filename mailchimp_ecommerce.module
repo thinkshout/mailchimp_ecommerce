@@ -6,11 +6,11 @@
  */
 
 /**
- * Implements hook_page_build().
+ * Implements hook_page_attachments().
  */
-function mailchimp_ecommerce_page_build(&$page) {
-  $campaign_id = isset($_GET['mc_cid']) ? \Drupal\Component\Utility\Html::escape($_GET['mc_cid']) : '';
-  if ($campaign_id) {
+function mailchimp_ecommerce_page_attachments(array &$attachments) {
+  $campaign_id = filter_input(INPUT_GET, 'mc_cid', FILTER_SANITIZE_STRING);
+  if (!empty($campaign_id)) {
     $_SESSION['mc_cid'] = $campaign_id;
   }
 }
@@ -42,7 +42,7 @@ function mailchimp_ecommerce_get_store_id() {
  *   The campaign ID.
  */
 function mailchimp_ecommerce_get_campaign_id() {
-  $session_campaign = isset($_SESSION['mc_cid']) ? \Drupal\Component\Utility\Html::escape($_SESSION['mc_cid']) : '';
+  $session_campaign = isset($_SESSION['mc_cid']) ? $_SESSION['mc_cid'] : '';
   $campaign_id = '';
 
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
