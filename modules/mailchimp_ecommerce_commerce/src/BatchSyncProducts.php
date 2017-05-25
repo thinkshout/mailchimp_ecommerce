@@ -8,10 +8,18 @@ namespace Drupal\mailchimp_ecommerce_commerce;
 class BatchSyncProducts {
 
   public static function syncProducts($product_ids, &$context) {
-    $total_products = count($product_ids);
-    $sync_count = 0;
+    if (!isset($context['sandbox']['progress'])) {
+      $context['sandbox']['progress'] = 0;
+      $context['sandbox']['total'] = count($product_ids);
+      $context['results']['product_ids'] = $product_ids;
+    }
 
-    foreach ($product_ids as $product_id) {
+    $config = \Drupal::config('mailchimp.settings');
+    $batch_limit = $config->get('batch_limit');
+
+    $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
+
+    foreach ($batch as $product_id) {
       /** @var \Drupal\commerce_product\Entity\Product $product */
       $product = \Drupal\commerce_product\Entity\Product::load($product_id);
 
@@ -26,12 +34,14 @@ class BatchSyncProducts {
 
       $product_handler->addProduct($product_id, $title, $description, $type, $variants);
 
-      $sync_count++;
+      $context['sandbox']['progress']++;
 
-      $context['message'] = t('Sent product @count of @total to MailChimp', [
-        '@count' => $sync_count,
-        '@total' => $total_products,
+      $context['message'] = t('Sent @count of @total products to MailChimp', [
+        '@count' => $context['sandbox']['progress'],
+        '@total' => $context['sandbox']['total'],
       ]);
+
+      $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
     }
   }
 
