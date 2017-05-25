@@ -47,6 +47,8 @@ class OrderHandler implements OrderHandlerInterface {
         // don't throw an exception.
         return;
       }
+
+      // Get the MailChimp campaign ID, if available.
       $campaign_id = mailchimp_ecommerce_get_campaign_id();
       if (!empty($campaign_id)) {
         $order['campaign_id'] = $campaign_id;

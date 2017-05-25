@@ -65,11 +65,11 @@ class CartHandler implements CartHandlerInterface {
         return;
       }
 
-      // TODO: Get Campaign ID.
-      // $campaign_id = mailchimp_ecommerce_get_campaign_id();
-      // if (!empty($campaign_id)) {
-      // $cart['campaign_id'] = $campaign_id;
-      // }
+      // Get the MailChimp campaign ID, if available.
+      $campaign_id = mailchimp_ecommerce_get_campaign_id();
+      if (!empty($campaign_id)) {
+        $cart['campaign_id'] = $campaign_id;
+      }
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
