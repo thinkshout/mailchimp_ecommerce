@@ -6,53 +6,6 @@
  */
 
 /**
- * Begins a batch process to add existing Commerce products to MailChimp.
- */
-function mailchimp_ecommerce_commerce_batch_add_existing_products() {
-  $batch = [
-    'title' => t('Adding products to MailChimp'),
-    'operations' => [],
-  ];
-
-  $query = \Drupal::entityQuery('commerce_product');
-  $result = $query->execute();
-
-  if (!empty($result)) {
-    $product_ids = array_keys($result);
-
-    foreach ($product_ids as $product_id) {
-      $batch['operations'][] = [
-        'mailchimp_ecommerce_commerce_batch_add_product',
-        [
-          $product_id,
-        ],
-      ];
-    }
-  }
-
-  batch_set($batch);
-}
-
-/**
- * Batch callback used to add a product to MailChimp.
- */
-function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) {
-  /** @var Drupal\commerce_product\Entity\Product $product */
-  $product = \Drupal\commerce_product\Entity\Product::load($product_id);
-
-  $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
-  $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
-  $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
-
-  /** @var \Drupal\mailchimp_ecommerce\ProductHandler $product_handler */
-  $product_handler = \Drupal::service('mailchimp_ecommerce.product_handler');
-
-  $variants = $product_handler->buildProductVariants($product);
-
-  $product_handler->addProduct($product_id, $title, $description, $type, $variants);
-}
-
-/**
  * Parses an address from a Commerce customer profile.
  *
  * @param object $customer_profile_wrapper

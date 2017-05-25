@@ -38,8 +38,6 @@ abstract class MailchimpEcommerceSync extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->_submitForm($form, $form_state);
-
-    parent::submitForm($form, $form_state);
   }
 
   /**
