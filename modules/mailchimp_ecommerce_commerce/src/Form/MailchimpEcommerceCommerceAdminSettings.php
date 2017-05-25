@@ -28,21 +28,4 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
     return $form;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    // If this form submission is adding a new store to MailChimp, begin
-    // the batch process to send all existing Commerce products.
-    $store_id = $form_state->getValue('mailchimp_ecommerce_list_id');
-    if (!empty($store_id)) {
-      $existing_store = $this->store_handler->getStore($store_id);
-      if (empty($existing_store)) {
-        mailchimp_ecommerce_commerce_batch_add_existing_products();
-      }
-    }
-
-    parent::submitForm($form, $form_state);
-  }
-
 }
