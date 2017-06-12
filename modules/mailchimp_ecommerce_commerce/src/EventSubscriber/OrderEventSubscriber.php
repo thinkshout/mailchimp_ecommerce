@@ -62,7 +62,6 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     $customer = [];
 
     $order_state = $order->get('state')->value;
-    //$original_order_state = $original_order->get('original');
 
     // Handle guest orders at the checkout review step - first time the user's
     // email address is available.
@@ -94,8 +93,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $this->cart_handler->deleteCart($order->id());
 
       // Email address should always be available on checkout completion.
-      $customer_email = $order->getEmail();
-      $customer = $this->customer_handler->buildCustomer($customer_email);
+      $customer['email_address'] = $order->getEmail();
+      $billing_profile = $order->getBillingProfile();
+
+      $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
       $order_data = $this->order_handler->buildOrder($order);
 
       $this->order_handler->addOrder($order->id(), $customer, $order_data);
@@ -113,15 +114,15 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // a cart with items. This is the first point we can send this cart to
     // MailChimp as we are now able to get the user's email address.
     $account = $event->getAccount();
+    $customer['email_address'] = $account->getEmail();
+    $billing_profile = $order->getBillingProfile();
 
-    $customer = $this->customer_handler->buildCustomer($order, $account->getEmail());
+    $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
 
     $this->customer_handler->addOrUpdateCustomer($customer);
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
-    $order_data = $this->order_handler->buildOrder($event->getOrder());
-
     $order_data = $this->order_handler->buildOrder($order);
 
     // Add cart item price to order data.
