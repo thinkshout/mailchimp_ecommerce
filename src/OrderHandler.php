@@ -88,7 +88,8 @@ class OrderHandler implements OrderHandlerInterface {
    * @inheritdoc
    */
   public function buildOrder(Order $order) {
-    // TODO: Get billing address from $order->billing_profile when available.
+    $billing_profile = $order->getBillingProfile();
+
     $billing_address = [
       'name' => '',
       'address1' => '',
