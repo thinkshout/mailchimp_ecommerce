@@ -144,8 +144,21 @@ class CustomerHandler implements CustomerHandlerInterface {
     if (!empty($customer_id)) {
       $customer['id'] = $customer_id;
     }
+    $address = $billing_profile->address->first();
 
-    //$commerce_customer->get
+    $customer['company'] = $address->getOrganization();
+    $customer['first_name'] = $address->getGivenName();
+    $customer['last_name'] = $address->getFamilyName();
+
+    $customer['address'] = [
+      'address1' => $address->getAddressLine1(),
+      'address2' => $address->getAddressLine2(),
+      'city' => $address->getLocality(),
+      'province_code' => $address->getAdministrativeArea(),
+      'postal_code' => $address->getPostalCode(),
+      'country_code' => $address->getcountryCode(),
+    ];
+
     return $customer;
   }
 
