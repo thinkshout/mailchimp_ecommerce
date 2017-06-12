@@ -69,11 +69,6 @@ class CustomerHandler implements CustomerHandlerInterface {
       // Pull member information to get member status.
       $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
 
-      if (empty($memberinfo) || !isset($memberinfo->status)) {
-        // Cannot create a customer with no list member.
-        return;
-      }
-
       $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
       $customer['opt_in_status'] = $opt_in_status;
 
@@ -150,8 +145,6 @@ class CustomerHandler implements CustomerHandlerInterface {
     if (!empty($customer_id)) {
       $customer['id'] = $customer_id;
       $customer['email_address'] = $email_address;
-      // TODO: Get opt_in_status from settings.
-      $customer['opt_in_status'] = TRUE;
     }
 
     return $customer;
