@@ -152,9 +152,74 @@ class CustomerHandler implements CustomerHandlerInterface {
       $customer['email_address'] = $email_address;
       // TODO: Get opt_in_status from settings.
       $customer['opt_in_status'] = TRUE;
+      $customer['orders_count'] = $this->getCustomerTotalOrders($email_address);
+      $customer['total_spent'] = $this->getCustomerTotalSpent($email_address);
     }
 
     return $customer;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function incrementCustomerOrderTotal($email_address, $total_spent, $orders_count = 1) {
+    $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
+      ->fields('c', ['mailchimp_customer_id', 'orders_count', 'total_spent'])
+      ->condition('mail', $email_address);
+
+    $result = $query->execute()->fetch();
+
+    if (!empty($result)) {
+      $customer_id = $result->mailchimp_customer_id;
+      $new_orders_count = ($result->orders_count + $orders_count);
+      $new_total_spent = ($result->total_spent + $total_spent);
+
+      $this->database->update('mailchimp_ecommerce_customer')
+        ->fields([
+          'orders_count' => $new_orders_count,
+          'total_spent' => $new_total_spent,
+        ])
+        ->condition('mailchimp_customer_id', $customer_id)
+        ->execute();
+
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCustomerTotalSpent($email_address) {
+    $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
+      ->fields('c', ['total_spent'])
+      ->condition('mail', $email_address);
+
+    $result = $query->execute()->fetch();
+
+    if (!empty($result)) {
+      return $result->total_spent;
+    }
+
+    return 0;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCustomerTotalOrders($email_address) {
+    $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
+      ->fields('c', ['orders_count'])
+      ->condition('mail', $email_address);
+
+    $result = $query->execute()->fetch();
+
+    if (!empty($result)) {
+      return $result->orders_count;
+    }
+
+    return 0;
   }
 
 }
