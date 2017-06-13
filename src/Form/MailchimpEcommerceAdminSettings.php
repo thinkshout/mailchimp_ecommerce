@@ -7,6 +7,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Url;
 use Drupal\mailchimp_ecommerce\StoreHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -164,6 +165,17 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_opt_in_status'),
       '#description' => t('Choose your opt-in status before using this module.'),
     ];
+
+    if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id'))) {
+      $form['sync'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Data sync'),
+        '#collapsible' => FALSE,
+      ];
+      $form['sync']['products'] = [
+        '#markup' => \Drupal::l(t('Sync existing Commerce products to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync')),
+      ];
+    }
 
     $settings_form = parent::buildForm($form, $form_state);
 
