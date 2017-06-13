@@ -90,15 +90,19 @@ class OrderHandler implements OrderHandlerInterface {
   public function buildOrder(Order $order) {
     $billing_profile = $order->getBillingProfile();
 
-    $billing_address = [
-      'name' => '',
-      'address1' => '',
-      'address2' => '',
-      'city' => '',
-      'province_code' => '',
-      'postal_code' => '',
-      'country_code' => '',
-      'company' => '',
+    $address = $billing_profile->address->first();
+
+    $customer['company'] = $address->getOrganization();
+    $customer['first_name'] = $address->getGivenName();
+    $customer['last_name'] = $address->getFamilyName();
+
+    $customer['address'] = [
+      'address1' => $address->getAddressLine1(),
+      'address2' => $address->getAddressLine2(),
+      'city' => $address->getLocality(),
+      'province_code' => $address->getAdministrativeArea(),
+      'postal_code' => $address->getPostalCode(),
+      'country_code' => $address->getcountryCode(),
     ];
 
     $order_items = $order->getItems();
@@ -120,7 +124,8 @@ class OrderHandler implements OrderHandlerInterface {
     }
 
     $order_data = [
-      'billing_address' => $billing_address,
+      'customer' => $customer,
+      'billing_address' => $customer['address'],
       'processed_at_foreign' => date('c'),
       'lines' => $lines,
     ];
