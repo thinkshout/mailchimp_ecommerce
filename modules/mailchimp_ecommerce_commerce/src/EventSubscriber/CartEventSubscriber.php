@@ -66,7 +66,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getCart();
 
-    $customer_email = $order->getEmail();
+    $customer['email_address'] = $order->getEmail();
 
     if (empty($customer_email)) {
       // Cannot create or add an item to a cart with no customer email address.
@@ -84,7 +84,8 @@ class CartEventSubscriber implements EventSubscriberInterface {
     }
     else {
       // Create a new cart.
-      $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
+      $billing_profile = $order->getBillingProfile();
+      $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
 
       // Update or add customer in case this is a new cart.
       $this->customer_handler->addOrUpdateCustomer($customer);
