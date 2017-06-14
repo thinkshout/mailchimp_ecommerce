@@ -6,8 +6,6 @@ mailchimp_ecommerce.settings:
       type: string
     mailchimp_ecommerce_list_id:
       type: string
-    mailchimp_ecommerce_opt_in_status:
-      type: string
     mailchimp_ecommerce_store_id:
       type: string
     mailchimp_ecommerce_integration:
