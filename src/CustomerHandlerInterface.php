@@ -38,17 +38,18 @@ interface CustomerHandlerInterface {
   public function deleteCustomer($customer_id);
 
   /**
-   * Returns customer data formatted for use with MailChimp.
+   * Saves the customer locally and returns customer data formatted for use with MailChimp.
    *
-   * @param int $order_id
-   *   The ID of the cart or order to build a customer for.
-   * @param string $email_address
-   *   The email address to give this customer.
+   * @param array $customer
+   *   The customer.
    *
+   * @param object $billing_profile
+   *   The Drupal Commerce Billing Profile.
    * @return array
+   *
    *   Array of customer data.
    */
-  public function buildCustomer($order_id, $email_address);
+  public function buildCustomer($customer, $billing_profile);
 
   /**
    * Increments the order count and total amount spent by a customer.

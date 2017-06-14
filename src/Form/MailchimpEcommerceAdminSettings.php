@@ -133,38 +133,6 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
     ];
 
-    $list_options = [
-      '' => '-- Select --',
-      1 => 'Normal Subscriber',
-      0 => 'Transactional Subscriber',
-    ];
-
-    $form['mailchimp_ecommerce_opt_in'] = [
-      '#type' => 'fieldset',
-      '#title' => t('New User Opt-In Status'),
-      '#collapsible' => FALSE,
-    ];
-    $form['mailchimp_ecommerce_opt_in']['mailchimp_ecommerce_opt_in_status_markup'] = [
-      '#markup' => t('You must decide on the status of customers that entered into
-     the eCommerce API. By choosing "<b>Normal Subscriber</b>" in the option
-     below, users will added as normal subscribers.  If you choose
-     "Normal Subscriber", be certain your customers know they are subscribing
-     to an email list. If you choose "<b>Transactional Subscriber</b>" below,
-     the users will be added as "transactional" users. Transactional users
-     cannot be changed via the MailChimp UI. Changing the status of a 
-     "transactional" user call only be accomplished via the API. For additional
-     information, please read the') . ' ' . \Drupal::l(t('MailChimp Documentation.'), \Drupal\Core\Url::fromUri('http://developer.mailchimp.com/documentation/mailchimp/guides/getting-started-with-ecommerce/#about-subscribers-and-customers')),
-    ];
-
-    $form['mailchimp_ecommerce_opt_in']['mailchimp_ecommerce_opt_in_status'] = [
-      '#type' => 'select',
-      '#title' => t('Opt-In Status For Customers'),
-      '#required' => TRUE,
-      '#options' => $list_options,
-      '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_opt_in_status'),
-      '#description' => t('Choose your opt-in status before using this module.'),
-    ];
-
     $settings_form = parent::buildForm($form, $form_state);
 
     return $settings_form;
@@ -179,14 +147,6 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
 
     if ($store_id != NULL) {
       $currency = $form_state->getValue(['mailchimp_ecommerce_currency']);
-
-      // Save value as boolean.
-      if ($form_state->getValue(['mailchimp_ecommerce_opt_in_status']) == 1) {
-        \Drupal::configFactory()->getEditable('mailchimp_ecommerce.settings')->set('mailchimp_ecommerce_opt_in_status', TRUE)->save();
-      }
-      else {
-        \Drupal::configFactory()->getEditable('mailchimp_ecommerce.settings')->set('mailchimp_ecommerce_opt_in_status', FALSE)->save();
-      }
 
       // Determine if a store is being created or updated.
       $existing_store = $this->store_handler->getStore($store_id);

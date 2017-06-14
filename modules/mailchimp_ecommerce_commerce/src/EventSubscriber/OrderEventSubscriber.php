@@ -59,17 +59,17 @@ class OrderEventSubscriber implements EventSubscriberInterface {
   public function orderUpdate(OrderEvent $event) {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getOrder();
-    $original_order = Order::load($order->id());
+    $customer = [];
 
     $order_state = $order->get('state')->value;
-    //$original_order_state = $original_order->get('original');
 
     // Handle guest orders at the checkout review step - first time the user's
     // email address is available.
     if (empty($order->getCustomer()->id()) && ($order->get('checkout_step')->value == 'review')) {
-      $customer_email = $event->getOrder()->getEmail();
-      if (!empty($customer_email)) {
-        $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
+      $customer['email_address'] = $event->getOrder()->getEmail();
+      if (!empty($customer['email_address'])) {
+        $billing_profile = $order->getBillingProfile();
+        $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
         $this->customer_handler->addOrUpdateCustomer($customer);
       }
 
@@ -96,8 +96,10 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $this->customer_handler->incrementCustomerOrderTotal($customer_email, $order_data['order_total']);
 
       // Email address should always be available on checkout completion.
-      $customer_email = $order->getEmail();
-      $customer = $this->customer_handler->buildCustomer($order->id(), $customer_email);
+      $customer['email_address'] = $order->getEmail();
+      $billing_profile = $order->getBillingProfile();
+
+      $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
       $order_data = $this->order_handler->buildOrder($order);
 
       $this->order_handler->addOrder($order->id(), $customer, $order_data);
@@ -115,15 +117,15 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // a cart with items. This is the first point we can send this cart to
     // MailChimp as we are now able to get the user's email address.
     $account = $event->getAccount();
+    $customer['email_address'] = $account->getEmail();
+    $billing_profile = $order->getBillingProfile();
 
-    $customer = $this->customer_handler->buildCustomer($order, $account->getEmail());
+    $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
 
     $this->customer_handler->addOrUpdateCustomer($customer);
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
-    $order_data = $this->order_handler->buildOrder($event->getOrder());
-
     $order_data = $this->order_handler->buildOrder($order);
 
     // Add cart item price to order data.
