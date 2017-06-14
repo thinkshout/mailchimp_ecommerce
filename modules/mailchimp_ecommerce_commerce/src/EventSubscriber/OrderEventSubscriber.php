@@ -93,7 +93,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $this->cart_handler->deleteCart($order->id());
 
       // Update the customer's total order count and total amount spent.
-      $this->customer_handler->incrementCustomerOrderTotal($customer_email, $order_data['order_total']);
+      $this->customer_handler->incrementCustomerOrderTotal($customer['email_address'], $order_data['order_total']);
 
       // Email address should always be available on checkout completion.
       $customer['email_address'] = $order->getEmail();
