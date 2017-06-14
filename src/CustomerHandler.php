@@ -150,7 +150,7 @@ class CustomerHandler implements CustomerHandlerInterface {
       $customer['company']    = $address->getOrganization();
       $customer['first_name'] = $address->getGivenName();
       $customer['last_name']  = $address->getFamilyName();
-      $customer['orders_count'] = $this->getCustomerTotalOrders($customer['email_address']);
+      $customer['orders_count'] = (int) $this->getCustomerTotalOrders($customer['email_address']);
       $customer['total_spent'] = $this->getCustomerTotalSpent($customer['email_address']);
 
       $customer['address'] = [
