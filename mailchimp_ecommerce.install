@@ -26,6 +26,20 @@ function mailchimp_ecommerce_schema() {
         'length' => 254,
         'not null' => FALSE,
       ],
+      'orders_count' => [
+        'type' => 'int',
+        'description' => 'Total orders for this customer.',
+        'unsigned' => TRUE,
+        'default' => 0,
+      ],
+      'total_spent' => [
+        'type' => 'numeric',
+        'description' => 'Total amount spent by this customer.',
+        'unsigned' => TRUE,
+        'precision' => 19,
+        'scale' => 6,
+        'default' => 0,
+      ],
     ],
     'primary key' => ['mailchimp_customer_id'],
     'indexes' => [
