@@ -156,8 +156,13 @@ class CartHandler implements CartHandlerInterface {
       $mc_ecommerce->updateCartLine($store_id, $cart_id, $line_id, $product);
     }
     catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to update a cart line: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      if ($e->getCode() == 404) {
+        // Cart line doesn't exist; no need to log an error.
+      }
+      else {
+        mailchimp_ecommerce_log_error_message('Unable to update a cart line: ' . $e->getMessage());
+        drupal_set_message($e->getMessage(), 'error');
+      }
     }
   }
 
