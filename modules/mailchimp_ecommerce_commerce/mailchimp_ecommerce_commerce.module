@@ -331,7 +331,6 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
     $order_total = commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
   }
 
-  if ($customer_wrapper
   if (isset($order_wrapper->commerce_customer_billing->profile_id)) {
     $customer_id = $order_wrapper->commerce_customer_billing->profile_id->value();
   }
