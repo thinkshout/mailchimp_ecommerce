@@ -23,6 +23,18 @@ function mailchimp_ecommerce_menu() {
     'weight' => 20,
   );
 
+  $items['admin/config/services/mailchimp/ecommerce/sync'] = array(
+    'title' => 'eCommerce data sync',
+    'description' => 'Sync eCommerce data to MailChimp.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailchimp_ecommerce_admin_sync'),
+    'access callback' => 'mailchimp_apikey_ready_access',
+    'access arguments' => array('administer mailchimp'),
+    'file' => 'includes/mailchimp_ecommerce.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 21,
+  );
+
   return $items;
 }
 

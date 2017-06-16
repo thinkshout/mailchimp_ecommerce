@@ -14,6 +14,69 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_sync_alter(&$form, &$form_state) {
+  $form['#submit'][] = 'mailchimp_ecommerce_commerce_admin_sync_submit';
+}
+
+/**
+ * Submit handler for the MailChimp eCommerce sync form.
+ */
+function mailchimp_ecommerce_commerce_admin_sync_submit($form, &$form_state) {
+  if (!empty($form_state['values']['sync_products'])) {
+    $batch = [
+      'title' => t('Adding products to MailChimp'),
+      'operations' => [],
+    ];
+
+    $query = new EntityFieldQuery();
+    $result = $query->entityCondition('entity_type', 'commerce_product')
+      ->execute();
+
+    if (isset($result['commerce_product'])) {
+      $product_ids = array_keys($result['commerce_product']);
+
+      $batch['operations'][] = [
+        'mailchimp_ecommerce_commerce_batch_add_products',
+        [$product_ids],
+      ];
+    }
+
+    batch_set($batch);
+  }
+}
+
+/**
+ * Batch callback used to add products to MailChimp.
+ */
+function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context) {
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['total'] = count($product_ids);
+    $context['results']['product_ids'] = $product_ids;
+  }
+
+  $batch_limit = variable_get('mailchimp_batch_limit', 100);
+
+  $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
+
+  foreach ($batch as $product_id) {
+    $product = commerce_product_load($product_id);
+    mailchimp_ecommerce_commerce_commerce_product_insert($product);
+
+    $context['sandbox']['progress']++;
+
+    $context['message'] = t('Sent @count of @total products to MailChimp', [
+      '@count' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
+    ]);
+
+    $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+  }
+}
+
+/**
  * Implements hook_commerce_customer_profile_insert().
  */
 function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer_profile) {
@@ -166,44 +229,6 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
  */
 function mailchimp_ecommerce_commerce_commerce_product_delete($product) {
   mailchimp_ecommerce_delete_product_variant($product->product_id, $product->sku);
-}
-
-/**
- * Implements hook_mailchimp_ecommerce_add_store().
- */
-function mailchimp_ecommerce_commerce_mailchimp_ecommerce_add_store($store) {
-  // Add existing Drupal Commerce products to MailChimp.
-  $batch = [
-    'title' => t('Adding products to MailChimp'),
-    'operations' => [],
-  ];
-
-  $query = new EntityFieldQuery();
-  $result = $query->entityCondition('entity_type', 'commerce_product')
-                  ->execute();
-
-  if (isset($result['commerce_product'])) {
-    $product_ids = array_keys($result['commerce_product']);
-
-    foreach ($product_ids as $product_id) {
-      $batch['operations'][] = [
-        'mailchimp_ecommerce_commerce_batch_add_product',
-        [
-          $product_id,
-        ],
-      ];
-    }
-  }
-
-  batch_set($batch);
-}
-
-/**
- * Batch callback used to add a product to MailChimp.
- */
-function mailchimp_ecommerce_commerce_batch_add_product($product_id, &$context) {
-  $product = commerce_product_load($product_id);
-  mailchimp_ecommerce_commerce_commerce_product_insert($product);
 }
 
 /**

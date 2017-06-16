@@ -88,6 +88,17 @@ function mailchimp_ecommerce_admin_settings() {
     '#description' => t('Choose your opt-in status before using this module.'),
   ];
 
+  if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
+    $form['sync'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Data sync'),
+      '#collapsible' => FALSE,
+    ];
+    $form['sync']['products'] = [
+      '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
+    ];
+  }
+
   $settings_form = system_settings_form($form);
   $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
@@ -134,4 +145,34 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
     }
   }
 
+}
+
+/**
+ * The MailChimp eCommerce data sync form.
+ */
+function mailchimp_ecommerce_admin_sync() {
+  $form['sync_products'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Sync Products'),
+    '#description' => t('Sync all existing products to MailChimp.'),
+  ];
+
+  $form['actions']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Sync with MailChimp'),
+  ];
+
+  $form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';
+
+  return $form;
+}
+
+/**
+ * Empty submit submit handler for the MailChimp eCommerce sync form.
+ *
+ * Syncing data is specific to each shopping cart implementation.
+ * Use a form_alter hook to add a custom submit handler to the
+ * 'mailchimp_ecommerce_admin_sync' form.
+ */
+function mailchimp_ecommerce_admin_sync_submit($form, &$form_state) {
 }
