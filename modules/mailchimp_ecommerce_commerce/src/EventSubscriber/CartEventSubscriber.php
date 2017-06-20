@@ -68,7 +68,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
 
     $customer['email_address'] = $order->getEmail();
 
-    if (empty($customer_email)) {
+    if (empty($customer['email_address'])) {
       // Cannot create or add an item to a cart with no customer email address.
       return;
     }
