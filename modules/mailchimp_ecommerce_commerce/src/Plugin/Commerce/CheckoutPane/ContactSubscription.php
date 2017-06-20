@@ -1,11 +1,10 @@
 <?php
 
-namespace Drupal\mailchimp_ecommerce_commerce\Plugin\CheckoutPane;
+namespace Drupal\mailchimp_ecommerce_commerce\Plugin\Commerce\CheckoutPane;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneInterface;
 use Drupal\commerce_checkout\Plugin\Commerce\CheckoutPane\CheckoutPaneBase;
-
 
 /**
  * Provides the subscription information pane.
