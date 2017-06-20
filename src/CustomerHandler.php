@@ -60,17 +60,10 @@ class CustomerHandler implements CustomerHandlerInterface {
   public function addOrUpdateCustomer($customer) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
-      $list_id = mailchimp_ecommerce_get_list_id();
 
       if (empty($store_id)) {
         throw new \Exception('Cannot add or update a customer without a store ID.');
       }
-
-      // Pull member information to get member status.
-      $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
-
-      $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
-      $customer['opt_in_status'] = $opt_in_status;
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
@@ -122,6 +115,7 @@ class CustomerHandler implements CustomerHandlerInterface {
    */
   public function buildCustomer($customer, $billing_profile) {
     $customer_id = 0;
+    $list_id = mailchimp_ecommerce_get_list_id();
 
     // Load an existing customer using the order ID.
     $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
@@ -144,6 +138,12 @@ class CustomerHandler implements CustomerHandlerInterface {
     if (!empty($customer_id)) {
       $customer['id'] = $customer_id;
     }
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
+
+    $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+    $customer['opt_in_status'] = $opt_in_status;
+
     if ($billing_profile->address) {
       $address = $billing_profile->address->first();
 

@@ -90,7 +90,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
       // Update or add customer in case this is a new cart.
       $this->customer_handler->addOrUpdateCustomer($customer);
 
-      $order_data = $this->order_handler->buildOrder($order);
+      $order_data = $this->order_handler->buildOrder($order, $customer);
 
       // Add cart total price to order data.
       if (!isset($order_data['currency_code'])) {
@@ -125,17 +125,6 @@ class CartEventSubscriber implements EventSubscriberInterface {
   public function cartItemRemove(CartOrderItemRemoveEvent $event) {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getCart();
-
-    $order_data = $this->order_handler->buildOrder($order);
-
-    // Add cart item price to order data.
-    if (!isset($order_data['currency_code'])) {
-      /** @var Price $price */
-      $price = $event->getOrderItem()->getTotalPrice();
-
-      $order_data['currencyCode'] = $price->getCurrencyCode();
-      $order_data['number'] = $price->getNumber();
-    }
 
     $this->cart_handler->deleteCartLine($order->id(), $event->getOrderItem()->id());
   }

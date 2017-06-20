@@ -59,10 +59,13 @@ interface OrderHandlerInterface {
    * @param \Drupal\commerce_order\Entity\Order $order
    *   The Commerce Order.
    *
+   * @param array
+   *   Order customer.
+   *
    * @return array
    *   Array of order data.
    */
-  public function buildOrder(Order $order);
+  public function buildOrder(Order $order, array $customer);
 
   /**
    * Returns product data formatted for use with MailChimp.
