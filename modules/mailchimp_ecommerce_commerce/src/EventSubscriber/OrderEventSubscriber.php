@@ -73,7 +73,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
         $this->customer_handler->addOrUpdateCustomer($customer);
       }
 
-      $order_data = $this->order_handler->buildOrder($order);
+      $order_data = $this->order_handler->buildOrder($order, $customer);
 
       // Add cart item price to order data.
       if (!isset($order_data['currency_code'])) {
@@ -100,7 +100,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $billing_profile = $order->getBillingProfile();
 
       $customer = $this->customer_handler->buildCustomer($customer, $billing_profile);
-      $order_data = $this->order_handler->buildOrder($order);
+      $order_data = $this->order_handler->buildOrder($order, $customer);
 
       $this->order_handler->addOrder($order->id(), $customer, $order_data);
     }
@@ -126,7 +126,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     // MailChimp considers any order to be a cart until the order is complete.
     // This order is created as a cart in MailChimp when assigned to the user.
-    $order_data = $this->order_handler->buildOrder($order);
+    $order_data = $this->order_handler->buildOrder($order, $customer);
 
     // Add cart item price to order data.
     if (!isset($order_data['currency_code'])) {
