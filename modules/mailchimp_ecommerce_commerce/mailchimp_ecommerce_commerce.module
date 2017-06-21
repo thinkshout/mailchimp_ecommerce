@@ -391,13 +391,11 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
       $lines[] = $line;
     }
   }
-  // Pull optin status. //todo fix opt in
 
   // Customer parameters used in the 'customer' portions of the API wrapper.
   $customer = [
     'id' => $customer_id,
     'email_address' => $customer_email,
-    'opt_in_status' => $opt_in_status,
   ];
 
   // Order paramaters that are used as the 'cart' portions of the API wrapper.
