@@ -199,8 +199,9 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  * Implements hook_commerce_checkout_complete().
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile',$order_wrapper->commerce_customer_billing->getIdentifier());
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper);
 
   // Convert cart to order in MailChimp.
   mailchimp_ecommerce_delete_cart($order->order_id);
@@ -295,8 +296,9 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
     // an empty cart in MailChimp.
     mailchimp_ecommerce_delete_cart($order->order_id);
   }
-  $wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($wrapper);
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile',$order_wrapper->commerce_customer_billing);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper);
 
   if ($order->created == $order->changed) {
     mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
@@ -350,17 +352,15 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  * @throws Exception
  *   Throws an exception if Opt In Status is not set.
  */
-function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper = null) {
+function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper) {
   $billing_address = [];
   $lines = [];
 
-  if ($customer_wrapper->uid != 0) {
-    $user = user_load($customer_wrapper->uid);
-    $customer_email = $user->mail;
+  if (isset($order_wrapper->mail)) {
+    $customer_email = $order_wrapper->mail->value();
   } else {
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
-
   if (isset($order_wrapper->commerce_order_total->currency_code)) {
     $currency_code = $order_wrapper->commerce_order_total->currency_code->value();
   }
