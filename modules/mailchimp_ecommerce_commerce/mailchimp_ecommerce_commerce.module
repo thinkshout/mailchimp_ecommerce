@@ -280,7 +280,7 @@ function mailchimp_ecommerce_commerce_rules_action_info() {
 }
 
 /**
- * Implements hook_commerce_order_presave().
+ * Rule callback for cart add.
  */
 function _mailchimp_ecommerce_commerce_send_cart($order) {
   if (empty($order->commerce_line_items)) {
