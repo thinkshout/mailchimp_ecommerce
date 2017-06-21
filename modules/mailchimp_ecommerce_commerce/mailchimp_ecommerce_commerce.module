@@ -137,6 +137,12 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   }
   $first_name = '';
   $last_name = '';
+  if (isset($customer_profile->entity_context['entity_id'])) {
+    $order_id = $customer_profile->entity_context['entity_id'];
+  }
+  else {
+    return;
+  }
   if ($customer_profile->uid != 0) {
     $user = user_load($customer_profile->uid);
     $customer_email = $user->mail;
@@ -168,7 +174,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   }
 
   // Update the order with the customer information.
-  $order_id = $customer_profile->entity_context['entity_id'];
   $order = commerce_order_load($order_id);
 
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
@@ -327,7 +332,7 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
       isset($customer_profile_wrapper->commerce_customer_address->postal_code) &&
       isset($customer_profile_wrapper->commerce_customer_address->country)
   ) {
-    $address = (object) [
+    $address = [
       'address1' => $customer_profile_wrapper->commerce_customer_address->thoroughfare->value(),
       'address2' => $customer_profile_wrapper->commerce_customer_address->premise->value(),
       'city' => $customer_profile_wrapper->commerce_customer_address->locality->value(),
