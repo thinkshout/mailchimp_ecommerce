@@ -374,9 +374,6 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
 
   if (isset($customer_wrapper->commerce_customer_address)) {
     $billing_address = mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_wrapper);
-    if (empty($billing_address['organisation_name'])) {
-      $billing_address['organisation_name'] = '';
-    }
   }
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
