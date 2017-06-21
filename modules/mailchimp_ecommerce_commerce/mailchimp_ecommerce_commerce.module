@@ -86,7 +86,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
 
   $first_name = '';
   $last_name = '';
-  $customer_email = '';
   if ($customer_profile->uid != 0) {
     $user = user_load($customer_profile->uid);
     $customer_email = $user->mail;
@@ -102,7 +101,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
     $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
-  //TODO: Get the email of a customer profile
   $customer = [
     'id' => $customer_profile->profile_id,
     'email_address' => $customer_email,
