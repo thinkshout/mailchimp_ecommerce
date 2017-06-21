@@ -144,6 +144,10 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
   if ($op == 'new') {
     $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
+    // Do nothing with no email.
+    if (!$mc_order['customer']['email_address']) {
+      return;
+    }
     if ($order->order_status == 'in_checkout') {
       // Ubercart doesn't create an entity for a customer, so we create
       // a customer in MailChimp at the same time as the cart.

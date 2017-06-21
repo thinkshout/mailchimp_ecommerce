@@ -316,6 +316,10 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
     if (empty($store_id)) {
       throw new Exception('Cannot update a cart without a store ID.');
     }
+    // Do nothing with no email.
+    if (!$customer['email_address']) {
+      return;
+    }
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
