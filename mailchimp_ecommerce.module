@@ -275,6 +275,11 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
     if (empty($store_id)) {
       throw new Exception('Cannot add a cart without a store ID.');
     }
+
+    // Do nothing with no email.
+    if (!$customer['email_address']) {
+      return;
+    }
     if (!mailchimp_ecommerce_validate_customer($customer)) {
       // A user not existing in the store's MailChimp list is not an error, so
       // don't throw an exception.
@@ -284,8 +289,18 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
     if (!empty($campaign_id)) {
       $cart['campaign_id'] = $campaign_id;
     }
+
+    $list_id = mailchimp_ecommerce_get_list_id();
+
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
+    if (isset($memberinfo->status)) {
+      $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+    }
+
     $mc_ecommerce->addCart($store_id, $cart_id, $customer, $cart);
   }
   catch (Exception $e) {
@@ -321,8 +336,17 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
       return;
     }
 
+    $list_id = mailchimp_ecommerce_get_list_id();
+
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
+    if (isset($memberinfo->status)) {
+      $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+    }
+
     $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
   }
   catch (Exception $e) {
@@ -507,8 +531,16 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
       $order['campaign_id'] = $campaign_id;
     }
 
+    $list_id = mailchimp_ecommerce_get_list_id();
+
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
+    if (isset($memberinfo->status)) {
+      $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+    }
     $mc_ecommerce->addOrder($store_id, $order_id, $customer, $order);
   }
   catch (Exception $e) {

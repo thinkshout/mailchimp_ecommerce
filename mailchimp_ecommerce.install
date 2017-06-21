@@ -11,5 +11,4 @@
 function mailchimp_ecommerce_uninstall() {
   variable_del('mailchimp_ecommerce_store_name');
   variable_del('mailchimp_ecommerce_list_id');
-  variable_del('mailchimp_ecommerce_opt_in_status');
 }

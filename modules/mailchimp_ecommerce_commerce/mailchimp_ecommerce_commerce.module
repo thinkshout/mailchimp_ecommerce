@@ -353,7 +353,6 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
 function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper = null) {
   $billing_address = [];
   $lines = [];
-  $opt_in_status = false;
 
   if ($customer_wrapper->uid != 0) {
     $user = user_load($customer_wrapper->uid);
