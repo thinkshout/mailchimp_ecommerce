@@ -302,7 +302,9 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
     mailchimp_ecommerce_delete_cart($order->order_id);
   }
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile',$order_wrapper->commerce_customer_billing);
+  $customer = commerce_customer_profile_load($order_wrapper->commerce_customer_billing->getIdentifier());
+
+  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer);
   $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper);
 
   if ($order->created == $order->changed) {
