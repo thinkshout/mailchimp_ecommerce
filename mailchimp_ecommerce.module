@@ -816,16 +816,6 @@ function mailchimp_ecommerce_get_campaign_id() {
 }
 
 /**
- * Determines if a MailChimp eCommerce integration is enabled.
- *
- * @return bool
- *   TRUE if an integration is enabled.
- */
-function mailchimp_ecommerce_is_enabled() {
-  return (variable_get('mailchimp_ecommerce_integration', '') !== '');
-}
-
-/**
  * Determines if customer data is valid.
  *
  * @param array $customer

@@ -80,10 +80,6 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
  * Implements hook_commerce_customer_profile_insert().
  */
 function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer_profile) {
-  if (!mailchimp_ecommerce_is_enabled()) {
-    return;
-  }
-
   $first_name = '';
   $last_name = '';
   if ($customer_profile->uid != 0) {
@@ -132,9 +128,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
  * Implements hook_commerce_customer_profile_update().
  */
 function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer_profile) {
-  if (!mailchimp_ecommerce_is_enabled()) {
-    return;
-  }
   $first_name = '';
   $last_name = '';
   if (isset($customer_profile->entity_context['entity_id'])) {
@@ -186,9 +179,6 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
  * Implements hook_commerce_customer_profile_delete().
  */
 function mailchimp_ecommerce_commerce_commerce_customer_profile_delete($customer_profile) {
-  if (!mailchimp_ecommerce_is_enabled()) {
-    return;
-  }
 
   mailchimp_ecommerce_delete_customer($customer_profile->uid);
 }
