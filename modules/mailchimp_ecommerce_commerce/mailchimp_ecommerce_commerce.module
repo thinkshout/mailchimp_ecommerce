@@ -405,3 +405,56 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
 
   return ['customer' => $customer, 'order_data' => $order_data];
 }
+
+/**
+ * @inheritdoc
+ */
+function _mailchimp_ecommerce_get_local_customer($email) {
+
+  // Load an existing customer using the order email.
+  $result = db_query("SELECT mailchimp_customer_id FROM {mailchimp_ecommerce_customer} WHERE mail = :email", array(
+    ':mail' => $email,
+  ));
+
+  if (!empty($result)) {
+    $customer_id = $result->mailchimp_customer_id;
+  }
+  else {
+    $customer_id = db_insert('mailchimp_ecommerce_customer')
+    ->fields(array(
+      'mail' => $email
+    ))
+    ->execute();
+  }
+
+  return $customer_id;
+}
+
+/**
+ * Increment order totals
+ */
+function _mailchimp_ecommerce_increment_order_total($email_address, $total_spent, $orders_count = 1) {
+  $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
+                          ->fields('c', ['mailchimp_customer_id', 'orders_count', 'total_spent'])
+                          ->condition('mail', $email_address);
+
+  $result = $query->execute()->fetch();
+
+  if (!empty($result)) {
+    $customer_id = $result->mailchimp_customer_id;
+    $new_orders_count = ($result->orders_count + $orders_count);
+    $new_total_spent = ($result->total_spent + $total_spent);
+
+    $this->database->update('mailchimp_ecommerce_customer')
+                   ->fields([
+                     'orders_count' => $new_orders_count,
+                     'total_spent' => $new_total_spent,
+                   ])
+                   ->condition('mailchimp_customer_id', $customer_id)
+                   ->execute();
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
