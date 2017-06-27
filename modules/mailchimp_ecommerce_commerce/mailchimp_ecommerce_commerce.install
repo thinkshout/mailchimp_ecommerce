@@ -10,6 +10,10 @@
  */
 function mailchimp_ecommerce_commerce_uninstall() {
   variable_del('mailchimp_ecommerce_store_id');
+  variable_del('mailchimp_ecommerce_currency');
+  variable_del('mailchimp_ecommerce_list_id');
+  variable_del('mailchimp_ecommerce_opt_in_status');
+  variable_del('mailchimp_ecommerce_store_name');
 }
 
 /**
@@ -56,44 +60,6 @@ function mailchimp_ecommerce_schema() {
 }
 
 /**
- * Install the 'mailchimp_ecommerce_customer' table schema.
- */
-function mailchimp_ecommerce_update_8001() {
-  drupal_install_schema('mailchimp_ecommerce_customer');
-}
-
-/**
- * Add 'orders_count', 'total_spent' to 'mailchimp_ecommerce_customer' table.
- */
-function mailchimp_ecommerce_update_8002() {
-  // Field to track total orders per customer.
-  $orders_count = [
-    'type' => 'int',
-    'description' => 'Total orders for this customer.',
-    'unsigned' => TRUE,
-    'default' => 0,
-  ];
-
-  // Field to track total amount spent per customer.
-  // `precision` and `scale` are based on the `price__number` column of the
-  // `commerce_product_variation_field_data` table, provided by the
-  // Drupal Commerce module.
-  $total_spent = [
-    'type' => 'numeric',
-    'description' => 'Total amount spent by this customer.',
-    'unsigned' => TRUE,
-    'precision' => 19,
-    'scale' => 6,
-    'default' => 0,
-  ];
-
-  $schema = Database::getConnection()->schema();
-  $schema->addField('mailchimp_ecommerce_customer', 'orders_count', $orders_count);
-  $schema->addField('mailchimp_ecommerce_customer', 'total_spent', $total_spent);
-}
-
-
-/**
  * Delete unused variable.
  */
 function mailchimp_ecommerce_commerce_update_7001() {
@@ -105,4 +71,11 @@ function mailchimp_ecommerce_commerce_update_7001() {
  */
 function mailchimp_ecommerce_update_7002() {
   variable_del('mailchimp_ecommere_commerce_default_currency');
+}
+
+/**
+ * Install the 'mailchimp_ecommerce_customer' table schema.
+ */
+function mailchimp_ecommerce_update_7003() {
+  drupal_install_schema('mailchimp_ecommerce_customer');
 }
