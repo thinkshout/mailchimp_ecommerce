@@ -9,54 +9,7 @@
  * Implements hook_uninstall().
  */
 function mailchimp_ecommerce_commerce_uninstall() {
-  variable_del('mailchimp_ecommerce_store_id');
-  variable_del('mailchimp_ecommerce_currency');
-  variable_del('mailchimp_ecommerce_list_id');
-  variable_del('mailchimp_ecommerce_opt_in_status');
-  variable_del('mailchimp_ecommerce_store_name');
-}
 
-/**
- * Implements hook_schema().
- */
-function mailchimp_ecommerce_schema() {
-  $schema['mailchimp_ecommerce_customer'] = [
-    'description' => 'Maintains a connection between carts, orders and a MailChimp customer.',
-    'fields' => [
-      'mailchimp_customer_id' => [
-        'description' => 'Primary Key (unique ID).',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-      'mail' => [
-        'description' => 'The customer email.',
-        'type' => 'varchar',
-        'length' => 254,
-        'not null' => FALSE,
-      ],
-      'orders_count' => [
-        'type' => 'int',
-        'description' => 'Total orders for this customer.',
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
-      'total_spent' => [
-        'type' => 'numeric',
-        'description' => 'Total amount spent by this customer.',
-        'unsigned' => TRUE,
-        'precision' => 19,
-        'scale' => 6,
-        'default' => 0,
-      ],
-    ],
-    'primary key' => ['mailchimp_customer_id'],
-    'indexes' => [
-      'mail' => ['mail'],
-    ],
-  ];
-
-  return $schema;
 }
 
 /**
@@ -73,9 +26,3 @@ function mailchimp_ecommerce_update_7002() {
   variable_del('mailchimp_ecommere_commerce_default_currency');
 }
 
-/**
- * Install the 'mailchimp_ecommerce_customer' table schema.
- */
-function mailchimp_ecommerce_update_7003() {
-  drupal_install_schema('mailchimp_ecommerce_customer');
-}

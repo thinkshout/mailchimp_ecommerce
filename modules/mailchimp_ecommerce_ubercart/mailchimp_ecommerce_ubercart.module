@@ -229,8 +229,10 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
     }
   }
 
+  $customer_id = _mailchimp_ecommerce_get_local_customer($order->mail);
+
   $customer = [
-    'id' => $order->uid,
+    'id' => $customer_id,
     'email_address' => $order->primary_email,
     'first_name' => $order->billing_first_name,
     'last_name' => $order->billing_last_name,
