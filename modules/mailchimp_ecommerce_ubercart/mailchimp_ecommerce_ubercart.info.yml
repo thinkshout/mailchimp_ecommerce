@@ -1,0 +1,11 @@
+name: 'MailChimp eCommerce Ubercart'
+description: 'Integrates Ubercart with MailChimp eCommerce.'
+package: MailChimp
+core: 8.x
+dependencies:
+  - uc_cart
+  - uc_order
+  - uc_product
+  - uc_store
+  - mailchimp_ecommerce
+type: module

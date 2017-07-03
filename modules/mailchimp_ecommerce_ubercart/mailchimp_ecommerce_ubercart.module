@@ -1,0 +1,286 @@
+<?php
+
+/**
+ * @file
+ * Integrates Ubercart with MailChimp eCommerce.
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_alter(&$form, &$form_state) {
+  // Set default currently from Ubercart.
+  // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// $form['mailchimp_ecommerce_currency']['#default_value'] = variable_get('uc_currency_code', 'USD');
+
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $node) {
+  if ($node->getType() == 'product') {
+    // Create a corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    mailchimp_ecommerce_add_product(
+      $product['id'],
+      $product['variant_id'],
+      $product['title'],
+      $product['description'],
+      $product['type'],
+      $product['sku'],
+      $product['price']);
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $node) {
+  if ($node->getType() == 'product') {
+    // Update the corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    mailchimp_ecommerce_add_product(
+      $product['id'],
+      $product['variant_id'],
+      $product['title'],
+      $product['description'],
+      $product['type'],
+      $product['sku'],
+      $product['price']);
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function mailchimp_ecommerce_ubercart_node_delete(\Drupal\node\NodeInterface $node) {
+  if ($node->getType() == 'product') {
+    // Delete the corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    mailchimp_ecommerce_delete_product_variant($product['id'], $product['variant_id']);
+  }
+}
+
+/**
+ * Implements hook_mailchimp_ecommerce_add_store().
+ */
+function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
+  // Add existing Ubercart products to MailChimp.
+  $batch = [
+    'title' => t('Adding products to MailChimp'),
+    'operations' => [],
+  ];
+
+  $products = \Drupal::entityManager()->getStorage('node')->loadByProperties([
+    'type' => 'product',
+  ]);
+
+  if (!empty($products)) {
+    $product_ids = array_keys($products);
+
+    foreach ($product_ids as $product_id) {
+      $batch['operations'][] = [
+        'mailchimp_ecommerce_ubercart_batch_add_product',
+        [
+          $product_id,
+        ],
+      ];
+    }
+  }
+
+  batch_set($batch);
+}
+
+/**
+ * Batch callback used to add a product to MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) {
+  $node = \Drupal::entityManager()->getStorage('node')->load($product_id);
+
+  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+  mailchimp_ecommerce_add_product(
+    $product['id'],
+    $product['variant_id'],
+    $product['title'],
+    $product['description'],
+    $product['type'],
+    $product['sku'],
+    $product['price']);
+}
+
+/**
+ * Gets MailChimp product values from an Ubercart product node.
+ *
+ * @param object $node
+ *   The Ubercart 'product' type node.
+ *
+ * @return array
+ *   Array of product values for use with MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_get_product_values_from_node(\Drupal\node\NodeInterface $node) {
+  $node_wrapper = entity_metadata_wrapper('node', $node);
+
+  $product = array(
+    'id' => $node_wrapper->nid->value(),
+    'variant_id' => $node_wrapper->model->value(),
+    'sku' => $node_wrapper->model->value(),
+    'title' => $node_wrapper->title->value(),
+    'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
+    'price' => $node_wrapper->sell_price->value(),
+    // TODO: Ubercart product types.
+    'type' => '',
+  );
+
+  return $product;
+}
+
+/**
+ * Implements hook_uc_order().
+ */
+function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
+  if ($op == 'new') {
+    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
+    // Do nothing with no email.
+    if (!$mc_order['customer']['email_address']) {
+      return;
+    }
+    if ($order->order_status == 'in_checkout') {
+      // Ubercart doesn't create an entity for a customer, so we create
+      // a customer in MailChimp at the same time as the cart.
+
+      if (mailchimp_ecommerce_get_customer($order->uid)) {
+        mailchimp_ecommerce_update_customer($mc_order['customer']);
+      }
+      else {
+        mailchimp_ecommerce_add_customer($mc_order['customer']);
+      }
+
+      // Create new cart in MailChimp.
+      mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+    else {
+      // Create new order in MailChimp.
+      mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+  }
+  elseif ($op == 'save') {
+    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
+    if ($order->order_status == 'in_checkout') {
+      // Update cart in MailChimp.
+      mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+    else {
+      if (!empty(mailchimp_ecommerce_get_order($order->order_id))) {
+
+        // Update existing order in MailChimp.
+        mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
+      }
+    }
+  }
+  elseif ($op  == 'update') {
+    if ($order->order_status == 'in_checkout') {
+      $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
+      // Convert cart to order in MailChimp.
+      mailchimp_ecommerce_delete_cart($order->order_id);
+      mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+    }
+  }
+}
+
+/**
+ * Builds a MailChimp order from an Ubercart order.
+ *
+ * @param UcOrder $order
+ *   The Ubercart order.
+ *
+ * @return object
+ *   Order object in a MailChimp-friendly format.
+ */
+function mailchimp_ecommerce_ubercart_build_order($order) {
+  $currency_code = $order->currency;
+  $order_total = '';
+  $lines = [];
+
+  $billing_address = mailchimp_ecommerce_ubercart_parse_billing_address($order);
+
+  $billing_address->name = $order->billing_first_name . ' ' . $order->billing_last_name;
+  $billing_address->company = $order->billing_company;
+
+  $order_total = uc_order_get_total($order);
+
+  $products = uc_cart_get_contents();
+  if (!empty($products)) {
+    foreach ($products as $product) {
+      $line = [
+        'id' => $product->cart_item_id,
+        'product_id' => $product->nid,
+        'product_variant_id' => $product->model,
+        'quantity' => (int) $product->qty,
+        'price' => $product->price,
+      ];
+
+      $lines[] = $line;
+    }
+  }
+
+  $customer_id = _mailchimp_ecommerce_get_local_customer($order->mail);
+
+  $customer = [
+    'id' => $customer_id,
+    'email_address' => $order->primary_email,
+    'first_name' => $order->billing_first_name,
+    'last_name' => $order->billing_last_name,
+    'address' => mailchimp_ecommerce_ubercart_parse_billing_address($order),
+  ];
+
+  $order_data = [
+    'currency_code' => $currency_code,
+    'order_total' => $order_total,
+    'billing_address' => $billing_address,
+    'processed_at_foreign' => date('c'),
+    'lines' => $lines,
+  ];
+
+  return ['customer' => $customer, 'order_data' => $order_data];
+}
+
+/**
+ * Parses a billing address from an Ubercart order.
+ *
+ * @param object $order
+ *   The Ubercart order.
+ *
+ * @return object
+ *   An address object formatted for use with MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
+  $country = uc_get_country_data(array('country_id' => $order->billing_country));
+  $country_code = (isset($country[0])) ? $country[0]['country_iso_code_3'] : '';
+  $province_code = uc_get_zone_code($order->billing_zone);
+
+  $address = (object) [
+    'address1' => $order->billing_street1,
+    'address2' => $order->billing_street2,
+    'city' => $order->billing_city,
+    'province_code' => ($province_code !== FALSE) ? $province_code : '',
+    'postal_code' => $order->billing_postal_code,
+    'country_code' => $country_code,
+  ];
+
+  return $address;
+}
+
+// TODO: Implement mailchimp_ecommerce_update_customer()
+// TODO: Implement mailchimp_ecommerce_delete_customer()
+// TODO: Implement mailchimp_ecommerce_get_customer()

@@ -4,7 +4,7 @@ namespace Drupal\mailchimp_ecommerce_ubercart\Form;
 
 use Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceSync;
 
-class MailchimpEcommerceUbercartSync extends MailchimpEcommerceSync {
+class MailchimpEcommerceCommerceSync extends MailchimpEcommerceSync {
 
   /**
    * {@inheritdoc}
