@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\mailchimp_ecommerce_commerce;
+namespace Drupal\mailchimp_ecommerce_ubercart;
 
 /**
  * Batch process handler for syncing product data to MailChimp.
@@ -20,6 +20,8 @@ class BatchSyncProducts {
     $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
 
     foreach ($batch as $product_id) {
+
+      //TODO load ubercart3 product
       /** @var \Drupal\commerce_product\Entity\Product $product */
       $product = \Drupal\commerce_product\Entity\Product::load($product_id);
 

@@ -1,14 +1,10 @@
 <?php
-// TODO FIX NAMESPACE
-/**
- * @file
- * Test class and methods for the Mailchimp eCommerce Commerce module.
- */
+namespace Drupal\mailchimp_ecommerce_ubercart;
 
 /**
  * Tests for MailChimp eCommerce integration with Drupal Commerce.
  */
-class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
+class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
 
   /**
    * Returns info displayed in the test interface.
@@ -18,8 +14,8 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'MailChimp eCommerce Commerce',
-      'description' => 'Test MailChimp eCommerce integration with Drupal Commerce.',
+      'name' => 'MailChimp eCommerce Ubercart',
+      'description' => 'Test MailChimp eCommerce integration with Ubercart.',
       'group' => 'MailChimp',
     );
   }
@@ -137,6 +133,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     $edit['commerce_price[und][0][amount]'] = 5;
     $edit['status'] = 1;
 
+    // TODO Ubercart path
     $this->drupalPost('admin/commerce/products/add/product', $edit, t('Save product'));
 
     $this->assertText(t('Product saved.'), 'The text "Product saved." should appear on the page, indicating a product was added successfully.');

@@ -4,7 +4,7 @@ namespace Drupal\mailchimp_ecommerce_ubercart\Form;
 
 use Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceSync;
 
-class MailchimpEcommerceCommerceSync extends MailchimpEcommerceSync {
+class MailchimpEcommerceUbercartSync extends MailchimpEcommerceSync {
 
   /**
    * {@inheritdoc}
@@ -25,6 +25,7 @@ class MailchimpEcommerceCommerceSync extends MailchimpEcommerceSync {
         'operations' => [],
       ];
 
+      // TODO Get all products
       $query = \Drupal::entityQuery('commerce_product');
       $result = $query->execute();
 
@@ -32,7 +33,7 @@ class MailchimpEcommerceCommerceSync extends MailchimpEcommerceSync {
         $product_ids = array_keys($result);
 
         $batch['operations'][] = [
-          '\Drupal\mailchimp_ecommerce_commerce\BatchSyncProducts::syncProducts',
+          '\Drupal\mailchimp_ecommerce_ubercart\BatchSyncProducts::syncProducts',
           [$product_ids],
         ];
       }
