@@ -19,7 +19,7 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
     $product_handler = new ProductHandler;
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-    //$variants = $product_handler->buildProductVariants($product);
+    $variants = $product_handler->buildProductVariants($product);
 
     $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
     /*
@@ -43,14 +43,12 @@ function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $no
     // Update the corresponding MailChimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-    mailchimp_ecommerce_add_product(
-      $product['id'],
-      $product['variant_id'],
-      $product['title'],
-      $product['description'],
-      $product['type'],
-      $product['sku'],
-      $product['price']);
+    $product_handler = new ProductHandler;
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    //$variants = $product_handler->buildProductVariants($product);
+
+    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
   }
 }
 
@@ -104,14 +102,12 @@ function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) 
 
   $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-  mailchimp_ecommerce_add_product(
-    $product['id'],
-    $product['variant_id'],
-    $product['title'],
-    $product['description'],
-    $product['type'],
-    $product['sku'],
-    $product['price']);
+  $product_handler = new ProductHandler;
+  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+  //$variants = $product_handler->buildProductVariants($product);
+
+  $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
 }
 
 /**
@@ -135,6 +131,20 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node(\Drupal\node\
     // TODO: Ubercart product types.
     'type' => '',
   );
+
+  $variant = [
+    'id' => $node->id(),
+    'title' => $product_variation->getTitle(),
+    'sku' => $product_variation->getSku(),
+  ];
+
+  $price = $product_variation->getPrice();
+  if (!empty($price)) {
+    $variant['price'] = $price->getNumber();
+  }
+  else {
+    $variant['price'] = 0;
+  }
 
   return $product;
 }
