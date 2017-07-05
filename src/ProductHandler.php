@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\Entity;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 
@@ -184,7 +185,7 @@ class ProductHandler implements ProductHandlerInterface {
    * @return array
    *   Array of product variant data.
    */
-  public function buildProductVariants(Product $product) {
+  public function buildProductVariants(Entity $product) {
     $variants = [];
 
     $product_variations = $product->get('variations')->getValue();

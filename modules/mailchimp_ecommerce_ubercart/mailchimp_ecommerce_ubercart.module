@@ -1,5 +1,10 @@
 <?php
 
+use Drupal\mailchimp_ecommerce\CartHandler;
+use Drupal\mailchimp_ecommerce\CustomerHandler;
+use Drupal\mailchimp_ecommerce\OrderHandler;
+use Drupal\mailchimp_ecommerce\ProductHandler;
+
 /**
  * @file
  * Integrates Ubercart with MailChimp eCommerce.
@@ -11,8 +16,13 @@
 function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $node) {
   if ($node->getType() == 'product') {
     // Create a corresponding MailChimp product.
+    $product_handler = new ProductHandler;
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
+    //$variants = $product_handler->buildProductVariants($product);
+
+    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
+    /*
     mailchimp_ecommerce_add_product(
       $product['id'],
       $product['variant_id'],
@@ -21,6 +31,7 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
       $product['type'],
       $product['sku'],
       $product['price']);
+    */
   }
 }
 
