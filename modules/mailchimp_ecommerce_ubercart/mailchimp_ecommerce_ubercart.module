@@ -20,16 +20,6 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
-    /*
-    mailchimp_ecommerce_add_product(
-      $product['id'],
-      $product['variant_id'],
-      $product['title'],
-      $product['description'],
-      $product['type'],
-      $product['sku'],
-      $product['price']);
-    */
   }
 }
 
@@ -94,7 +84,7 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
  * Batch callback used to add a product to MailChimp.
  */
 function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) {
-  $node = \Drupal::entityManager()->getStorage('node')->load($product_id);
+  $node = Node::load($product_id);
   $product_handler = new ProductHandler;
   $product = $product_handler->buildProductFromNode($node);
 
