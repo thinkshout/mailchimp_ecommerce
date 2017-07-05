@@ -113,15 +113,14 @@ function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) 
  *   Array of product values for use with MailChimp.
  */
 function mailchimp_ecommerce_ubercart_get_product_values_from_node(\Drupal\node\NodeInterface $node) {
-  $node_wrapper = entity_metadata_wrapper('node', $node);
 
   $product = array(
-    'id' => $node_wrapper->nid->value(),
-    'variant_id' => $node_wrapper->model->value(),
-    'sku' => $node_wrapper->model->value(),
-    'title' => $node_wrapper->title->value(),
-    'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
-    'price' => $node_wrapper->sell_price->value(),
+    'id' => $node->id(),
+    'variant_id' => $node->get('model')->getValue(),
+    'sku' => $node->get('model')->getValue(),
+    'title' => $node->getTitle(),
+    'description' => $node->get('body')->getValue(),
+    //'price' => $node->get('sell_price')->getValue(),
     // TODO: Ubercart product types.
     'type' => '',
   );
