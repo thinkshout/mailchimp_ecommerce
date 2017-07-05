@@ -32,12 +32,12 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The Config Factory Interface.
-   * @param \Drupal\commerce_store\StoreContextInterface $store_context
+   * @param mixed $store_context
    *   The Store Context Interface.
    * @param \Drupal\mailchimp_ecommerce\StoreHandlerInterface $store_handler
    *   The Store Handler Interface.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StoreContextInterface $store_context, StoreHandlerInterface $store_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, $store_context, StoreHandlerInterface $store_handler) {
     parent::__construct($config_factory);
 
     $this->store_context = $store_context;
@@ -48,11 +48,22 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('commerce_store.store_context'),
-      $container->get('mailchimp_ecommerce.store_handler')
-    );
+    if (\Drupal::moduleHandler()->moduleExists('commerce')) {
+      new static(
+        $static = $container->get('config.factory'),
+        $container->get('commerce_store.store_context'),
+        $container->get('mailchimp_ecommerce.store_handler')
+      );
+    }
+    else {
+      $static = new static(
+        $container->get('config.factory'),
+        '',
+        $container->get('mailchimp_ecommerce.store_handler')
+      );
+    }
+
+      return $static;
   }
 
   /**
