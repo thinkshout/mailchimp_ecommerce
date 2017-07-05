@@ -219,4 +219,45 @@ class ProductHandler implements ProductHandlerInterface {
     return $variants;
   }
 
+  /**
+   * Build MailChimp product values from an Ubercart product node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The Ubercart 'product' type node.
+   *
+   * @return array
+   *   Array of product values for use with MailChimp.
+   */
+  function buildProductFromNode(\Drupal\node\NodeInterface $node) {
+    $variant = [
+      'id' => $node->id(),
+      'title' => $node->getTitle(),
+      'sku' => $node->get('model')->getValue(),
+    ];
+
+    $price = $node->get('price')->getValue();
+
+    if (!empty($price)) {
+      $variant['price'] = $price->getNumber();
+    }
+    else {
+      $variant['price'] = 0;
+    }
+
+    $product = array(
+      'id' => $node->id(),
+      'variant_id' => $node->id(),
+      'sku' => $node->get('model')->getValue(),
+      'title' => $node->getTitle(),
+      'description' => $node->get('body')->getValue(),
+      'price' => $node->get('price')->getValue(),
+      'type' => $node->getType(),
+      'variant' => $variant,
+    );
+
+
+
+    return $product;
+  }
+
 }

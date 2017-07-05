@@ -19,9 +19,7 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
     $product_handler = new ProductHandler;
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-    $variants = $product_handler->buildProductVariants($product);
-
-    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
+    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
     /*
     mailchimp_ecommerce_add_product(
       $product['id'],
@@ -46,9 +44,7 @@ function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $no
     $product_handler = new ProductHandler;
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-    //$variants = $product_handler->buildProductVariants($product);
-
-    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
+    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
   }
 }
 
@@ -99,54 +95,10 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
  */
 function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) {
   $node = \Drupal::entityManager()->getStorage('node')->load($product_id);
-
-  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
-
   $product_handler = new ProductHandler;
-  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+  $product = $product_handler->buildProductFromNode($node);
 
-  //$variants = $product_handler->buildProductVariants($product);
-
-  $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $variants);
-}
-
-/**
- * Gets MailChimp product values from an Ubercart product node.
- *
- * @param object $node
- *   The Ubercart 'product' type node.
- *
- * @return array
- *   Array of product values for use with MailChimp.
- */
-function mailchimp_ecommerce_ubercart_get_product_values_from_node(\Drupal\node\NodeInterface $node) {
-
-  $product = array(
-    'id' => $node->id(),
-    'variant_id' => $node->get('model')->getValue(),
-    'sku' => $node->get('model')->getValue(),
-    'title' => $node->getTitle(),
-    'description' => $node->get('body')->getValue(),
-    //'price' => $node->get('sell_price')->getValue(),
-    // TODO: Ubercart product types.
-    'type' => '',
-  );
-
-  $variant = [
-    'id' => $node->id(),
-    'title' => $product_variation->getTitle(),
-    'sku' => $product_variation->getSku(),
-  ];
-
-  $price = $product_variation->getPrice();
-  if (!empty($price)) {
-    $variant['price'] = $price->getNumber();
-  }
-  else {
-    $variant['price'] = 0;
-  }
-
-  return $product;
+  $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
 }
 
 /**
