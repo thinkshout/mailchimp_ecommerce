@@ -17,7 +17,7 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
   if ($node->getType() == 'product') {
     // Create a corresponding MailChimp product.
     $product_handler = new ProductHandler;
-    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+    $product = $product_handler->buildProductFromNode($node);
 
     $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
   }
@@ -32,7 +32,7 @@ function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $no
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     $product_handler = new ProductHandler;
-    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+    $product = $product_handler->buildProductFromNode($node);
 
     $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
   }
@@ -44,7 +44,8 @@ function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $no
 function mailchimp_ecommerce_ubercart_node_delete(\Drupal\node\NodeInterface $node) {
   if ($node->getType() == 'product') {
     // Delete the corresponding MailChimp product.
-    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+    $product_handler = new ProductHandler;
+    $product = $product_handler->buildProductFromNode($node);
 
     mailchimp_ecommerce_delete_product_variant($product['id'], $product['variant_id']);
   }
