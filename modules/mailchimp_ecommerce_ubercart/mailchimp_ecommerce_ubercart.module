@@ -47,7 +47,7 @@ function mailchimp_ecommerce_ubercart_node_delete(\Drupal\node\NodeInterface $no
     $product_handler = new ProductHandler;
     $product = $product_handler->buildProductFromNode($node);
 
-    mailchimp_ecommerce_delete_product_variant($product['id'], $product['variant_id']);
+    $product_handler->deleteProductVariant($product['id'], $product['variant_id']);
   }
 }
 
@@ -96,54 +96,46 @@ function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) 
  * Implements hook_uc_order().
  */
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
+  $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+  $customer_handler = new customerHandler;
+  $cart_handler = new cartHandler;
+  $order_handler = new orderHandler;
+
   if ($op == 'new') {
-    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
     // Do nothing with no email.
     if (!$mc_order['customer']['email_address']) {
       return;
     }
     if ($order->order_status == 'in_checkout') {
+
       // Ubercart doesn't create an entity for a customer, so we create
       // a customer in MailChimp at the same time as the cart.
 
-      if (mailchimp_ecommerce_get_customer($order->uid)) {
-        mailchimp_ecommerce_update_customer($mc_order['customer']);
-      }
-      else {
-        mailchimp_ecommerce_add_customer($mc_order['customer']);
-      }
+      $customer_handler->addOrUpdateCustomer($mc_order['customer']);
+
 
       // Create new cart in MailChimp.
-      mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      $cart_handler->addOrUpdateCart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
     else {
       // Create new order in MailChimp.
-      mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      $cart_handler->deleteCart($order->order_id);
+      $order_handler->addOrder($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
   }
   elseif ($op == 'save') {
-    $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
-    if ($order->order_status == 'in_checkout') {
-      // Update cart in MailChimp.
-      mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
-    }
-    else {
-      if (!empty(mailchimp_ecommerce_get_order($order->order_id))) {
+    // Update cart in MailChimp.
+    $cart_handler->addOrUpdateCart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
 
-        // Update existing order in MailChimp.
-        mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
-      }
-    }
   }
   elseif ($op  == 'update') {
     if ($order->order_status == 'in_checkout') {
-      $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
       // Convert cart to order in MailChimp.
-      mailchimp_ecommerce_delete_cart($order->order_id);
-      mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      $cart_handler->deleteCart($order->order_id);
+      $order_handler->addOrder($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
   }
 }
