@@ -232,30 +232,20 @@ class ProductHandler implements ProductHandlerInterface {
     $variant = [
       'id' => $node->id(),
       'title' => $node->getTitle(),
-      'sku' => $node->get('model')->getValue(),
+      'sku' => $node->model->value,
+      'price' => $node->price->value,
     ];
-
-    $price = $node->get('price')->getValue();
-
-    if (!empty($price)) {
-      $variant['price'] = $price->getNumber();
-    }
-    else {
-      $variant['price'] = 0;
-    }
 
     $product = array(
       'id' => $node->id(),
       'variant_id' => $node->id(),
-      'sku' => $node->get('model')->getValue(),
+      'sku' => $node->model->value,
       'title' => $node->getTitle(),
-      'description' => $node->get('body')->getValue(),
-      'price' => $node->get('price')->getValue(),
+      'description' => $node->body->value,
+      'price' => $node->price->value,
       'type' => $node->getType(),
-      'variant' => $variant,
+      'variants' => [$variant],
     );
-
-
 
     return $product;
   }

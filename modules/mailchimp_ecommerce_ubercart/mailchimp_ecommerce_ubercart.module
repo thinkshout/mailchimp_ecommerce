@@ -29,7 +29,6 @@ function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $no
 function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $node) {
   if ($node->getType() == 'product') {
     // Update the corresponding MailChimp product.
-    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     $product_handler = new ProductHandler;
     $product = $product_handler->buildProductFromNode($node);
