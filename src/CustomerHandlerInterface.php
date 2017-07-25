@@ -38,6 +38,17 @@ interface CustomerHandlerInterface {
   public function deleteCustomer($customer_id);
 
   /**
+   * Loads the existing customer id or creates a new one.
+   *
+   * @param array $customer
+   *   The customer.
+   *
+   * @return int $customer_id
+   *  The customer id.
+   */
+  public function loadCustomerId($customer);
+
+  /**
    * Saves the customer locally and returns customer data formatted for use with MailChimp.
    *
    * @param array $customer

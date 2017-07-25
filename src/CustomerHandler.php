@@ -109,18 +109,16 @@ class CustomerHandler implements CustomerHandlerInterface {
       drupal_set_message($e->getMessage(), 'error');
     }
   }
-
   /**
    * @inheritdoc
    */
-  public function buildCustomer($customer, $billing_profile) {
-    $customer_id = 0;
-    $list_id = mailchimp_ecommerce_get_list_id();
+  public function loadCustomerId($email) {
+    $customer = [];
 
-    // Load an existing customer using the order ID.
+    // Load an existing customer using the email.
     $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
       ->fields('c', ['mailchimp_customer_id'])
-      ->condition('mail', $customer['email_address']);
+      ->condition('mail', $email);
 
     $result = $query->execute()->fetch();
 
@@ -131,13 +129,25 @@ class CustomerHandler implements CustomerHandlerInterface {
     // Create a new customer if no customer is attached to the order.
     if (empty($customer_id)) {
       $customer_id = $result = $this->database->insert('mailchimp_ecommerce_customer')
-        ->fields(['mail' => $customer['email_address']])
+        ->fields(['mail' => $email])
         ->execute();
     }
 
+    return $customer_id;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function buildCustomer($customer, $billing_profile) {
+    $customer_id = 0;
+    $list_id = mailchimp_ecommerce_get_list_id();
+
+    $customer_id = $this->loadCustomerId($customer['email_address']);
     if (!empty($customer_id)) {
       $customer['id'] = $customer_id;
     }
+
     // Pull member information to get member status.
     $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
 

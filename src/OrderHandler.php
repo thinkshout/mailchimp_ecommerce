@@ -143,6 +143,8 @@ class OrderHandler implements OrderHandlerInterface {
     $currency_code = $order->getCurrency();
     $order_total = '';
     $lines = [];
+    $customer_handler = new customerHandler(\Drupal::database());
+
 
     $billing_address = $order->getAddress('billing');
     //(isset($province_code)) ? $province_code : ''
@@ -174,7 +176,7 @@ class OrderHandler implements OrderHandlerInterface {
       }
     }
 
-    $customer_id = _mailchimp_ecommerce_get_local_customer($order->mail);
+    $customer_id = $customer_handler->loadCustomerId($order->mail);
 
     $customer = [
       'id' => $customer_id,
