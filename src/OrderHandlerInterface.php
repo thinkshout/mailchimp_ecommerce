@@ -65,7 +65,7 @@ interface OrderHandlerInterface {
    * @return array
    *   Array of order data.
    */
-  public function buildOrder(Order $order, array $customer);
+  public function buildOrder(Drupal\commerce_order\Entity\Order $order, array $customer);
 
   /**
    * Returns product data formatted for use with MailChimp.
@@ -77,5 +77,16 @@ interface OrderHandlerInterface {
    *   Array of product data.
    */
   public function buildProduct(OrderItem $item);
+
+  /**
+   * Builds a MailChimp order from an Ubercart order.
+   *
+   * @param UcOrder $order
+   *   The Ubercart order.
+   *
+   * @return object
+   *   Order object in a MailChimp-friendly format.
+   */
+  public function buildUberOrder(\Drupal\uc_order\Entity\Order $order);
 
 }

@@ -87,7 +87,7 @@ class OrderHandler implements OrderHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function buildOrder(Order $order, array $customer) {
+  public function buildOrder(Drupal\commerce_order\Entity\Order $order, array $customer) {
     $order_items = $order->getItems();
     $lines = [];
 
@@ -134,6 +134,65 @@ class OrderHandler implements OrderHandlerInterface {
     ];
 
     return $product;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  function buildUberOrder(\Drupal\uc_order\Entity\Order $order) {
+    $currency_code = $order->getCurrency();
+    $order_total = '';
+    $lines = [];
+
+    $billing_address = $order->getAddress('billing');
+    //(isset($province_code)) ? $province_code : ''
+    $mc_billing_address = [
+
+      'name' => $billing_address->getFirstName() . ' ' . $billing_address->getLastName(),
+      'company' => null !== $billing_address->getCompany() ? $billing_address->getCompany() : '',
+      'address1' => $billing_address->getStreet1(),
+      'address2' => $billing_address->getStreet2(),
+      'city' => $billing_address->getCity(),
+      'province_code' => $billing_address->getZone(),
+      'postal_code' => $billing_address->getPostalCode(),
+      'country_code' => $billing_address->getCountry()
+    ];
+    $order_total = $order->getTotal();
+    $products = $order->getLineItems();
+
+    if (!empty($products)) {
+      foreach ($products as $product) {
+        $line = [
+          'id' => $product->cart_item_id,
+          'product_id' => $product->nid,
+          'product_variant_id' => $product->model,
+          'quantity' => (int) $product->qty,
+          'price' => $product->price,
+        ];
+
+        $lines[] = $line;
+      }
+    }
+
+    $customer_id = _mailchimp_ecommerce_get_local_customer($order->mail);
+
+    $customer = [
+      'id' => $customer_id,
+      'email_address' => $order->primary_email,
+      'first_name' => $order->billing_first_name,
+      'last_name' => $order->billing_last_name,
+      'address' => mailchimp_ecommerce_ubercart_parse_billing_address($order),
+    ];
+
+    $order_data = [
+      'currency_code' => $currency_code,
+      'order_total' => $order_total,
+      'billing_address' => $billing_address,
+      'processed_at_foreign' => date('c'),
+      'lines' => $lines,
+    ];
+
+    return ['customer' => $customer, 'order_data' => $order_data];
   }
 
 }
