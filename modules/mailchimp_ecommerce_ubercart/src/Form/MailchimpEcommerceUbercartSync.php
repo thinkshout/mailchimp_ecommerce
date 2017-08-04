@@ -25,7 +25,7 @@ class MailchimpEcommerceUbercartSync extends MailchimpEcommerceSync {
         'operations' => [],
       ];
 
-      // TODO Get all products
+      // TODO FIX ME TO load ubercart products
       $query = \Drupal::entityQuery('commerce_product');
       $result = $query->execute();
 

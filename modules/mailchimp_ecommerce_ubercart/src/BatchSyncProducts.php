@@ -21,9 +21,7 @@ class BatchSyncProducts {
 
     foreach ($batch as $product_id) {
 
-      //TODO load ubercart3 product
-      /** @var \Drupal\commerce_product\Entity\Product $product */
-      $product = \Drupal\commerce_product\Entity\Product::load($product_id);
+      $product = $node = Node::load($product_id);
 
       $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
       $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';

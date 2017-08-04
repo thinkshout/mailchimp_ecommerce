@@ -33,7 +33,6 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
     // Enable modules required for the test.
     $enabled_modules = array(
       'commerce',
-      'commerce_product_ui',
       'entity',
       'libraries',
       'mailchimp',
@@ -122,7 +121,6 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
     $admin = $this->drupalCreateUser(array(
       'administer site configuration',
       'configure store',
-      'administer commerce_product entities',
     ));
     $this->drupalLogin($admin);
 
