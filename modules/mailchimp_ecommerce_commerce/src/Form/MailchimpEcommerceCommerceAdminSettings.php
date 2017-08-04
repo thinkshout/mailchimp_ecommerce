@@ -1,11 +1,11 @@
 <?php
 
-namespace Drupal\mailchimp_ecommerce_ubercart\Form;
+namespace Drupal\mailchimp_ecommerce_commerce\Form;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceAdminSettings;
 
-class MailchimpEcommerceUbercartAdminSettings extends MailchimpEcommerceAdminSettings {
+class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSettings {
 
   /**
    * {@inheritdoc}
