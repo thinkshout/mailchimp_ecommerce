@@ -143,33 +143,40 @@ class OrderHandler implements OrderHandlerInterface {
     $currency_code = $order->getCurrency();
     $order_total = '';
     $lines = [];
+    $mc_billing_address = [];
+
+    //TODO: Refactor this into the customer handler.
     $customer_handler = new customerHandler(\Drupal::database());
 
-
     $billing_address = $order->getAddress('billing');
-    //(isset($province_code)) ? $province_code : ''
-    $mc_billing_address = [
-
-      'name' => $billing_address->getFirstName() . ' ' . $billing_address->getLastName(),
-      'company' => null !== $billing_address->getCompany() ? $billing_address->getCompany() : '',
-      'address1' => $billing_address->getStreet1(),
-      'address2' => $billing_address->getStreet2(),
-      'city' => $billing_address->getCity(),
-      'province_code' => $billing_address->getZone(),
-      'postal_code' => $billing_address->getPostalCode(),
-      'country_code' => $billing_address->getCountry()
-    ];
+    if ($billing_address->getFirstName() && $billing_address->getLastName()) {
+      $mc_billing_address = [
+        'name' => $billing_address->getFirstName() . ' ' . $billing_address->getLastName(),
+        'company' => $billing_address->getCompany(),
+        'address1' => $billing_address->getStreet1(),
+        'address2' => $billing_address->getStreet2(),
+        'city' => $billing_address->getCity(),
+        'province_code' => $billing_address->getZone(),
+        'postal_code' => $billing_address->getPostalCode(),
+        'country_code' => $billing_address->getCountry()
+      ];
+    }
+    foreach ($mc_billing_address as $key => $value) {
+      if ($value === null) {
+        unset($mc_billing_address[$key]);
+      }
+    }
     $order_total = $order->getTotal();
-    $products = $order->getLineItems();
+    $products = $order->products;
 
     if (!empty($products)) {
       foreach ($products as $product) {
         $line = [
-          'id' => $product->cart_item_id,
-          'product_id' => $product->nid,
-          'product_variant_id' => $product->model,
-          'quantity' => (int) $product->qty,
-          'price' => $product->price,
+          'id' => $product->nid->target_id,
+          'product_id' => $product->nid->target_id,
+          'product_variant_id' => $product->nid->target_id,
+          'quantity' => (int) $product->qty->value,
+          'price' => $product->price->value,
         ];
 
         $lines[] = $line;
@@ -178,23 +185,42 @@ class OrderHandler implements OrderHandlerInterface {
 
     $customer_id = $customer_handler->loadCustomerId($order->mail);
 
+    $list_id = mailchimp_ecommerce_get_list_id();
+    // Pull member information to get member status.
+    $memberinfo = mailchimp_get_memberinfo($list_id, $order->getEmail(), TRUE);
+
+    $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+
     $customer = [
       'id' => $customer_id,
-      'email_address' => $order->primary_email,
-      'first_name' => $order->billing_first_name,
-      'last_name' => $order->billing_last_name,
-      'address' => mailchimp_ecommerce_ubercart_parse_billing_address($order),
+      'email_address' => $order->getEmail(),
+      'opt_in_status' => $opt_in_status,
+      'first_name' => $billing_address->getFirstName(),
+      'last_name' => $billing_address->getlastName(),
+      'address' => $mc_billing_address,
     ];
 
+    foreach ($customer as $key => $value) {
+      if ($value === null) {
+        unset($customer[$key]);
+      }
+    }
+    // TODO: END Refactor
+
     $order_data = [
+      'customer' => $customer,
       'currency_code' => $currency_code,
       'order_total' => $order_total,
-      'billing_address' => $billing_address,
+      'billing_address' => $mc_billing_address,
       'processed_at_foreign' => date('c'),
       'lines' => $lines,
     ];
+    foreach ($order_data as $key => $value) {
+      if ($value === null) {
+        unset($order_data[$key]);
+      }
+    }
 
     return ['customer' => $customer, 'order_data' => $order_data];
   }
-
 }

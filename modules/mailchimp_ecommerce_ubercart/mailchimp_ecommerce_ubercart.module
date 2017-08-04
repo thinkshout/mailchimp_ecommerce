@@ -97,7 +97,6 @@ function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) 
  * Implements hook_uc_order_create().
  */
 function mailchimp_ecommerce_ubercart_entity_insert(\Drupal\Core\Entity\EntityInterface $entity) {
-  echo 'huh?';
 }
 
 /**
@@ -159,17 +158,29 @@ function mailchimp_ecommerce_ubercart_uc_cart_checkout_start($order) {
   $cart_handler = new cartHandler;
   $order_handler = new orderHandler;
 
-  $mc_order = $order_handler->buildUberOrder($order);
-
-
-
+  $mc_data = $order_handler->buildUberOrder($order);
+  $cart_handler->addOrUpdateCart($order->id(), $mc_data['customer'], $mc_data['order_data']);
 }
+
 /**
  * Implements hook_uc_checkout_complete().
  */
 function mailchimp_ecommerce_ubercart_uc_checkout_complete($order, $account) {
-  $hi = 'wat?';
-  // This on checkout comlpete
+  if (!$order->getEmail()) {
+    return;
+  }
+  $customer_handler = new customerHandler(\Drupal::database());
+  $cart_handler = new cartHandler;
+  $order_handler = new orderHandler;
+
+  $cart_handler->deleteCart($order->id());
+  $mc_data = $order_handler->buildUberOrder($order);
+
+  // Update the customer's total order count and total amount spent.
+  $customer_handler->incrementCustomerOrderTotal($mc_data['customer']['email_address'], $mc_data['order_data']['order_total']);
+
+  $cart_handler->addOrUpdateCart($order->id(), $mc_data['customer'], $mc_data['order_data']);
+  $order_handler->addOrder($order->id(), $mc_data['customer'], $mc_data['order_data']);
 }
 
 /**
@@ -212,32 +223,6 @@ function mailchimp_ecommerce_ubertcart_uc_order_create($order) {
   }
 }
 */
-
-/**
- * Parses a billing address from an Ubercart order.
- *
- * @param object $order
- *   The Ubercart order.
- *
- * @return object
- *   An address object formatted for use with MailChimp.
- */
-function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
-  $country = uc_get_country_data(array('country_id' => $order->billing_country));
-  $country_code = (isset($country[0])) ? $country[0]['country_iso_code_3'] : '';
-  $province_code = uc_get_zone_code($order->billing_zone);
-
-  $address = (object) [
-    'address1' => $order->billing_street1,
-    'address2' => $order->billing_street2,
-    'city' => $order->billing_city,
-    'province_code' => ($province_code !== FALSE) ? $province_code : '',
-    'postal_code' => $order->billing_postal_code,
-    'country_code' => $country_code,
-  ];
-
-  return $address;
-}
 
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
