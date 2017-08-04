@@ -1,0 +1,5 @@
+services:
+  mailchimp_ecommerce_ubercart.route_subscriber:
+    class: '\Drupal\mailchimp_ecommerce_ubercart\Routing\RouteSubscriber'
+    tags:
+      - { name: event_subscriber }
