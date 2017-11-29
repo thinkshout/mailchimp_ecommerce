@@ -209,8 +209,9 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
   $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
+  $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   // TODO: Get product description from product display, if available.
-  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $price);
+  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price);
 }
 
 /**
@@ -219,7 +220,8 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
 function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
-  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $price);
+  $url = _mailchimp_ecommerce_commerce_build_product_url($product);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price);
 }
 
 /**
@@ -404,4 +406,13 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
   ];
 
   return ['customer' => $customer, 'order_data' => $order_data];
+}
+
+function _mailchimp_ecommerce_commerce_build_product_url($product) {
+  global $base_url;
+
+  $path = drupal_get_path_alias('product/' . $product->product_id);
+  $url = $base_url . '/' . $path;
+
+  return $url;
 }

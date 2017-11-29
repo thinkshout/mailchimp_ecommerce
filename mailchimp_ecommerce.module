@@ -599,7 +599,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $price) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -623,6 +623,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'id' => $product_variant_id,
           'title' => $title,
           'sku' => $sku,
+          'url' => $url,
           'price' => $price,
         ];
 
@@ -674,7 +675,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $price) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -686,6 +687,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
     $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
       'title' => $title,
       'sku' => $sku,
+      'url' => $url,
       'price' => $price,
     ]);
   }
