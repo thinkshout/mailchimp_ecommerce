@@ -6,6 +6,7 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Event\ProductEvent;
 use Drupal\commerce_product\Event\ProductEvents;
+use Drupal\Core\Url;
 use Drupal\mailchimp_ecommerce\ProductHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -62,6 +63,8 @@ class ProductEventSubscriber implements EventSubscriberInterface {
         /** @var ProductVariation $product_variation */
         $product_variation = ProductVariation::load($variation_data['target_id']);
 
+        $url = $this->buildProductUrl($product);
+
         $existing_variant = $this->product_handler->getProductVariant($product_id, $product_variation->id());
         if ($existing_variant == NULL) {
           // Create a new product variant.
@@ -99,6 +102,29 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     $events[ProductEvents::PRODUCT_DELETE][] = ['productDelete'];
 
     return $events;
+  }
+
+  /**
+   * Creates a URL from a product.
+   *
+   * @param Product $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  private function buildProductUrl(Product $product) {
+    global $base_url;
+
+    // MailChimp will accept an empty string if no URL is available.
+    $full_url = '';
+
+    $url = Url::fromRoute('entity.commerce_product.canonical', ['commerce_product' => $product->id()]);
+    if (!empty($url)) {
+      $full_url = $base_url . $url->toString();
+    }
+
+    return $full_url;
   }
 
 }
