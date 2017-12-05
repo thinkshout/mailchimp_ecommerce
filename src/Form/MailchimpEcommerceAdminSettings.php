@@ -2,9 +2,10 @@
 
 namespace Drupal\mailchimp_ecommerce\Form;
 
-use Drupal\commerce_store\StoreContextInterface;
+use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -16,7 +17,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
   /**
    * The Store Context Interface.
    *
-   * @var \Drupal\commerce_store\StoreContextInterface $store_context
+   * @var \Drupal\commerce_store\CurrentStoreInterface $store_context
    */
   protected $store_context;
 
@@ -37,7 +38,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    * @param \Drupal\mailchimp_ecommerce\StoreHandlerInterface $store_handler
    *   The Store Handler Interface.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, $store_context, StoreHandlerInterface $store_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, CurrentStoreInterface $store_context, StoreHandlerInterface $store_handler) {
     parent::__construct($config_factory);
 
     $this->store_context = $store_context;
@@ -49,9 +50,9 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     if (\Drupal::moduleHandler()->moduleExists('commerce')) {
-      new static(
-        $static = $container->get('config.factory'),
-        $container->get('commerce_store.store_context'),
+      $static = new static(
+        $container->get('config.factory'),
+        $container->get('commerce_store.current_store'),
         $container->get('mailchimp_ecommerce.store_handler')
       );
     }
@@ -101,7 +102,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form['mailchimp_ecommerce_notice'] = [
       '#markup' => t('This page will allow you to create a store. Once created, you cannot change the list associated with the store.'),
     ];
