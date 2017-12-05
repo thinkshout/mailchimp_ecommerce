@@ -485,27 +485,28 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wra
 function _mailchimp_ecommerce_commerce_build_product_url($product) {
   global $base_url;
 
+  // MailChimp will accept an empty string if no URL is available.
+  $url = '';
+
   // Find the node associated with this product.
   $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
   $product_node_field = variable_get('mailchimp_ecommerce_product_node_field', '');
 
-  $query = new EntityFieldQuery();
+  if (!empty($product_node_type) && !empty($product_node_field)) {
+    $query = new EntityFieldQuery();
 
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', $product_node_type)
-    ->fieldCondition($product_node_field, 'product_id', $product->product_id)
-    ->propertyCondition('status', NODE_PUBLISHED);
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', $product_node_type)
+      ->fieldCondition($product_node_field, 'product_id', $product->product_id)
+      ->propertyCondition('status', NODE_PUBLISHED);
 
-  $result = $query->execute();
-  if (!empty($result) && !empty($result['node'])) {
-    $node = reset($result['node']);
+    $result = $query->execute();
+    if (!empty($result) && !empty($result['node'])) {
+      $node = reset($result['node']);
 
-    $path = drupal_get_path_alias('node/' . $node->nid);
-    $url = $base_url . '/' . $path;
-  }
-  else {
-    // MailChimp will accept an empty string if no URL is available.
-    $url = '';
+      $path = drupal_get_path_alias('node/' . $node->nid);
+      $url = $base_url . '/' . $path;
+    }
   }
 
   return $url;
