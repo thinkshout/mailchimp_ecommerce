@@ -61,6 +61,7 @@ function mailchimp_ecommerce_admin_settings() {
       '#type' => 'fieldset',
       '#title' => t('Data sync'),
       '#collapsible' => FALSE,
+      '#weight' => 99,
     ];
     $form['sync']['products'] = [
       '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
