@@ -88,12 +88,20 @@ function mailchimp_ecommerce_get_store($store_id) {
  *   - name (string) The name of the store.
  *   - currency_code (string) The three-letter ISO 4217 code for the currency
  *     that the store accepts.
+ * @param string $platform
+ *   The eCommerce platform being used to create this store.
+ *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
  */
-function mailchimp_ecommerce_add_store($store_id, $store) {
+function mailchimp_ecommerce_add_store($store_id, $store, $platform) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_store = $mc_ecommerce->addStore($store_id, $store);
+
+    $parameters = [
+      'platform' => $platform,
+    ];
+
+    $mc_store = $mc_ecommerce->addStore($store_id, $store, $parameters);
 
     module_invoke_all('mailchimp_ecommerce_add_store', $mc_store);
   }
@@ -112,12 +120,20 @@ function mailchimp_ecommerce_add_store($store_id, $store) {
  *   The name of the store.
  * @param string $currency_code
  *   The three-letter ISO 4217 code.
+ * @param string $platform
+ *   The eCommerce platform being used to create this store.
+ *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
  */
-function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
+function mailchimp_ecommerce_update_store($store_id, $name, $currency_code, $platform) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateStore($store_id, $name, $currency_code);
+
+    $parameters = [
+      'platform' => $platform,
+    ];
+
+    $mc_ecommerce->updateStore($store_id, $name, $currency_code, $parameters);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a store: ' . $e->getMessage());
