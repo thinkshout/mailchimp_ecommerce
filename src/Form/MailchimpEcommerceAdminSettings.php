@@ -157,6 +157,11 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       ];
     }
 
+    $form['platform'] = [
+      '#type' => 'hidden',
+      '#default_value' => '',
+    ];
+
     $settings_form = parent::buildForm($form, $form_state);
 
     return $settings_form;
@@ -172,6 +177,8 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     if ($store_id != NULL) {
       $currency = $form_state->getValue(['mailchimp_ecommerce_currency']);
 
+      $platform = !empty($form_state->getValue('platform')) ? $form_state->getValue('platform') : '';
+
       // Determine if a store is being created or updated.
       $existing_store = $this->store_handler->getStore($store_id);
 
@@ -182,11 +189,10 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
           'currency_code' => $currency,
         ];
 
-        $this->store_handler->addStore($store_id, $store);
+        $this->store_handler->addStore($store_id, $store, $platform);
       }
       else {
-
-        $this->store_handler->updateStore($store_id, $form_state->getValue(['mailchimp_ecommerce_store_name']), $currency);
+        $this->store_handler->updateStore($store_id, $form_state->getValue(['mailchimp_ecommerce_store_name']), $currency, $platform);
       }
     }
 

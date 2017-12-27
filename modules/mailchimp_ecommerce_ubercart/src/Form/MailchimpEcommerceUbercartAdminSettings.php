@@ -22,6 +22,9 @@ class MailchimpEcommerceUbercartAdminSettings extends MailchimpEcommerceAdminSet
       }
     }
 
+    // Identify Ubercart to MailChimp.
+    $form['platform']['#default_value'] = 'Drupal Ubercart';
+
     return $form;
   }
 

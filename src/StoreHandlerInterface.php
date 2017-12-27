@@ -29,8 +29,11 @@ interface StoreHandlerInterface {
    *   - name (string) The name of the store.
    *   - currency_code (string) The three-letter ISO 4217 code for the currency
    *     that the store accepts.
+   * @param string $platform
+   *   The eCommerce platform being used to create this store.
+   *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
    */
-  public function addStore($store_id, $store);
+  public function addStore($store_id, $store, $platform);
 
   /**
    * Update a store name or currency code.
@@ -41,7 +44,10 @@ interface StoreHandlerInterface {
    *   The name of the store.
    * @param string $currency_code
    *   The three-letter ISO 4217 code.
+   * @param string $platform
+   *   The eCommerce platform being used to create this store.
+   *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
    */
-  public function updateStore($store_id, $name, $currency_code);
+  public function updateStore($store_id, $name, $currency_code, $platform);
 
 }

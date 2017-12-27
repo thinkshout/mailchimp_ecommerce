@@ -25,6 +25,9 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
       }
     }
 
+    // Identify Drupal Commerce to MailChimp.
+    $form['platform']['#default_value'] = 'Drupal Commerce';
+
     return $form;
   }
 

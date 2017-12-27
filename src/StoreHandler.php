@@ -33,11 +33,16 @@ class StoreHandler implements StoreHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addStore($store_id, $store) {
+  public function addStore($store_id, $store, $platform) {
     try {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_store = $mc_ecommerce->addStore($store_id, $store);
+
+      $parameters = [
+        'platform' => $platform,
+      ];
+
+      $mc_store = $mc_ecommerce->addStore($store_id, $store, $parameters);
 
       \Drupal::moduleHandler()->invokeAll('mailchimp_ecommerce_add_store', [$mc_store]);
     }
@@ -50,11 +55,16 @@ class StoreHandler implements StoreHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function updateStore($store_id, $name, $currency_code) {
+  public function updateStore($store_id, $name, $currency_code, $platform) {
     try {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_ecommerce->updateStore($store_id, $name, $currency_code);
+
+      $parameters = [
+        'platform' => $platform,
+      ];
+
+      $mc_ecommerce->updateStore($store_id, $name, $currency_code, $parameters);
     }
     catch (\Exception $e) {
       mailchimp_ecommerce_log_error_message('Unable to update a store: ' . $e->getMessage());
