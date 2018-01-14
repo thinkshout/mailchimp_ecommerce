@@ -19,7 +19,7 @@ function mailchimp_ecommerce_uninstall() {
  * Implements hook_schema().
  */
 function mailchimp_ecommerce_schema() {
-  $schema['mailchimp_ecommerce'] = [
+  $schema['mailchimp_ecommerce_customer'] = [
     'description' => 'Maintains a connection between carts, orders and a MailChimp customer.',
     'fields' => [
       'mailchimp_customer_id' => [
@@ -62,5 +62,5 @@ function mailchimp_ecommerce_schema() {
  * Install the 'mailchimp_ecommerce_customer' table schema.
  */
 function mailchimp_ecommerce_update_7002() {
-  drupal_install_schema('mailchimp_ecommerce');
+  drupal_install_schema('mailchimp_ecommerce_customer');
 }
