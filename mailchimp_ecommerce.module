@@ -902,21 +902,23 @@ function mailchimp_ecommerce_log_error_message($message) {
  * @inheritdoc
  */
 function _mailchimp_ecommerce_get_local_customer($email) {
-
   // Load an existing customer using the order email.
   $result = db_query("SELECT mailchimp_customer_id FROM {mailchimp_ecommerce_customer} WHERE mail = :mail", array(
     ':mail' => $email,
   ));
 
-  if (!empty($result)) {
-    $customer_id = $result->mailchimp_customer_id;
-  }
-  else {
+  $customer_id = NULL;
+  $customer = $result->fetchAssoc();
 
-    // Create a new local customer
+  if (!empty($customer)) {
+    $customer_id = $customer['mailchimp_customer_id'];
+  }
+
+  if (empty($customer_id)) {
+    // Create a new local customer.
     $customer_id = db_insert('mailchimp_ecommerce_customer')
       ->fields(array(
-        'mail' => $email
+        'mail' => $email,
       ))
       ->execute();
   }
