@@ -232,7 +232,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
     }
   }
 
-  $customer_id = _mailchimp_ecommerce_get_local_customer($order->mail);
+  $customer_id = _mailchimp_ecommerce_get_local_customer($order->primary_email);
 
   $customer = [
     'id' => $customer_id,
