@@ -104,27 +104,4 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     return $events;
   }
 
-  /**
-   * Creates a URL from a product.
-   *
-   * @param Product $product
-   *   The Commerce product object.
-   *
-   * @return string
-   *   The URL of the product.
-   */
-  private function buildProductUrl(Product $product) {
-    global $base_url;
-
-    // MailChimp will accept an empty string if no URL is available.
-    $full_url = '';
-
-    $url = Url::fromRoute('entity.commerce_product.canonical', ['commerce_product' => $product->id()]);
-    if (!empty($url)) {
-      $full_url = $base_url . $url->toString();
-    }
-
-    return $full_url;
-  }
-
 }

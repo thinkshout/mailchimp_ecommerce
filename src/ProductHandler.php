@@ -13,7 +13,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProduct($product_id, $title, $description, $type, $variants) {
+  public function addProduct($product_id, $title, $url, $description, $type, $variants) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -23,7 +23,7 @@ class ProductHandler implements ProductHandlerInterface {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
-      $mc_ecommerce->addProduct($store_id, (string) $product_id, $title, $variants, [
+      $mc_ecommerce->addProduct($store_id, (string) $product_id, $title, $url, $variants, [
         'description' => $description,
         'type' => $type,
       ]);
@@ -37,7 +37,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function updateProduct($product_id, $product_variant_id, $title, $sku, $price) {
+  public function updateProduct($product_id, $product_variant_id, $title, $url, $sku, $price) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -46,8 +46,18 @@ class ProductHandler implements ProductHandlerInterface {
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
+
+      // Update the base product with no variant.
+      $mc_ecommerce->updateProduct($store_id, $product_id, [], [
+          'title' => $title,
+          'url' => $url,
+          'price' => $price,
+      ]);
+
+      // Update the variant.
       $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
         'title' => $title,
+        'url' => $url,
         'sku' => $sku,
         'price' => $price,
       ]);
@@ -81,7 +91,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price) {
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -93,6 +103,7 @@ class ProductHandler implements ProductHandlerInterface {
       $mc_ecommerce->addProductVariant($store_id, $product_id, [
         'id' => $product_variant_id,
         'title' => $title,
+        'url' => $url,
         'sku' => $sku,
         'price' => $price,
       ]);
@@ -248,6 +259,31 @@ class ProductHandler implements ProductHandlerInterface {
     );
 
     return $product;
+  }
+
+  /**
+   * Creates a URL from a product.
+   *
+   * @param string $product_id
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  public function buildProductUrl($product_id) {
+    global $base_url;
+
+    // MailChimp will accept an empty string if no URL is available.
+    $full_url = '';
+
+    // TODO: Add Ubercart product URL
+
+    $url = Url::fromRoute('entity.commerce_product.canonical', ['commerce_product' => $product_id]);
+    if (!empty($url)) {
+      $full_url = $base_url . $url->toString();
+    }
+
+    return $full_url;
   }
 
 }

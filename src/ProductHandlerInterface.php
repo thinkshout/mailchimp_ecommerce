@@ -31,7 +31,7 @@ interface ProductHandlerInterface {
    *
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/products/#create-post_ecommerce_stores_store_id_products
    */
-  public function addProduct($product_id, $title, $description, $type, $variants);
+  public function addProduct($product_id, $title, $url, $description, $type, $variants);
 
   /**
    * Updates an existing product in MailChimp.
@@ -52,7 +52,7 @@ interface ProductHandlerInterface {
    * @param float $price
    *   The product price.
    */
-  public function updateProduct($product_id, $product_variant_id, $title, $sku, $price);
+  public function updateProduct($product_id, $product_variant_id, $title, $url, $sku, $price);
 
   /**
    * Deletes a product in MailChimp.
@@ -76,7 +76,7 @@ interface ProductHandlerInterface {
    * @param float $price
    *   The product price.
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price);
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price);
 
   /**
    * Gets a product variant from MailChimp.
@@ -104,4 +104,14 @@ interface ProductHandlerInterface {
    */
   public function deleteProductVariant($product_id, $product_variant_id);
 
+  /**
+   * Creates a URL from a Commerce product.
+   *
+   * @param string $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  function buildProductUrl($product_id);
 }
