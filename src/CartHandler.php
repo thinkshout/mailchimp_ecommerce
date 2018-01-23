@@ -157,7 +157,7 @@ class CartHandler implements CartHandlerInterface {
     }
     catch (\Exception $e) {
       if ($e->getCode() == 404) {
-        // Cart line doesn't exist; no need to log an error.
+        $mc_ecommerce->addCartLine($store_id, $cart_id, $line_id, $product);
       }
       else {
         mailchimp_ecommerce_log_error_message('Unable to update a cart line: ' . $e->getMessage());
