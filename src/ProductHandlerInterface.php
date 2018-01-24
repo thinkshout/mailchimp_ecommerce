@@ -2,6 +2,8 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\commerce_product\Entity\Product;
+
 /**
  * Interface for the Product handler.
  */
@@ -42,17 +44,19 @@ interface ProductHandlerInterface {
    *
    * @param string $product_id
    *   Unique ID of the product.
-   * @param string $product_variant_id
-   *   ID of the product variant.
-   *   May be identical to $product_id for single products.
    * @param string $title
    *   The product title.
-   * @param string $sku
-   *   The product SKU.
-   * @param float $price
-   *   The product price.
+   * @param string $url
+   *   The product URL.
+   * @param string $description
+   *   The product description.
+   * @param string $type
+   *   The product type.
+   * @param array $variants
+   *   The product variants.
+   *   May be identical to $product_id for single products.
    */
-  public function updateProduct($product_id, $product_variant_id, $title, $url, $sku, $price);
+  public function updateProduct($product_id, $title, $url, $description, $type, $variants);
 
   /**
    * Deletes a product in MailChimp.
@@ -107,11 +111,11 @@ interface ProductHandlerInterface {
   /**
    * Creates a URL from a Commerce product.
    *
-   * @param string $product
+   * @param Product $product
    *   The Commerce product object.
    *
    * @return string
    *   The URL of the product.
    */
-  function buildProductUrl($product_id);
+  function buildProductUrl($product);
 }

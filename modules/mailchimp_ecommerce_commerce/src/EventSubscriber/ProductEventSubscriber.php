@@ -6,7 +6,6 @@ use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Event\ProductEvent;
 use Drupal\commerce_product\Event\ProductEvents;
-use Drupal\Core\Url;
 use Drupal\mailchimp_ecommerce\ProductHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -42,11 +41,13 @@ class ProductEventSubscriber implements EventSubscriberInterface {
     $product_id = $product->get('product_id')->value;
     $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
     $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
+    // TODO Fix Type
     $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
 
     $variants = $this->product_handler->buildProductVariants($product);
+    $url = $this->product_handler->buildProductUrl($product);
 
-    $this->product_handler->addProduct($product_id, $title, $description, $type, $variants);
+    $this->product_handler->addProduct($product_id, $title, $url, $description, $type, $variants);
   }
 
   /**
@@ -55,35 +56,17 @@ class ProductEventSubscriber implements EventSubscriberInterface {
   public function productUpdate(ProductEvent $event) {
     $product = $event->getProduct();
 
-    $product_id = $product->get('product_id')->value;
+    $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
+    $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
+    // TODO Fix Type
+    $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
 
-    $product_variations = $product->get('variations')->getValue();
-    if (!empty($product_variations)) {
-      foreach ($product_variations as $variation_data) {
-        /** @var ProductVariation $product_variation */
-        $product_variation = ProductVariation::load($variation_data['target_id']);
+    $variants = $this->product_handler->buildProductVariants($product);
+    $url = $this->product_handler->buildProductUrl($product);
 
-        $url = $this->buildProductUrl($product);
+    // Update the existing product and variant.
+    $this->product_handler->updateProduct($product, $title, $url, $description, $type, $variants);
 
-        $existing_variant = $this->product_handler->getProductVariant($product_id, $product_variation->id());
-        if ($existing_variant == NULL) {
-          // Create a new product variant.
-          $this->product_handler->addProductVariant($product_id,
-            $product_variation->id(),
-            $product_variation->getTitle(),
-            $product_variation->getSku(),
-            $product_variation->getPrice()->getNumber());
-        }
-        else {
-          // Update the existing product variant.
-          $this->product_handler->updateProduct($product_id,
-            $product_variation->id(),
-            $product_variation->getTitle(),
-            $product_variation->getSku(),
-            $product_variation->getPrice()->getNumber());
-        }
-      }
-    }
   }
 
   /**
