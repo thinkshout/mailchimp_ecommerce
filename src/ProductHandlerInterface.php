@@ -2,6 +2,8 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\commerce_product\Entity\Product;
+
 /**
  * Interface for the Product handler.
  */
@@ -31,7 +33,7 @@ interface ProductHandlerInterface {
    *
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/products/#create-post_ecommerce_stores_store_id_products
    */
-  public function addProduct($product_id, $title, $description, $type, $variants);
+  public function addProduct($product_id, $title, $url, $description, $type, $variants);
 
   /**
    * Updates an existing product in MailChimp.
@@ -42,17 +44,19 @@ interface ProductHandlerInterface {
    *
    * @param string $product_id
    *   Unique ID of the product.
-   * @param string $product_variant_id
-   *   ID of the product variant.
-   *   May be identical to $product_id for single products.
    * @param string $title
    *   The product title.
-   * @param string $sku
-   *   The product SKU.
-   * @param float $price
-   *   The product price.
+   * @param string $url
+   *   The product URL.
+   * @param string $description
+   *   The product description.
+   * @param string $type
+   *   The product type.
+   * @param array $variants
+   *   The product variants.
+   *   May be identical to $product_id for single products.
    */
-  public function updateProduct($product_id, $product_variant_id, $title, $sku, $price);
+  public function updateProduct($product_id, $title, $url, $description, $type, $variants);
 
   /**
    * Deletes a product in MailChimp.
@@ -76,7 +80,7 @@ interface ProductHandlerInterface {
    * @param float $price
    *   The product price.
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price);
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price);
 
   /**
    * Gets a product variant from MailChimp.
@@ -104,4 +108,14 @@ interface ProductHandlerInterface {
    */
   public function deleteProductVariant($product_id, $product_variant_id);
 
+  /**
+   * Creates a URL from a Commerce product.
+   *
+   * @param Product $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  function buildProductUrl($product);
 }

@@ -30,10 +30,11 @@ class BatchSyncProducts {
       /** @var \Drupal\mailchimp_ecommerce\ProductHandler $product_handler */
       $product_handler = \Drupal::service('mailchimp_ecommerce.product_handler');
 
+      $url = $product_handler->buildProductUrl($product);
       $variants = $product_handler->buildProductVariants($product);
 
       // TODO: Replace with add or update product function to avoid duplicates.
-      $product_handler->addProduct($product_id, $title, $description, $type, $variants);
+      $product_handler->addProduct($product_id, $title, $url, $description, $type, $variants);
 
       $context['sandbox']['progress']++;
 

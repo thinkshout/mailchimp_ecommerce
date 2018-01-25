@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\Core\Url;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 
@@ -13,7 +14,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProduct($product_id, $title, $description, $type, $variants) {
+  public function addProduct($product_id, $title, $url, $description, $type, $variants) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -23,9 +24,10 @@ class ProductHandler implements ProductHandlerInterface {
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
-      $mc_ecommerce->addProduct($store_id, (string) $product_id, $title, $variants, [
+      $mc_ecommerce->addProduct($store_id, (string) $product_id, $title, $url, $variants, [
         'description' => $description,
         'type' => $type,
+        'url' => $url,
       ]);
     }
     catch (\Exception $e) {
@@ -37,24 +39,69 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function updateProduct($product_id, $product_variant_id, $title, $sku, $price) {
+  public function updateProduct($product, $title, $url, $description, $type, $variants) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
         throw new \Exception('Cannot update a product without a store ID.');
       }
 
+      $product_id = $product->get('product_id')->value;
+
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-      $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
-        'title' => $title,
-        'sku' => $sku,
-        'price' => $price,
+
+      // Update the base product with no variant.
+      $mc_ecommerce->updateProduct($store_id, $product_id, $variants, [
+          'title' => $title,
+          'description' => $description,
+          'type' => $type,
+          'url' => $url,
       ]);
+
+      // Update the variant.
+      $product_variations = $product->get('variations')->getValue();
+      if (!empty($product_variations)) {
+        foreach ($product_variations as $variation_data) {
+
+          /** @var ProductVariation $product_variation */
+          $product_variation = ProductVariation::load($variation_data['target_id']);
+
+          $url = $this->buildProductUrl($product);
+
+          $existing_variant = $this->getProductVariant($product_id, $product_variation->id());
+          if ($existing_variant) {
+
+            // Update the existing product variant.
+            $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variation->id(), [
+              'title' => $product->getTitle(),
+              'url' => $url,
+              'sku' => $product_variation->getSku(),
+              'price' => $product_variation->getPrice()->getNumber(),
+            ]);
+          }
+          else {
+
+            // Create a new product variant.
+            $this->addProductVariant($product_id,
+              $product_variation->id(),
+              $product->getTitle(),
+              $url,
+              $product_variation->getSku(),
+              $product_variation->getPrice()->getNumber());
+          }
+        }
+      }
     }
     catch (\Exception $e) {
-      mailchimp_ecommerce_log_error_message('Unable to update product: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      if ($e->getCode() == 404) {
+        drupal_set_message('This product doesn\'t exist in MailChimp. Please sync all your products.');
+      }
+      else {
+        // An actual error occurred; pass on the exception.
+        mailchimp_ecommerce_log_error_message('Unable to update product: ' . $e->getMessage());
+        drupal_set_message($e->getMessage(), 'error');
+      }
     }
   }
 
@@ -81,7 +128,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $sku, $price) {
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -93,6 +140,7 @@ class ProductHandler implements ProductHandlerInterface {
       $mc_ecommerce->addProductVariant($store_id, $product_id, [
         'id' => $product_variant_id,
         'title' => $title,
+        'url' => $url,
         'sku' => $sku,
         'price' => $price,
       ]);
@@ -192,10 +240,12 @@ class ProductHandler implements ProductHandlerInterface {
       foreach ($product_variations as $variation_data) {
         /** @var ProductVariation $product_variation */
         $product_variation = ProductVariation::load($variation_data['target_id']);
+        $url = $this->buildProductUrl($product);
 
         $variant = [
           'id' => $product_variation->id(),
-          'title' => $product_variation->getTitle(),
+          'title' => $product->getTitle(),
+          'url' => $url,
           'sku' => $product_variation->getSku(),
         ];
 
@@ -248,6 +298,30 @@ class ProductHandler implements ProductHandlerInterface {
     );
 
     return $product;
+  }
+
+  /**
+   * Creates a URL from a product.
+   *
+   * @param Product $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  public function buildProductUrl($product) {
+    global $base_url;
+
+    // MailChimp will accept an empty string if no URL is available.
+    $full_url = '';
+
+    // TODO: Add Ubercart product URL
+    $url = $product->toURL();
+    if (!empty($url)) {
+      $full_url = $base_url . $url->toString();
+    }
+
+    return $full_url;
   }
 
 }

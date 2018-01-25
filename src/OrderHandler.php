@@ -87,7 +87,7 @@ class OrderHandler implements OrderHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function buildOrder(Drupal\commerce_order\Entity\Order $order, array $customer) {
+  public function buildOrder(Order $order, array $customer) {
     $order_items = $order->getItems();
     $lines = [];
 
