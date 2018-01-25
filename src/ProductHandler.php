@@ -53,6 +53,7 @@ class ProductHandler implements ProductHandlerInterface {
 
       // Update the base product with no variant.
       $mc_ecommerce->updateProduct($store_id, $product_id, $variants, [
+          'title' => $title,
           'description' => $description,
           'type' => $type,
           'url' => $url,
@@ -72,12 +73,12 @@ class ProductHandler implements ProductHandlerInterface {
           if ($existing_variant) {
 
             // Update the existing product variant.
-            $mc_ecommerce->updateProductVariant($store_id, $product_id,
-              $product_variation->id(),
-              $product->getTitle(),
-              $url,
-              $product_variation->getSku(),
-              $product_variation->getPrice()->getNumber());
+            $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variation->id(), [
+              'title' => $product->getTitle(),
+              'url' => $url,
+              'sku' => $product_variation->getSku(),
+              'price' => $product_variation->getPrice()->getNumber(),
+            ]);
           }
           else {
 
