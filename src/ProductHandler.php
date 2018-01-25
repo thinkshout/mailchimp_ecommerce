@@ -90,13 +90,6 @@ class ProductHandler implements ProductHandlerInterface {
           }
         }
       }
-        $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
-          'title' => $title,
-          'url'   => $url,
-          'sku'   => $sku,
-          'price' => $price,
-        ]);
-
     }
     catch (\Exception $e) {
       if ($e->getCode() == 404) {
