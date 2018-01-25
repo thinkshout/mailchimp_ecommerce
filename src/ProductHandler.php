@@ -80,6 +80,7 @@ class ProductHandler implements ProductHandlerInterface {
               $product_variation->getPrice()->getNumber());
           }
           else {
+
             // Create a new product variant.
             $this->addProductVariant($product_id,
               $product_variation->id(),
