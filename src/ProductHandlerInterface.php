@@ -79,8 +79,10 @@ interface ProductHandlerInterface {
    *   The product SKU.
    * @param float $price
    *   The product price.
+   * @param int $stock
+   *   The stock total for a product.
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price);
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price, $stock);
 
   /**
    * Gets a product variant from MailChimp.

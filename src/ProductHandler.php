@@ -78,6 +78,9 @@ class ProductHandler implements ProductHandlerInterface {
               'url' => $url,
               'sku' => $product_variation->getSku(),
               'price' => $product_variation->getPrice()->getNumber(),
+
+              // Hard code a positive number because D8 doesn't support stock yet.
+              'inventory_quantity' => 100,
             ]);
           }
           else {
@@ -88,7 +91,8 @@ class ProductHandler implements ProductHandlerInterface {
               $product->getTitle(),
               $url,
               $product_variation->getSku(),
-              $product_variation->getPrice()->getNumber());
+              $product_variation->getPrice()->getNumber(),
+              100);
           }
         }
       }
@@ -128,7 +132,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price) {
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price, $stock) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -143,6 +147,7 @@ class ProductHandler implements ProductHandlerInterface {
         'url' => $url,
         'sku' => $sku,
         'price' => $price,
+        'inventory_quantity' => $stock,
       ]);
     }
     catch (\Exception $e) {
@@ -247,6 +252,7 @@ class ProductHandler implements ProductHandlerInterface {
           'title' => $product->getTitle(),
           'url' => $url,
           'sku' => $product_variation->getSku(),
+          'stock' => 100,
         ];
 
         $price = $product_variation->getPrice();
