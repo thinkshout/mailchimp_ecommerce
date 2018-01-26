@@ -57,19 +57,15 @@ function mailchimp_ecommerce_cron_queue_info() {
 /**
  * Callback to create a queue item.
  *
- * @param $item
- *  An a
- * The properties required vary by the op specified:
- * - 'op'
- *   The operation to be performed by the MailChimp API. This maps
- *   to the actual MailChimp API classes.
- *   Potenial values: addOrder, updateCart, addCart, deleteCart
- * - 'cart_id'
- * - 'store_id'
- * - 'customer'
- *  A fully loaded MailChimp $customer object
- *
- * - 'cart'
+ * @param array $item
+ *   Properties to send to the Queue API.
+ *   - 'op' (string) The operation to be performed by the MailChimp API. This maps
+ *     to the actual MailChimp API methods. 
+ *   - 'cart_id' (string) The ID of the current cart.
+ *   - 'store_id' (string) The Store ID.
+ *   - 'customer' (array) A fully loaded MailChimp $customer. 
+ *   - 'cart'  For cart operations, this is the $order from Drupal.
+ *   - 'order' For order operations, this is the $order from Drupal.
  */
 function mailchimp_ecommerce_create_queue_item($item) {
   $queue = DrupalQueue::get('mailchimp_ecommerce_ops');
