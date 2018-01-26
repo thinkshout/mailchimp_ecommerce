@@ -73,13 +73,11 @@ function mailchimp_ecommerce_admin_settings() {
     ];
   }
 
-  $form['mailchimp_ecommerce_use_queue'] = [
-    '#type' => 'radios',
-    '#options' => [ 1  => 'Queue requests', 0 => 'Do not use queue'],
-    '#title' => t('Use Queue'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('mailchimp_ecommerce_use_queue', 0),
-    '#description' => t('Enable this to use the Queue API to process requests as background tasks. Requires Cron.'),
+  // Identify the eCommerce platform to MailChimp. This value is set in this
+  // module's submodules for both Drupal Commerce and Ubercart.
+  $form['platform'] = [
+    '#type' => 'hidden',
+    '#default_value' => '',
   ];
 
   $settings_form = system_settings_form($form);
