@@ -80,15 +80,6 @@ function mailchimp_ecommerce_admin_settings() {
     '#default_value' => '',
   ];
 
-  $form['mailchimp_ecommerce_use_queue'] = [
-    '#type' => 'radios',
-    '#options' => [ 1  => 'Queue requests', 0 => 'Do not use queue'],
-    '#title' => t('Use Queue'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('mailchimp_ecommerce_use_queue', 0),
-    '#description' => t('Enable this to use the Queue API to process requests as background tasks. Requires Cron.'),
-  ];
-
   $settings_form = system_settings_form($form);
   $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
