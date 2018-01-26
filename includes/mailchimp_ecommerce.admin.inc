@@ -73,6 +73,13 @@ function mailchimp_ecommerce_admin_settings() {
     ];
   }
 
+  // Identify the eCommerce platform to MailChimp. This value is set in this
+  // module's submodules for both Drupal Commerce and Ubercart.
+  $form['platform'] = [
+    '#type' => 'hidden',
+    '#default_value' => '',
+  ];
+
   $form['mailchimp_ecommerce_use_queue'] = [
     '#type' => 'radios',
     '#options' => [ 1  => 'Queue requests', 0 => 'Do not use queue'],
