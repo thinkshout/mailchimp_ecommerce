@@ -60,10 +60,10 @@ function mailchimp_ecommerce_cron_queue_info() {
  * @param array $item
  *   Properties to send to the Queue API.
  *   - 'op' (string) The operation to be performed by the MailChimp API. This maps
- *     to the actual MailChimp API methods. 
+ *     to the actual MailChimp API methods.
  *   - 'cart_id' (string) The ID of the current cart.
  *   - 'store_id' (string) The Store ID.
- *   - 'customer' (array) A fully loaded MailChimp $customer. 
+ *   - 'customer' (array) A fully loaded MailChimp $customer.
  *   - 'cart'  For cart operations, this is the $order from Drupal.
  *   - 'order' For order operations, this is the $order from Drupal.
  */
