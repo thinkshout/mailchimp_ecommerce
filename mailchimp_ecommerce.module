@@ -188,12 +188,20 @@ function mailchimp_ecommerce_get_store($store_id) {
  *   - name (string) The name of the store.
  *   - currency_code (string) The three-letter ISO 4217 code for the currency
  *     that the store accepts.
+ * @param string $platform
+ *   The eCommerce platform being used to create this store.
+ *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
  */
-function mailchimp_ecommerce_add_store($store_id, $store) {
+function mailchimp_ecommerce_add_store($store_id, $store, $platform) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_store = $mc_ecommerce->addStore($store_id, $store);
+
+    $parameters = [
+      'platform' => $platform,
+    ];
+
+    $mc_store = $mc_ecommerce->addStore($store_id, $store, $parameters);
 
     module_invoke_all('mailchimp_ecommerce_add_store', $mc_store);
   }
@@ -212,12 +220,20 @@ function mailchimp_ecommerce_add_store($store_id, $store) {
  *   The name of the store.
  * @param string $currency_code
  *   The three-letter ISO 4217 code.
+ * @param string $platform
+ *   The eCommerce platform being used to create this store.
+ *   This module's submodules use 'Drupal Ubercart' and 'Drupal Commerce'.
  */
-function mailchimp_ecommerce_update_store($store_id, $name, $currency_code) {
+function mailchimp_ecommerce_update_store($store_id, $name, $currency_code, $platform) {
   try {
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateStore($store_id, $name, $currency_code);
+
+    $parameters = [
+      'platform' => $platform,
+    ];
+
+    $mc_ecommerce->updateStore($store_id, $name, $currency_code, $parameters);
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a store: ' . $e->getMessage());
@@ -782,7 +798,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $price) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -806,6 +822,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'id' => $product_variant_id,
           'title' => $title,
           'sku' => $sku,
+          'url' => $url,
           'price' => $price,
         ];
 
@@ -857,7 +874,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $price) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -869,6 +886,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
     $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
       'title' => $title,
       'sku' => $sku,
+      'url' => $url,
       'price' => $price,
     ]);
   }
@@ -1067,21 +1085,23 @@ function mailchimp_ecommerce_log_error_message($message) {
  * @inheritdoc
  */
 function _mailchimp_ecommerce_get_local_customer($email) {
-
   // Load an existing customer using the order email.
   $result = db_query("SELECT mailchimp_customer_id FROM {mailchimp_ecommerce_customer} WHERE mail = :mail", array(
     ':mail' => $email,
   ));
 
-  if (!empty($result)) {
-    $customer_id = $result->mailchimp_customer_id;
-  }
-  else {
+  $customer_id = NULL;
+  $customer = $result->fetchAssoc();
 
-    // Create a new local customer
+  if (!empty($customer)) {
+    $customer_id = $customer['mailchimp_customer_id'];
+  }
+
+  if (empty($customer_id)) {
+    // Create a new local customer.
     $customer_id = db_insert('mailchimp_ecommerce_customer')
       ->fields(array(
-        'mail' => $email
+        'mail' => $email,
       ))
       ->execute();
   }

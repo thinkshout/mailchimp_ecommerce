@@ -19,7 +19,7 @@ function mailchimp_ecommerce_uninstall() {
  * Implements hook_schema().
  */
 function mailchimp_ecommerce_schema() {
-  $schema['mailchimp_ecommerce'] = [
+  $schema['mailchimp_ecommerce_customer'] = [
     'description' => 'Maintains a connection between carts, orders and a MailChimp customer.',
     'fields' => [
       'mailchimp_customer_id' => [
@@ -62,5 +62,17 @@ function mailchimp_ecommerce_schema() {
  * Install the 'mailchimp_ecommerce_customer' table schema.
  */
 function mailchimp_ecommerce_update_7002() {
-  drupal_install_schema('mailchimp_ecommerce');
+  drupal_install_schema('mailchimp_ecommerce_customer');
+}
+
+/**
+ * Rename 'mailchimp_ecommerce' table to 'mailchimp_ecommerce_customer'.
+ */
+function mailchimp_ecommerce_update_7003() {
+  // At one point the schema defined a table named 'mailchimp_ecommerce',
+  // which should have been named 'mailchimp_ecommerce_customer'.
+  // The table is renamed here, if it exists.
+  if (db_table_exists('mailchimp_ecommerce')) {
+    db_rename_table('mailchimp_ecommerce', 'mailchimp_ecommerce_customer');
+  }
 }
