@@ -56,17 +56,12 @@ function mailchimp_ecommerce_admin_settings() {
     '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
   ];
 
-  $list_options = [
-    '' => '-- Select --',
-    1 => 'Normal Subscriber',
-    0 => 'Transactional Subscriber',
-  ];
-
   if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
     $form['sync'] = [
       '#type' => 'fieldset',
       '#title' => t('Data sync'),
       '#collapsible' => FALSE,
+      '#weight' => 99,
     ];
     $form['sync']['products'] = [
       '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
@@ -111,6 +106,8 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
     // Determine if a store is being created or updated.
     $existing_store = mailchimp_ecommerce_get_store($store_id);
 
+    $platform = !empty($form_state['values']['platform']) ? $form_state['values']['platform'] : '';
+
     if (empty($existing_store)) {
       $store = [
         'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
@@ -118,12 +115,13 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
         'currency_code' => $currency,
       ];
 
-      mailchimp_ecommerce_add_store($store_id, $store);
+      mailchimp_ecommerce_add_store($store_id, $store, $platform);
     }
     else {
       mailchimp_ecommerce_update_store($store_id,
         $form_state['values']['mailchimp_ecommerce_store_name'],
-        $currency);
+        $currency,
+        $platform);
     }
   }
 
