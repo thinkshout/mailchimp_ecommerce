@@ -67,7 +67,6 @@ function mailchimp_ecommerce_admin_settings() {
       '#type' => 'fieldset',
       '#title' => t('Data sync'),
       '#collapsible' => FALSE,
-      '#weight' => 99,
     ];
     $form['sync']['products'] = [
       '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
@@ -108,8 +107,7 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
     else {
       mailchimp_ecommerce_update_store($store_id,
         $form_state['values']['mailchimp_ecommerce_store_name'],
-        $currency,
-        $platform);
+        $currency);
     }
   }
 
