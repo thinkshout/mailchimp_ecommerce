@@ -56,6 +56,12 @@ function mailchimp_ecommerce_admin_settings() {
     '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
   ];
 
+  $list_options = [
+    '' => '-- Select --',
+    1 => 'Normal Subscriber',
+    0 => 'Transactional Subscriber',
+  ];
+
   if (!empty(variable_get('mailchimp_ecommerce_list_id', ''))) {
     $form['sync'] = [
       '#type' => 'fieldset',
