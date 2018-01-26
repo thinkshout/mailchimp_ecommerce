@@ -146,6 +146,38 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       '#description' => t('This is overridden if you have selected to use the default currency from Commerce.'),
     ];
 
+    $options = ['' => t('-- Select --')];
+    $has_images = false;
+    $field_map = \Drupal::entityManager()->getFieldMap();
+
+    $field_definitions = [];
+    foreach ($field_map as $entity_type => $fields) {
+      $field_definitions[$entity_type] = \Drupal::entityManager()->getFieldStorageDefinitions($entity_type);
+    }
+    foreach ($field_map as $entity_type => $fields) {
+      if ($entity_type == 'commerce_product') {
+        foreach ($fields as $field_name => $field_properties) {
+          if ($field_properties['type'] == 'image') {
+            $options[$field_name] = $field_name;
+            $has_images = true;
+          }
+        }
+      }
+    }
+    if ($has_images) {
+      $form['mailchimp_ecommerce_product_image'] = [
+        '#type'        => 'select',
+        '#title'       => t('Product Image'),
+        '#multiple'    => FALSE,
+        '#description' => t('Please choose the image field for your products.'),
+
+        '#options'       => $options,
+        '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')
+                                   ->get('mailchimp_ecommerce_product_image'),
+        '#required'      => TRUE,
+      ];
+    }
+
     if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id'))) {
       $form['sync'] = [
         '#type' => 'fieldset',
