@@ -74,13 +74,6 @@ function mailchimp_ecommerce_admin_settings() {
     ];
   }
 
-  // Identify the eCommerce platform to MailChimp. This value is set in this
-  // module's submodules for both Drupal Commerce and Ubercart.
-  $form['platform'] = [
-    '#type' => 'hidden',
-    '#default_value' => '',
-  ];
-
   $settings_form = system_settings_form($form);
   $settings_form['#submit'][] = 'mailchimp_ecommerce_admin_settings_submit';
 
@@ -103,8 +96,6 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
     // Determine if a store is being created or updated.
     $existing_store = mailchimp_ecommerce_get_store($store_id);
 
-    $platform = !empty($form_state['values']['platform']) ? $form_state['values']['platform'] : '';
-
     if (empty($existing_store)) {
       $store = [
         'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
@@ -112,7 +103,7 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
         'currency_code' => $currency,
       ];
 
-      mailchimp_ecommerce_add_store($store_id, $store, $platform);
+      mailchimp_ecommerce_add_store($store_id, $store);
     }
     else {
       mailchimp_ecommerce_update_store($store_id,
