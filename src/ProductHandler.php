@@ -14,7 +14,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProduct($product_id, $title, $url, $description, $type, $variants) {
+  public function addProduct($product_id, $title, $url, $image_url, $description, $type, $variants) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -28,9 +28,12 @@ class ProductHandler implements ProductHandlerInterface {
         'description' => $description,
         'type' => $type,
         'url' => $url,
+        'image_url' => $image_url,
       ]);
     }
     catch (\Exception $e) {
+
+      //TODO: If add fails with product exists error code, run an update here.
       mailchimp_ecommerce_log_error_message('Unable to add product: ' . $e->getMessage());
       drupal_set_message($e->getMessage(), 'error');
     }
@@ -39,7 +42,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function updateProduct($product, $title, $url, $description, $type, $variants) {
+  public function updateProduct($product, $title, $url, $image_url, $description, $type, $variants) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -57,6 +60,7 @@ class ProductHandler implements ProductHandlerInterface {
           'description' => $description,
           'type' => $type,
           'url' => $url,
+          'image_url' => $image_url,
       ]);
 
       // Update the variant.
@@ -76,6 +80,7 @@ class ProductHandler implements ProductHandlerInterface {
             $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variation->id(), [
               'title' => $product->getTitle(),
               'url' => $url,
+              'image_url' => $image_url,
               'sku' => $product_variation->getSku(),
               'price' => $product_variation->getPrice()->getNumber(),
 
@@ -90,6 +95,7 @@ class ProductHandler implements ProductHandlerInterface {
               $product_variation->id(),
               $product->getTitle(),
               $url,
+              $image_url,
               $product_variation->getSku(),
               $product_variation->getPrice()->getNumber(),
               100);
@@ -132,7 +138,7 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price, $stock) {
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $image_url, $sku, $price, $stock) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
       if (empty($store_id)) {
@@ -145,6 +151,7 @@ class ProductHandler implements ProductHandlerInterface {
         'id' => $product_variant_id,
         'title' => $title,
         'url' => $url,
+        'image_url' => $image_url,
         'sku' => $sku,
         'price' => $price,
         'inventory_quantity' => $stock,
@@ -184,6 +191,22 @@ class ProductHandler implements ProductHandlerInterface {
     }
 
     return $product_variant;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getProductImageUrl($product) {
+    $image_url = '';
+
+    $config = \Drupal::config('mailchimp_ecommerce.settings');
+    $image_field_name = $config->get('product_image');
+
+    if (isset($product->{$image_field_name}->entity)) {
+      $image_url = $product->{$image_field_name}->entity->url();
+    }
+
+    return $image_url;
   }
 
   /**

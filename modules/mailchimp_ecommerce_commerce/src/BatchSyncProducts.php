@@ -32,9 +32,9 @@ class BatchSyncProducts {
 
       $url = $product_handler->buildProductUrl($product);
       $variants = $product_handler->buildProductVariants($product);
+      $image_url = $product_handler->getProductImageUrl($product);
 
-      // TODO: Replace with add or update product function to avoid duplicates.
-      $product_handler->addProduct($product_id, $title, $url, $description, $type, $variants);
+      $product_handler->addProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
 
       $context['sandbox']['progress']++;
 

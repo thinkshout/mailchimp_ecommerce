@@ -46,8 +46,9 @@ class ProductEventSubscriber implements EventSubscriberInterface {
 
     $variants = $this->product_handler->buildProductVariants($product);
     $url = $this->product_handler->buildProductUrl($product);
+    $image_url = $this->product_handler->getProductImageUrl($product);
 
-    $this->product_handler->addProduct($product_id, $title, $url, $description, $type, $variants);
+    $this->product_handler->addProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
   }
 
   /**
@@ -63,9 +64,10 @@ class ProductEventSubscriber implements EventSubscriberInterface {
 
     $variants = $this->product_handler->buildProductVariants($product);
     $url = $this->product_handler->buildProductUrl($product);
+    $image_url = $this->product_handler->getProductImageUrl($product);
 
     // Update the existing product and variant.
-    $this->product_handler->updateProduct($product, $title, $url, $description, $type, $variants);
+    $this->product_handler->updateProduct($product, $title, $url, $image_url, $description, $type, $variants);
 
   }
 

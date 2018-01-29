@@ -24,6 +24,10 @@ interface ProductHandlerInterface {
    *   Unique ID of the product.
    * @param string $title
    *   The product title.
+   * @param string $url
+   *   The product url.
+   * @param string $image_url
+   *   The product image url.
    * @param string $description
    *   The product description.
    * @param string $type
@@ -33,7 +37,7 @@ interface ProductHandlerInterface {
    *
    * @see http://developer.mailchimp.com/documentation/mailchimp/reference/ecommerce/stores/products/#create-post_ecommerce_stores_store_id_products
    */
-  public function addProduct($product_id, $title, $url, $description, $type, $variants);
+  public function addProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
 
   /**
    * Updates an existing product in MailChimp.
@@ -47,7 +51,9 @@ interface ProductHandlerInterface {
    * @param string $title
    *   The product title.
    * @param string $url
-   *   The product URL.
+   *   The product url.
+   * @param string $image_url
+   *   The product image url.
    * @param string $description
    *   The product description.
    * @param string $type
@@ -56,7 +62,7 @@ interface ProductHandlerInterface {
    *   The product variants.
    *   May be identical to $product_id for single products.
    */
-  public function updateProduct($product_id, $title, $url, $description, $type, $variants);
+  public function updateProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
 
   /**
    * Deletes a product in MailChimp.
@@ -75,6 +81,10 @@ interface ProductHandlerInterface {
    *   ID of the product variant.
    * @param string $title
    *   The product title.
+   * @param string $url
+   *   The product url.
+   * @param string $image_url
+   *   The product image url.
    * @param string $sku
    *   The product SKU.
    * @param float $price
@@ -82,7 +92,7 @@ interface ProductHandlerInterface {
    * @param int $stock
    *   The stock total for a product.
    */
-  public function addProductVariant($product_id, $product_variant_id, $title, $url, $sku, $price, $stock);
+  public function addProductVariant($product_id, $product_variant_id, $title, $url, $image_url, $sku, $price, $stock);
 
   /**
    * Gets a product variant from MailChimp.

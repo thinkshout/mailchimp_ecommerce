@@ -165,15 +165,14 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
       }
     }
     if ($has_images) {
-      $form['mailchimp_ecommerce_product_image'] = [
+      $form['product_image'] = [
         '#type'        => 'select',
         '#title'       => t('Product Image'),
         '#multiple'    => FALSE,
         '#description' => t('Please choose the image field for your products.'),
 
         '#options'       => $options,
-        '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')
-                                   ->get('mailchimp_ecommerce_product_image'),
+        '#default_value' => \Drupal::config('mailchimp_ecommerce.settings')->get('product_image'),
         '#required'      => TRUE,
       ];
     }
