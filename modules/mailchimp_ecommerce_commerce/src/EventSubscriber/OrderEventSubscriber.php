@@ -131,10 +131,13 @@ class OrderEventSubscriber implements EventSubscriberInterface {
     // Add cart item price to order data.
     if (!isset($order_data['currency_code'])) {
       /** @var \Drupal\commerce_price\Price $price */
-      $price = $event->getEntity()->getPrice();
+      $price = $event->getOrder()->getTotalPrice();
 
-      $order_data['currency_code'] = $price->getCurrencyCode();
-      $order_data['order_total'] = $price->getNumber();
+      if($price) {
+        $order_data['currency_code'] = $price->getCurrencyCode();
+        $order_data['order_total'] = $price->getNumber();
+        $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
+      }
     }
 
     $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);

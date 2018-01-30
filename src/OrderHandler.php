@@ -107,10 +107,14 @@ class OrderHandler implements OrderHandlerInterface {
 
     $order_data = [
       'customer' => $customer,
-      'billing_address' => $customer['address'],
       'processed_at_foreign' => date('c'),
       'lines' => $lines,
     ];
+
+    if(isset($customer['address'])) {
+      $order_data['billing_address'] = $customer['address'];
+    }
+
 
     if (!empty($order->getTotalPrice())) {
       $order_data['currency_code'] = $order->getTotalPrice()->getCurrencyCode();

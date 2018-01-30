@@ -154,7 +154,7 @@ class CustomerHandler implements CustomerHandlerInterface {
     $opt_in_status = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
     $customer['opt_in_status'] = $opt_in_status;
 
-    if ($billing_profile->address) {
+    if ($billing_profile && $billing_profile->address) {
       $address = $billing_profile->address->first();
 
       $customer['company']    = $address->getOrganization();
