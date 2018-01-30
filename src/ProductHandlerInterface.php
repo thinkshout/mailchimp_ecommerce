@@ -2,6 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
+use Drupal\node\Entity\Node;
 use Drupal\commerce_product\Entity\Product;
 
 /**
@@ -130,4 +131,15 @@ interface ProductHandlerInterface {
    *   The URL of the product.
    */
   function buildProductUrl($product);
+
+  /**
+   * Creates a product URL from a node.
+   *
+   * @param Node $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  public function buildNodeUrl(Node $product);
 }

@@ -148,14 +148,23 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
 
     $options = ['' => t('-- Select --')];
     $has_images = false;
+    $desired_type = '';
+
     $field_map = \Drupal::entityManager()->getFieldMap();
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('mailchimp_ecommerce_commerce')) {
+      $desired_type = 'commerce_product';
+    }
+    elseif ($moduleHandler->moduleExists('mailchimp_ecommerce_ubercart')) {
+      $desired_type = 'node';
+    }
 
     $field_definitions = [];
     foreach ($field_map as $entity_type => $fields) {
       $field_definitions[$entity_type] = \Drupal::entityManager()->getFieldStorageDefinitions($entity_type);
     }
     foreach ($field_map as $entity_type => $fields) {
-      if ($entity_type == 'commerce_product') {
+      if ($entity_type == $desired_type) {
         foreach ($fields as $field_name => $field_properties) {
           if ($field_properties['type'] == 'image') {
             $options[$field_name] = $field_name;

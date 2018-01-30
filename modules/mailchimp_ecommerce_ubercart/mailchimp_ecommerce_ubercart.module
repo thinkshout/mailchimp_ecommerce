@@ -1,7 +1,6 @@
 <?php
 
-use Drupal\uc_order\Entity\Order;
-use Drupal\uc_order\OrderInterface;
+use Drupal\node\Entity\Node;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
 use Drupal\mailchimp_ecommerce\OrderHandler;
@@ -15,36 +14,34 @@ use Drupal\mailchimp_ecommerce\ProductHandler;
 /**
  * Implements hook_node_insert().
  */
-function mailchimp_ecommerce_ubercart_node_insert(\Drupal\node\NodeInterface $node) {
+function mailchimp_ecommerce_ubercart_node_insert(Node $node) {
   if ($node->getType() == 'product') {
     // Create a corresponding MailChimp product.
     $product_handler = new ProductHandler;
     $product = $product_handler->buildProductFromNode($node);
 
-    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
+    $product_handler->addProduct($product['id'], $product['title'], $product['url'], $product['title'], $product['description'], $product['type'], $product['variants']);
   }
 }
 
 /**
  * Implements hook_node_update().
  */
-function mailchimp_ecommerce_ubercart_node_update(\Drupal\node\NodeInterface $node) {
+function mailchimp_ecommerce_ubercart_node_update(Node $node) {
   if ($node->getType() == 'product') {
-    // Update the corresponding MailChimp product.
 
     $product_handler = new ProductHandler;
     $product = $product_handler->buildProductFromNode($node);
 
-    $product_handler->addProduct($product['id'], $product['title'], $product['description'], $product['type'], $product['variants']);
+    $product_handler->updateProduct($product['id'], $product['title'], $product['url'], $product['title'], $product['description'], $product['type'], $product['variants']);
   }
 }
 
 /**
  * Implements hook_node_delete().
  */
-function mailchimp_ecommerce_ubercart_node_delete(\Drupal\node\NodeInterface $node) {
+function mailchimp_ecommerce_ubercart_node_delete(Node $node) {
   if ($node->getType() == 'product') {
-    // Delete the corresponding MailChimp product.
     $product_handler = new ProductHandler;
     $product = $product_handler->buildProductFromNode($node);
 

@@ -2,7 +2,7 @@
 
 namespace Drupal\mailchimp_ecommerce;
 
-use Drupal\Core\Url;
+use Drupal\node\Entity\Node;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 
@@ -49,7 +49,13 @@ class ProductHandler implements ProductHandlerInterface {
         throw new \Exception('Cannot update a product without a store ID.');
       }
 
-      $product_id = $product->get('product_id')->value;
+      // Ubercart doesn't have product objects. So, just pass the ID.
+      if (!is_string($product)) {
+        $product_id = $product->get('product_id')->value;
+      }
+      else {
+        $product_id = $product;
+      }
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
@@ -62,46 +68,6 @@ class ProductHandler implements ProductHandlerInterface {
           'url' => $url,
           'image_url' => $image_url,
       ]);
-
-      // Update the variant.
-      $product_variations = $product->get('variations')->getValue();
-      if (!empty($product_variations)) {
-        foreach ($product_variations as $variation_data) {
-
-          /** @var ProductVariation $product_variation */
-          $product_variation = ProductVariation::load($variation_data['target_id']);
-
-          $url = $this->buildProductUrl($product);
-
-          $existing_variant = $this->getProductVariant($product_id, $product_variation->id());
-          if ($existing_variant) {
-
-            // Update the existing product variant.
-            $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variation->id(), [
-              'title' => $product->getTitle(),
-              'url' => $url,
-              'image_url' => $image_url,
-              'sku' => $product_variation->getSku(),
-              'price' => $product_variation->getPrice()->getNumber(),
-
-              // Hard code a positive number because D8 doesn't support stock yet.
-              'inventory_quantity' => 100,
-            ]);
-          }
-          else {
-
-            // Create a new product variant.
-            $this->addProductVariant($product_id,
-              $product_variation->id(),
-              $product->getTitle(),
-              $url,
-              $image_url,
-              $product_variation->getSku(),
-              $product_variation->getPrice()->getNumber(),
-              100);
-          }
-        }
-      }
     }
     catch (\Exception $e) {
       if ($e->getCode() == 404) {
@@ -212,6 +178,23 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * @inheritdoc
    */
+  public function getNodeImageUrl($product) {
+    $image_url = '';
+
+    $config = \Drupal::config('mailchimp_ecommerce.settings');
+    $image_field_name = $config->get('product_image');
+
+    if (isset($product->{$image_field_name}->entity)) {
+      $image_url = $product->{$image_field_name}->entity->url();
+    }
+
+    return $image_url;
+  }
+
+
+  /**
+   * @inheritdoc
+   */
   public function deleteProductVariant($product_id, $product_variant_id) {
     try {
       $store_id = mailchimp_ecommerce_get_store_id();
@@ -301,16 +284,22 @@ class ProductHandler implements ProductHandlerInterface {
   /**
    * Build MailChimp product values from an Ubercart product node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param Node $node
    *   The Ubercart 'product' type node.
    *
    * @return array
    *   Array of product values for use with MailChimp.
    */
-  function buildProductFromNode(\Drupal\node\NodeInterface $node) {
+  function buildProductFromNode(Node $node) {
+
+    $url = $this->buildNodeUrl($node);
+    $image_url = $this->getNodeImageUrl($node);
+
     $variant = [
       'id' => $node->id(),
       'title' => $node->getTitle(),
+      'url' => $url,
+      'image_url' => $image_url,
       'sku' => $node->model->value,
       'price' => $node->price->value,
     ];
@@ -320,6 +309,8 @@ class ProductHandler implements ProductHandlerInterface {
       'variant_id' => $node->id(),
       'sku' => $node->model->value,
       'title' => $node->getTitle(),
+      'url' => $url,
+      'image_url' => $image_url,
       'description' => $node->body->value,
       'price' => $node->price->value,
       'type' => $node->getType(),
@@ -344,10 +335,32 @@ class ProductHandler implements ProductHandlerInterface {
     // MailChimp will accept an empty string if no URL is available.
     $full_url = '';
 
-    // TODO: Add Ubercart product URL
     $url = $product->toURL();
     if (!empty($url)) {
       $full_url = $base_url . $url->toString();
+    }
+
+    return $full_url;
+  }
+
+  /**
+   * Creates a product URL from a node.
+   *
+   * @param Node $product
+   *   The Commerce product object.
+   *
+   * @return string
+   *   The URL of the product.
+   */
+  public function buildNodeUrl(Node $product) {
+    global $base_url;
+
+    // MailChimp will accept an empty string if no URL is available.
+    $full_url = '';
+
+    $url = $product->toUrl()->toString();
+    if (!empty($url)) {
+      $full_url = $base_url . $url;
     }
 
     return $full_url;
