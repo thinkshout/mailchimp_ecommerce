@@ -98,7 +98,32 @@ class ContactSubscription extends CheckoutPaneBase implements CheckoutPaneInterf
    */
   public function submitPaneForm(array &$pane_form, FormStateInterface $form_state, array &$complete_form) {
     $values = $form_state->getValue($pane_form['#parents']);
-    // Do Stuff
+
+    if($values['subscription'] == 1) {
+      $customer = [];
+      $customer['email_address'] = $this->order->getEmail();
+
+      if (!empty($customer['email_address'])) {
+        /* @var \Drupal\mailchimp_ecommerce\CustomerHandler $customer_handler */
+        $customer_handler = \Drupal::service('mailchimp_ecommerce.customer_handler');
+
+        $billing_profile = $this->order->getBillingProfile();
+        $customer = $customer_handler->buildCustomer($customer, $billing_profile);
+        $customer_handler->addOrUpdateCustomer($customer);
+
+        module_load_include('module', 'mailchimp', 'mailchimp');
+
+        $list_id = mailchimp_ecommerce_get_list_id();
+
+        $merge_vars = [
+          'EMAIL' => $customer['email_address'],
+          'FNAME' => $customer['first_name'],
+          'LNAME' => $customer['last_name'],
+        ];
+
+        mailchimp_subscribe($list_id, $customer['email_address'], $merge_vars);
+      }
+    }
   }
 
 }
