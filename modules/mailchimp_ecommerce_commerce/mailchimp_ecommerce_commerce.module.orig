@@ -361,8 +361,6 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
     // Last line item has been deleted, remove the cart because you can't save
     // an empty cart in MailChimp.
     mailchimp_ecommerce_delete_cart($order->order_id);
-
-    return;
   }
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
   $customer = commerce_customer_profile_load($order_wrapper->commerce_customer_billing->getIdentifier());
