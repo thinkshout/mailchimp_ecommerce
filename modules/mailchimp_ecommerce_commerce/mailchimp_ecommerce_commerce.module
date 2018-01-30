@@ -349,7 +349,7 @@ function mailchimp_ecommerce_commerce_rules_action_info() {
 }
 
 /**
- * Rule callback for cart add.
+ * Private function to send cart data to Mailchimp.
  */
 function _mailchimp_ecommerce_commerce_send_cart($order) {
 
