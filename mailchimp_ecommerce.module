@@ -472,7 +472,12 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
       $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
       $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
 
-      $mc_ecommerce->updateCart($store_id, $cart_id, $customer, $cart);
+      $parameters = [
+        'customer' => (object) $customer,
+      ];
+
+      $parameters += $cart;
+      $mc_ecommerce->updateCart($store_id, $cart_id, $parameters);
     }
   }
   catch (Exception $e) {
