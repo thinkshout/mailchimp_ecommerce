@@ -171,6 +171,12 @@ class CustomerHandler implements CustomerHandlerInterface {
         'postal_code'   => $address->getPostalCode(),
         'country_code'  => $address->getcountryCode(),
       ];
+
+      foreach ($customer['address'] as $key => $value) {
+        if ($value === NULL) {
+          unset($customer['address'][$key]);
+        }
+      }
     }
 
     return $customer;
