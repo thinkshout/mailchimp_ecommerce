@@ -800,6 +800,8 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  *   The product type.
  * @param string $sku
  *   The product SKU.
+ * @param string $url
+ *   The product URL.
  * @param float $price
  *   The product price.
  */
