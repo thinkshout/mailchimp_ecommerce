@@ -168,25 +168,6 @@ function mailchimp_ecommerce_ubercart_batch_add_products($product_ids, &$context
 }
 
 /**
- * Batch callback used to add a product to MailChimp.
- */
-function mailchimp_ecommerce_ubercart_batch_add_product($product_id, &$context) {
-  $node = node_load($product_id);
-
-  $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
-
-  mailchimp_ecommerce_add_product(
-    $product['id'],
-    $product['variant_id'],
-    $product['title'],
-    $product['description'],
-    $product['type'],
-    $product['sku'],
-    $product['url'],
-    $product['price']);
-}
-
-/**
  * Gets MailChimp product values from an Ubercart product node.
  *
  * @param object $node
