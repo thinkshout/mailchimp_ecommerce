@@ -206,6 +206,7 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
     'url' => $alias = drupal_get_path_alias($node->nid),
   'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
     'price' => $node_wrapper->sell_price->value(),
+    'url' => _mailchimp_ecommerce_ubercart_build_product_url($node_wrapper->nid->value()),
     // TODO: Ubercart product types.
     'type' => '',
   );
@@ -355,3 +356,21 @@ function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
 // TODO: Implement mailchimp_ecommerce_update_customer()
 // TODO: Implement mailchimp_ecommerce_delete_customer()
 // TODO: Implement mailchimp_ecommerce_get_customer()
+
+
+/**
+ * Creates a URL from a product, as long as the product is referenced by a node.
+ *
+ * @param object $product
+ *   The Commerce object.
+ * @return string
+ *   The URL of the node referencing the product.
+ */
+function _mailchimp_ecommerce_ubercart_build_product_url($nid) {
+	global $base_url;
+
+	$path = drupal_get_path_alias('node/' . $nid);
+	$url = $base_url . '/' . $path;
+
+	return $url;
+}
