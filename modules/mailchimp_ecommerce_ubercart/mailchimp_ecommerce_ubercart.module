@@ -131,7 +131,8 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
     'variant_id' => $node_wrapper->model->value(),
     'sku' => $node_wrapper->model->value(),
     'title' => $node_wrapper->title->value(),
-    'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
+    'url' => $alias = drupal_get_path_alias($node->nid),
+  'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
     'price' => $node_wrapper->sell_price->value(),
     // TODO: Ubercart product types.
     'type' => '',
