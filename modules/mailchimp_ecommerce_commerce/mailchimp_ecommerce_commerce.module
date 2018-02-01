@@ -365,14 +365,11 @@ function _mailchimp_ecommerce_commerce_send_cart($order) {
     // Last line item has been deleted, remove the cart because you can't save
     // an empty cart in MailChimp.
     mailchimp_ecommerce_delete_cart($order->order_id);
-
     return;
   }
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $customer = commerce_customer_profile_load($order_wrapper->commerce_customer_billing->getIdentifier());
 
-  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer);
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
 
   if ($order->created == $order->changed) {
     mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
@@ -428,28 +425,39 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  * @throws Exception
  *   Throws an exception if Opt In Status is not set.
  */
-function _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper) {
+function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
   $billing_address = [];
   $lines = [];
 
   if (isset($order_wrapper->mail)) {
     $customer_email = $order_wrapper->mail->value();
-  } else {
+  }
+  else {
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
-  if (isset($order_wrapper->commerce_order_total->currency_code)) {
+
+  $customer_id = _mailchimp_ecommerce_get_local_customer($customer_email);
+
+  if ($order_wrapper->commerce_order_total->__isset('currency_code') && $order_wrapper->commerce_order_total->currency_code->value()) {
     $currency_code = $order_wrapper->commerce_order_total->currency_code->value();
   }
-  if (isset($order_wrapper->commerce_order_total->amount)) {
-    $order_total = commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
-  }
-  if (isset($customer_wrapper)) {
-    $customer_id = $customer_wrapper->getIdentifier();
+  else {
+    $currency_code = commerce_default_currency();
   }
 
-  if (isset($customer_wrapper->commerce_customer_address)) {
-    $billing_address = mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_wrapper);
+  $order_total = commerce_currency_amount_to_decimal($order_wrapper->commerce_order_total->amount->value(), $currency_code);
+
+  $customer_wrapper = NULL;
+  if ($order_wrapper->__isset('commerce_customer_billing') && $order_wrapper->commerce_customer_billing->value()) {
+    $order_customer = commerce_customer_profile_load($order_wrapper->commerce_customer_billing->getIdentifier());
+    $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile', $order_customer);
+
+    // If a valid order customer was found, include the current address.
+    if ($customer_wrapper->__isset('commerce_customer_address')) {
+      $billing_address = mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_wrapper);
+    }
   }
+
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
     if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
       $products[] = $line_item_wrapper->commerce_product;
