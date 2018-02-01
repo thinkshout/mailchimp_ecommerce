@@ -19,6 +19,13 @@ function mailchimp_ecommerce_admin_settings() {
     '#default_value' => variable_get('mailchimp_ecommerce_store_name', ''),
     '#description' => t('The name of your store as it should appear in your MailChimp account.'),
   ];
+  $form['mailchimp_ecommerce_store_domain'] = [
+    '#type' => 'textfield',
+    '#title' => t('Store Domain'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('mailchimp_ecommerce_store_domain', ''),
+    '#description' => t('The domain of your store as it should appear in your MailChimp account. Use absolute URL without protocol or trailing slash.'),
+  ];
 
   $mailchimp_lists = mailchimp_get_lists();
   $list_options = [
@@ -113,6 +120,7 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
         'list_id' => isset($form_state['values']['mailchimp_ecommerce_list_id']) ? $form_state['values']['mailchimp_ecommerce_list_id'] : variable_get('mailchimp_ecommerce_list_id'),
         'name' => $form_state['values']['mailchimp_ecommerce_store_name'],
         'currency_code' => $currency,
+        'domain' => check_plain($form_state['values']['mailchimp_ecommerce_store_domain']),
       ];
 
       mailchimp_ecommerce_add_store($store_id, $store, $platform);
