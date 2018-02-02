@@ -51,6 +51,8 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     $product_node_type = !empty($form_state['values']['mailchimp_ecommerce_product_node_type']) ? $form_state['values']['mailchimp_ecommerce_product_node_type'] : NULL;
   }
 
+  $product_image_types = [];
+
   // List product reference fields.
   if (!empty($product_node_type)) {
     $field_info = field_info_instances('node', $product_node_type);
@@ -62,10 +64,8 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
           $node_field_options[$field_name] = $properties['label'];
         }
 
-        // Image fields
-        if (isset($properties['settings']['default_image'])) {
-          $image_field_options[$field_name] = $properties['label'];
-        }
+        // Track referenceable product variation types for this field.
+        $product_image_types += array_filter($properties['settings']['referenceable_types']);
       }
     }
   }
@@ -79,6 +79,17 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '#prefix' => '<div id="node-field-wrapper">',
     '#suffix' => '</div>',
   ];
+
+  // Since each product variant can have its own image, inform MailChimp
+  // about any image fields that exist on our enabled product types.
+  foreach ($product_image_types as $product_image_type) {
+    foreach (field_info_instances('commerce_product', $product_image_type) as $field_name => $properties) {
+      $field = field_info_field($field_name);
+      if ($field['type'] == 'image' || $field['type'] == 'file') {
+        $image_field_options[$field['field_name']] = $properties['label'];
+      }
+    }
+  }
 
   $form['product']['mailchimp_ecommerce_commerce_image_field'] = [
     '#type' => 'select',
@@ -569,7 +580,7 @@ function _mailchimp_ecommerce_commerce_build_product_url($product) {
 }
 
 /**
- * Creates am Image URL for a product variant.
+ * Creates an Image URL for a product variant.
  *
  * @param object $product
  *   The Commerce product entity.
