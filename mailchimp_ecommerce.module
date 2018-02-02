@@ -1020,9 +1020,7 @@ function mailchimp_ecommerce_get_campaign_id() {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get campaign: ' . $e->getMessage());
-      if (user_access('administer mailchimp')) {
-        drupal_set_message($e->getMessage(), 'error');
-      }
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 
