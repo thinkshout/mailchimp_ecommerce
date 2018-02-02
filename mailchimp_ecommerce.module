@@ -170,7 +170,7 @@ function mailchimp_ecommerce_get_store($store_id) {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get store: ' . $e->getMessage());
-      mailchimp_ecommerce_show_error($e->getMessage())
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 
