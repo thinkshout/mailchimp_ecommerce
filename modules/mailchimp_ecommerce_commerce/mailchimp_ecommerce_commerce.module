@@ -53,9 +53,14 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
 
     if (!empty($field_info)) {
       foreach ($field_info as $field_name => $properties) {
-        // Only list product reference fields.
+        // Product reference fields.
         if (isset($properties['settings']['referenceable_types'][$product_node_type])) {
           $node_field_options[$field_name] = $properties['label'];
+        }
+
+        // Image fields
+        if (isset($properties['settings']['default_image'])) {
+          $image_fields[$field_name] = $properties['label'];
         }
       }
     }
