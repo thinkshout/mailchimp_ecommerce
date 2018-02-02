@@ -595,18 +595,20 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
 
   if (!empty($image_field) && !empty($image_style)) {
     $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
-    $image = $product_wrapper->{$image_field}->value();
+    if ($product_wrapper->__isset($image_field) && $product_wrapper->{$image_field}->value()) {
+      $image = $product_wrapper->{$image_field}->value();
 
-    // @TODO: Check cardinality of image field, and send all available images.
-    if (is_array($image)) {
-      $image = reset($image);
+      // @TODO: Check cardinality of image field, and send all available images.
+      if (is_array($image)) {
+        $image = reset($image);
+      }
+
+      // Construct a public URL for this image.
+      // If the product is being added via a node form, we must load the new file.
+      $fid = $image['fid'];
+      $file = file_load($fid);
+      $image_url = image_style_url($image_style, $file->uri);
     }
-
-    // Construct a public URL for this image.
-    // If the product is being added via a node form, we must load the new file.
-    $fid = $image['fid'];
-    $file = file_load($fid);
-    $image_url = image_style_url($image_style, $file->uri);
   }
 
   return $image_url;
