@@ -1151,6 +1151,9 @@ function _mailchimp_ecommerce_increment_order_total($email_address, $total_spent
   return FALSE;
 }
 
+/**
+ * Helper function to show an error message for admin users.
+ */
 function mailchimp_ecommerce_show_error($message) {
   if (user_access('administer mailchimp')) {
     drupal_set_message($message, 'error');
