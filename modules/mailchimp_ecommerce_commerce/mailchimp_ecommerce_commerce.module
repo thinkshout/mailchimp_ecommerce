@@ -158,6 +158,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
 
+  $customer_id = _mailchimp_ecommerce_get_local_customer($customer_email);
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
   if (isset($customer_profile_wrapper->commerce_customer_address) &&
@@ -169,14 +170,14 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
   $customer = [
-    'id' => $customer_profile->profile_id,
+    'id' => $customer_id,
     'email_address' => $customer_email,
     'first_name' => $first_name,
     'last_name' => $last_name,
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  if (mailchimp_ecommerce_get_customer($customer_profile->profile_id)) {
+  if (mailchimp_ecommerce_get_customer($customer_id)) {
     mailchimp_ecommerce_update_customer($customer);
   }
   else {
@@ -189,7 +190,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
     $order = commerce_order_load($order_id);
 
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_profile_wrapper);
+    $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
 
     mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
   }
@@ -213,6 +214,8 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   } else {
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
+
+  $customer_id = _mailchimp_ecommerce_get_local_customer($customer_email);
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
   if (isset($customer_profile_wrapper->commerce_customer_address) &&
@@ -225,14 +228,14 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   }
 
   $customer = [
-    'id' => $customer_profile->profile_id,
+    'id' => $customer_id,
     'email_address' => $customer_email,
     'first_name' => $first_name,
     'last_name' => $last_name,
     'address' => mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper),
   ];
 
-  if (mailchimp_ecommerce_get_customer($customer_profile->profile_id)) {
+  if (mailchimp_ecommerce_get_customer($customer_id)) {
     mailchimp_ecommerce_update_customer($customer);
   }
   else {
@@ -243,7 +246,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   $order = commerce_order_load($order_id);
 
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_profile_wrapper);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
 
   mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
 }
@@ -268,8 +271,7 @@ function mailchimp_ecommerce_commerce_commerce_cart_order_refresh($order_wrapper
  */
 function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $customer_wrapper = entity_metadata_wrapper('commerce_customer_profile',$order_wrapper->commerce_customer_billing->getIdentifier());
-  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper, $customer_wrapper);
+  $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
 
   // Convert cart to order in MailChimp.
   mailchimp_ecommerce_delete_cart($order->order_id);
