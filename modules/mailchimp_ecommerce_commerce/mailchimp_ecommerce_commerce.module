@@ -569,50 +569,33 @@ function _mailchimp_ecommerce_commerce_build_product_url($product) {
 }
 
 /**
- * Creates am Image URL for a product, from its display node.
+ * Creates am Image URL for a product variant.
  *
  * @param object $product
- *   The Commerce object.
+ *   The Commerce product entity.
  *
  * @return string
- *   The URL of the image.
+ *   The external URL of the stylized image.
  */
 function _mailchimp_ecommerce_commerce_build_image_url($product) {
-  // Find the node associated with this product.
-  $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
-  $product_node_field = variable_get('mailchimp_ecommerce_product_node_field', '');
   $image_field = variable_get('mailchimp_ecommerce_commerce_image_field', '');
   $image_style = variable_get('mailchimp_ecommerce_commerce_image_style', '');
   $image_url = '';
 
-  if (!empty($product_node_type) && !empty($product_node_field)) {
-    $query = new EntityFieldQuery();
+  if (!empty($image_field) && !empty($image_style)) {
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    $image = $product_wrapper->{$image_field}->value();
 
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', $product_node_type)
-      ->fieldCondition($product_node_field, 'product_id', $product->product_id)
-      ->propertyCondition('status', NODE_PUBLISHED);
-
-    $result = $query->execute();
-
-    if (!empty($result) && !empty($result['node'])) {
-      $node = reset($result['node']);
-
-      if (!empty($image_field) && !empty($image_style)) {
-        $wrapper = entity_metadata_wrapper('node', node_load($node->nid));
-        $image = $wrapper->{$image_field}->value();
-
-        // @TODO: Check cardinality of image field, and send all available images instead of one.
-        if (is_array($image)) {
-          $image = reset($image);
-        }
-
-        // Construct a public URL for this image and the chosen style.
-        $fid = $image['fid'];
-        $file = file_load($fid);
-        $image_url = image_style_url($image_style, $file->uri);
-      }
+    // @TODO: Check cardinality of image field, and send all available images.
+    if (is_array($image)) {
+      $image = reset($image);
     }
+
+    // Construct a public URL for this image.
+    // If the product is being added via a node form, we must load the new file.
+    $fid = $image['fid'];
+    $file = file_load($fid);
+    $image_url = image_style_url($image_style, $file->uri);
   }
 
   return $image_url;
