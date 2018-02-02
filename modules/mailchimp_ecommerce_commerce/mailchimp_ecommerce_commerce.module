@@ -23,6 +23,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '' => '-- Select --',
   ];
 
+  $image_field_options = $image_styles = [
+    '' => '-- Select --',
+  ];
+
   $node_types = node_type_get_names();
 
   foreach ($node_types as $node_type => $node_name) {
@@ -60,7 +64,7 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
 
         // Image fields
         if (isset($properties['settings']['default_image'])) {
-          $image_fields[$field_name] = $properties['label'];
+          $image_field_options[$field_name] = $properties['label'];
         }
       }
     }
@@ -78,7 +82,7 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
 
   $form['product']['mailchimp_ecommerce_commerce_image_field'] = [
     '#type' => 'select',
-    '#options' => $image_fields,
+    '#options' => $image_field_options,
     '#title' => t('Product image field'),
     '#description' => t('Select the image field used on the above content type.'),
     '#default_value' => variable_get('mailchimp_ecommerce_commerce_image_field', ''),
