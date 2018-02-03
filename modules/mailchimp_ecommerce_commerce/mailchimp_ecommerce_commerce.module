@@ -62,10 +62,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
         // Only list product reference fields.
         if (isset($properties['settings']['referenceable_types'])) {
           $node_field_options[$field_name] = $properties['label'];
-        }
 
-        // Track referenceable product variation types for this field.
-        $product_image_types += array_filter($properties['settings']['referenceable_types']);
+          // Track referenceable product variation types for this field.
+          $product_image_types += array_filter($properties['settings']['referenceable_types']);
+        }
       }
     }
   }
