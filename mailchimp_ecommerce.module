@@ -834,7 +834,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'image_url' => $image_url,
         ];
 
-        $mc_ecommerce->addProduct($store_id, $product_id, $title, [$variant], [
+        $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, $variant, [
           'description' => $description,
           'type' => $type,
         ]);
