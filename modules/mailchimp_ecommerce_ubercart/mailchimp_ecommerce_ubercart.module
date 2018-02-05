@@ -20,8 +20,7 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
  * Implements hook_node_insert().
  */
 function mailchimp_ecommerce_ubercart_node_insert($node) {
-	// @TODO: implement better check for products (can be of any type defined in node_types w/ base = uc_product
-  if ($node->type == 'product') {
+  if (uc_product_is_product($node)) {
     // Create a corresponding MailChimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
@@ -41,7 +40,7 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
  * Implements hook_node_update().
  */
 function mailchimp_ecommerce_ubercart_node_update($node) {
-  if ($node->type == 'product') {
+  if (uc_product_is_product($node)) {
     // Update the corresponding MailChimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
@@ -61,7 +60,7 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
  * Implements hook_node_delete().
  */
 function mailchimp_ecommerce_ubercart_node_delete($node) {
-  if ($node->type == 'product') {
+  if (uc_product_is_product($node)) {
     // Delete the corresponding MailChimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
