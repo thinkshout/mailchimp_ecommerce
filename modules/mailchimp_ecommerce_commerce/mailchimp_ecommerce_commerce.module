@@ -673,19 +673,12 @@ function _mailchimp_ecommerce_commerce_get_inventory($product) {
   // Setting to 1 is a safe fallback in case no stock modules are enabled.
   $inventory_amount = variable_get('mailchimp_ecommerce_fixed_inventory_amount', 1);
 
-  // If fixed_inventory is enabled, default to the configured value.
-  if (variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE) === TRUE) {
-    return $inventory_amount;
-  }
-  // Otherwise, check for the Stock module and use its inventory
-  // if the product has stock enabled.
-  elseif (module_exists('commerce_stock')) {
+  if (variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE) == FALSE) {
     $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
     if ($product_wrapper->__isset('commerce_stock') && $product_wrapper->commerce_stock->value()) {
       $inventory_amount = (int) $product_wrapper->commerce_stock->value();
     }
   }
 
-  // Fallback to our fixed inventory amount.
   return $inventory_amount;
 }

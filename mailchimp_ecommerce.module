@@ -807,7 +807,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  * @param int $stock
  *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '', $stock) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -891,7 +891,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param int $stock
  *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '', $stock) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
