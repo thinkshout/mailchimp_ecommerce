@@ -79,10 +79,15 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
   ];
 
 
-  // @todo update to use EntityFieldQuery, types should come from node_type table where base = uc_product
-  $products = node_load_multiple([], [
-    'type' => 'product',
-  ]);
+  // select all nodes that are types of products
+	$query = db_select('node', 'n')
+		->fields('n', ['nid']);
+	$query->join('node_type', 'nt', 'n.type = nt.type');
+	$nids = $query->condition('nt.base', 'uc_product')
+		->execute()
+		->fetchCol();
+
+	$products = node_load_multiple($nids);
 
   if (!empty($products)) {
     $product_ids = array_keys($products);
