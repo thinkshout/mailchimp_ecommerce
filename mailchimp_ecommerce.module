@@ -824,8 +824,9 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
     }
     catch (Exception $e) {
       if ($e->getCode() == 404) {
+      	// TODO check if product has adjustments with additional SKUs defined. Add these as variants instead of default
         // No existing product; create new product with default variant.
-        $variant = (object) [
+        $variant = [
           'id' => $product_variant_id,
           'title' => $title,
           'sku' => $sku,
@@ -834,7 +835,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'image_url' => $image_url,
         ];
 
-        $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, $variant, [
+        $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, [$variant], [
           'description' => $description,
           'type' => $type,
         ]);
