@@ -71,7 +71,7 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
 		    $variant['title'],
 		    $product['description'],
 		    $product['type'],
-		    $product['sku'],
+		    $variant['sku'],
 		    $product['url'],
 		    $variant['price']);
     }
