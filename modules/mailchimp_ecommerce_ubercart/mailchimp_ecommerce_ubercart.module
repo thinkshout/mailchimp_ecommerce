@@ -86,6 +86,7 @@ function mailchimp_ecommerce_ubercart_get_product_variant_values($product) {
 
 			// store variant data for adding to MC API
 			$variants[$sku]['variant_id'] = $sku;
+			$variants[$sku]['sku'] = $sku;
 			$variants[$sku]['title'] = $product['title'] . ' (' . $attributes[$attribute_id]->label . ': '. $variant_data->name . ')';
 			$variants[$sku]['price'] = $product['price'] + $variant_data->price;
 		}
@@ -122,7 +123,7 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
 					$product['id'],
 					$variant['variant_id'],
 					$variant['title'],
-					$product['sku'],
+					$variant['sku'],
 					$product['url'],
 					$variant['price']
 				);
