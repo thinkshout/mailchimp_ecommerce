@@ -25,39 +25,31 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     // get variants
+	if (module_exists('uc_attribute')) {
 		$attributes = uc_product_get_attributes($node->nid);
 		$variants = [];
 
 		// Get variant adjusted price, and modified title (from UC option name)
 		$combinations = db_select('uc_product_adjustments', 'pa')
+			->fields('pa', ['combination', 'model'])
+			->condition('pa.nid', $node->nid)
+			->execute()
+			->fetchAllKeyed();
+
+		foreach ($combinations as $serialized_combo => $sku) {
+			$combo = unserialize($serialized_combo);
+			$option_id = reset($combo);
+			$attribute_id = key($combo);
+			$variant_data = $attributes[$attribute_id]->options[$option_id];
+
+			// store variant data for adding to MC API
 			$variants[$sku]['variant_id'] = $sku;
+			$variants[$sku]['title'] = $product['title'] . ' (' . $attributes[$attribute_id]->label . ': '. $variant_data->name . ')';
 			$variants[$sku]['price'] = $product['price'] + $variant_data->price;
 		}
 	}
 
 	// add base product
-    mailchimp_ecommerce_add_product(
-      $product['id'],
-      $product['variant_id'],
-      $product['title'],
-      $product['description'],
-      $product['type'],
-      $product['sku'],
-      $product['url'],
-      $product['price']);
-  }
-}
-
-/**
- * Implements hook_node_update().
- */
-function mailchimp_ecommerce_ubercart_node_update($node) {
-  if (uc_product_is_product($node)) {
-    // Update the corresponding MailChimp product.
-    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
-
-    // TODO refactor to use mailchimp_ecommerce_update_product and handle variants
-
     mailchimp_ecommerce_add_product(
       $product['id'],
       $product['variant_id'],
@@ -83,6 +75,28 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
 		    $product['url'],
 		    $variant['price']);
     }
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function mailchimp_ecommerce_ubercart_node_update($node) {
+  if (uc_product_is_product($node)) {
+    // Update the corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+
+    // TODO refactor to use mailchimp_ecommerce_update_product and handle variants
+
+    mailchimp_ecommerce_add_product(
+      $product['id'],
+      $product['variant_id'],
+      $product['title'],
+      $product['description'],
+      $product['type'],
+      $product['sku'],
+      $product['url'],
+      $product['price']);
   }
 }
 
