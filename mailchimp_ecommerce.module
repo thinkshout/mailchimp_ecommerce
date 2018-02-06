@@ -1156,3 +1156,23 @@ function mailchimp_ecommerce_show_error($message) {
     drupal_set_message($message, 'error');
   }
 }
+
+/**
+ * Get the human readable name of a node type by the slug.
+ *
+ * @param $type_slug
+ *  slug of a node type
+ *
+ * @return string|false
+ *  String for the name of the type if it exists, otherwise FALSE
+ */
+function mailchimp_ecommerce_get_node_type_name($type_slug) {
+	$all_types = node_type_get_names();
+	$type_name = false;
+
+	if (isset($all_types[$type_slug])) {
+		$type_name = $all_types[$type_slug];
+	}
+
+	return $type_name;
+}
