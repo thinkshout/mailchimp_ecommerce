@@ -83,7 +83,7 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
 	$query = db_select('node', 'n')
 		->fields('n', ['nid']);
 	$query->join('node_type', 'nt', 'n.type = nt.type');
-	$nids = $query->condition('nt.base', 'uc_product')
+	$nids = $query->condition('nt.base', ['uc_product', 'uc_product_kit'], 'IN')
 		->execute()
 		->fetchCol();
 
