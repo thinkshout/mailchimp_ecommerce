@@ -170,7 +170,7 @@ function mailchimp_ecommerce_get_store($store_id) {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get store: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 
@@ -207,7 +207,7 @@ function mailchimp_ecommerce_add_store($store_id, $store, $platform) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a new store: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -237,7 +237,7 @@ function mailchimp_ecommerce_update_store($store_id, $name, $currency_code, $pla
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a store: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -270,7 +270,7 @@ function mailchimp_ecommerce_add_customer($customer) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a customer: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -301,7 +301,7 @@ function mailchimp_ecommerce_get_customer($customer_id) {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 
@@ -334,7 +334,7 @@ function mailchimp_ecommerce_update_customer($customer) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a customer: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -357,7 +357,7 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -422,7 +422,7 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a cart: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -482,7 +482,7 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a cart: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -518,7 +518,7 @@ function mailchimp_ecommerce_delete_cart($cart_id) {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to delete a cart: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 }
@@ -561,7 +561,7 @@ function mailchimp_ecommerce_add_cart_line($cart_id, $line_id, $product) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a cart line: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -603,7 +603,7 @@ function mailchimp_ecommerce_update_cart_line($cart_id, $line_id, $product) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update a cart line: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -638,7 +638,7 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to delete a cart line: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -665,7 +665,7 @@ function mailchimp_ecommerce_get_order($order_id) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 
   return NULL;
@@ -732,7 +732,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add an order: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -772,7 +772,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to update an order: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -803,7 +803,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '') {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -829,6 +829,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'sku' => $sku,
           'url' => $url,
           'price' => $price,
+          'image_url' => $image_url,
         ];
 
         $mc_ecommerce->addProduct($store_id, $product_id, $title, [$variant], [
@@ -856,7 +857,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to add a product: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -879,7 +880,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param float $price
  *   The product price.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '') {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -893,6 +894,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
       'sku' => $sku,
       'url' => $url,
       'price' => $price,
+      'image_url' => $image_url,
     ]);
   }
   catch (Exception $e) {
@@ -920,7 +922,7 @@ function mailchimp_ecommerce_delete_product($product_id) {
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to delete product: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -970,7 +972,7 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $product_varian
   }
   catch (Exception $e) {
     mailchimp_ecommerce_log_error_message('Unable to delete product variant: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
@@ -1020,7 +1022,7 @@ function mailchimp_ecommerce_get_campaign_id() {
     }
     else {
       mailchimp_ecommerce_log_error_message('Unable to get campaign: ' . $e->getMessage());
-      drupal_set_message($e->getMessage(), 'error');
+      mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
 
@@ -1141,4 +1143,13 @@ function _mailchimp_ecommerce_increment_order_total($email_address, $total_spent
   }
 
   return FALSE;
+}
+
+/**
+ * Helper function to show an error message for admin users.
+ */
+function mailchimp_ecommerce_show_error($message) {
+  if (user_access('administer mailchimp')) {
+    drupal_set_message($message, 'error');
+  }
 }
