@@ -127,8 +127,6 @@ function mailchimp_ecommerce_ubercart_admin_sync_submit($form, &$form_state) {
 			->execute()
 			->fetchCol();
 
-		//*debug*/ dd($result, __FUNCTION__.'() $result');
-
 		if (count($result)) {
 			$product_ids = array_unique($result);
 			$batch['operations'][] = [
