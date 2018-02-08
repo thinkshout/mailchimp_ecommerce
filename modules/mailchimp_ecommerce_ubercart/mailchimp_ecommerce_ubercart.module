@@ -278,7 +278,8 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
  * Implements hook_uc_order().
  */
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
-	// TODO: cannot properly sync cart line items until MailChimp has info on all product variants since variant ID = SKU
+	/*debug*/ mq_dd($op);
+
   if ($op == 'new') {
     $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
@@ -343,6 +344,7 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
 function mailchimp_ecommerce_ubercart_build_order($order) {
   $currency_code = $order->currency;
   $order_total = '';
+  $discount_total = 0;
   $lines = [];
 
   $billing_address = mailchimp_ecommerce_ubercart_parse_billing_address($order);
@@ -355,15 +357,20 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
   $products = uc_cart_get_contents();
   if (!empty($products)) {
     foreach ($products as $product) {
-      $line = [
-        'id' => $product->cart_item_id,
-        'product_id' => $product->nid,
-        'product_variant_id' => $product->model,
-        'quantity' => (int) $product->qty,
-        'price' => $product->price,
-      ];
+      if ($product->module === "uc_coupon") {
+      	// calculate discount_total for order
+	    $discount_total += $product->price;
+      } else {
+	      $line = [
+		      'id'                 => $product->cart_item_id,
+		      'product_id'         => $product->nid,
+		      'product_variant_id' => $product->model,
+		      'quantity'           => (int) $product->qty,
+		      'price'              => $product->price,
+	      ];
 
-      $lines[] = $line;
+	      $lines[] = $line;
+      }
     }
   }
 
@@ -380,6 +387,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
   $order_data = [
     'currency_code' => $currency_code,
     'order_total' => $order_total,
+	'discount_total' => abs($discount_total),
     'billing_address' => $billing_address,
     'processed_at_foreign' => date('c'),
     'lines' => $lines,
