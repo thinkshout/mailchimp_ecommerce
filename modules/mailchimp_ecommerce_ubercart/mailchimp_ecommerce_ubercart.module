@@ -278,8 +278,6 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
  * Implements hook_uc_order().
  */
 function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
-	/*debug*/ mq_dd($op);
-
   if ($op == 'new') {
     $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
