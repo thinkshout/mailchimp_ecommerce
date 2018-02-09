@@ -86,7 +86,6 @@ function mailchimp_ecommerce_admin_settings() {
     '#type' => 'checkbox',
     '#options' => [1 => 'Send all active Carts', 0 => 'Send completed orders only'],
     '#title' => t('Send Carts to MailChimp'),
-    '#required' => TRUE,
     '#default_value' => variable_get('mailchimp_ecommerce_send_carts', FALSE),
     '#description' => t('When enabled, Shopping Carts and orders are sent to MailChimp. When disabled, only completed Orders are sent during Checkout completion.'),
   ];
