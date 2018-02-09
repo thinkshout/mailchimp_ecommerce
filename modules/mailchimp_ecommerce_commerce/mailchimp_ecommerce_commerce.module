@@ -201,7 +201,7 @@ function mailchimp_ecommerce_commerce_commerce_order_update($order){
     $checkout_states = array_keys(commerce_order_statuses(array('state' => 'checkout')));
 
     if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
-      // @todo: Handle admin-created orders,
+      // @todo: Handle admin-created orders.
       _mailchimp_ecommerce_commerce_send_cart($order);
     }
   }
