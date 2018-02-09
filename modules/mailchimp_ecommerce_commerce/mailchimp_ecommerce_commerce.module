@@ -208,6 +208,16 @@ function mailchimp_ecommerce_commerce_commerce_order_update($order){
 }
 
 /**
+ * Implements hook_commerce_order_delete().
+ */
+function mailchimp_ecommerce_commerce_commerce_order_delete($order) {
+  $cart_statuses = array_keys(commerce_order_statuses(array('state' => 'cart')));
+  if (in_array($order->status, $cart_statuses)) {
+    mailchimp_ecommerce_delete_cart($order->order_id);
+  }
+}
+
+/**
  * Implements hook_commerce_cart_product_add().
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product, $quantity, $line_item) {
