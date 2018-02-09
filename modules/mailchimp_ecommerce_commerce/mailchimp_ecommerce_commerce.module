@@ -190,6 +190,13 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
  * Implements hook_commerce_cart_product_add().
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
   // If this order is new, that means this is the first line item;
   // send the entire cart to MailChimp first.
   if ($order->created == $order->changed) {
