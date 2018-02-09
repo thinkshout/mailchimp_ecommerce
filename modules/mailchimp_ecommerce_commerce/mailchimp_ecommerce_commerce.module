@@ -436,7 +436,7 @@ function mailchimp_ecommerce_commerce_default_rules_configuration() {
 
   $rule->label = t('Send cart to MailChimp');
   $rule->tags = ['Commerce Cart'];
-  $rule->active = FALSE;
+  $rule->active = TRUE;
 
   $rule
     ->event('commerce_cart_product_add')
