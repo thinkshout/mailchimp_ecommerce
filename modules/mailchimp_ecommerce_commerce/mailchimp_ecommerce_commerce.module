@@ -190,7 +190,7 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
  * Implements hook_commerce_cart_product_add().
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product, $quantity, $line_item) {
-  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
 
   // Do not send Carts to MailChimp if we're not configured to.
   if ($send_carts == FALSE) {
@@ -223,7 +223,7 @@ function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product
  * deleting the cartLine from MailChimp.
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_remove($order, $product, $quantity, $line_item) {
-  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
 
   // Do not send Carts to MailChimp if we're not configured to.
   if ($send_carts == FALSE) {
@@ -237,7 +237,7 @@ function mailchimp_ecommerce_commerce_commerce_cart_product_remove($order, $prod
  * Implements hook_commerce_line_item_update().
  */
 function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
-  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
 
   // Do not send Carts to MailChimp if we're not configured to.
   if ($send_carts == FALSE) {
