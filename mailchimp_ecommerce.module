@@ -801,7 +801,7 @@ function mailchimp_ecommerce_delete_order($order_id) {
     if (mailchimp_ecommerce_use_queue()) {
       mailchimp_ecommerce_create_queue_item([
         'op' => 'deleteOrder',
-        'cart_id' => $order_id,
+        'order_id' => $order_id,
         'store_id' => $store_id,
       ]);
     }
