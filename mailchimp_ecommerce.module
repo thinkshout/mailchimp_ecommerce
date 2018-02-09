@@ -822,10 +822,10 @@ function mailchimp_ecommerce_delete_order($order_id) {
   }
   catch (Exception $e) {
     if ($e->getCode() == 404) {
-      // Cart doesn't exist; no need to log an error.
+      // Order doesn't exist; no need to log an error.
     }
     else {
-      mailchimp_ecommerce_log_error_message('Unable to delete a cart: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to delete an order: ' . $e->getMessage());
       mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
