@@ -223,7 +223,40 @@ function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product
  * deleting the cartLine from MailChimp.
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_remove($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
   mailchimp_ecommerce_delete_cart_line($order->order_id, $line_item->line_item_id);
+}
+
+/**
+ * Implements hook_commerce_line_item_update().
+ */
+function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_cart', TRUE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+    $product = $line_item_wrapper->commerce_product->value();
+    $mc_product = [
+      'product_id' => $product->product_id,
+      'product_variant_id' => $product->sku,
+      'quantity' => $line_item->quantity,
+      'price' => commerce_currency_amount_to_decimal(
+        $line_item_wrapper->commerce_unit_price->amount->value(),
+        $line_item_wrapper->commerce_unit_price->currency_code->value()),
+    ];
+    mailchimp_ecommerce_update_cart_line($line_item->order_id, $line_item->line_item_id, $mc_product);
+  }
 }
 
 /**
