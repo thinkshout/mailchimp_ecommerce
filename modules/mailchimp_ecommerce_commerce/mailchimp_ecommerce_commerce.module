@@ -112,8 +112,51 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '#default_value' => variable_get('mailchimp_ecommerce_commerce_image_style', ''),
   ];
 
+  // If Stock modules are detected, show the admin some options for
+  // handling inventory quantities.
+  // @todo: Allow for any other known Stock modules.
+  if (module_exists('commerce_stock')) {
+    $form['stock'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Inventory'),
+      '#description' => t("Stock module detected. The Fixed Inventory Amount will be used for any products that do not have stock fields configured."),
+      '#collapsible' => FALSE,
+    ];
+    $form['stock']['mailchimp_ecommerce_use_fixed_inventory'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Use fixed inventory'),
+      '#description' => t('Enable to set the Fixed Inventory Amount for all products regardless of stock availability.'),
+      '#default_value' => variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE),
+    ];
+    $form['stock']['mailchimp_ecommerce_fixed_inventory_amount'] = [
+      '#type' => 'textfield',
+      '#title' => t('Fixed inventory amount'),
+      '#default_value' => variable_get('mailchimp_ecommerce_fixed_inventory_amount', 1),
+    ];
+  }
+
   // Identify Drupal Commerce to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Commerce';
+
+  // Validate our settings.
+  $form['#validate'][] = 'mailchimp_ecommerce_commerce_admin_validate';
+}
+
+/**
+ * Validation handler for our admin settings form.
+ */
+function mailchimp_ecommerce_commerce_admin_validate(&$form, &$form_state) {
+  // Make sure the inventory amount is an integer.
+  $amount = $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'];
+  if (!empty($amount) && !is_numeric($amount) && !is_int($amount)) {
+    form_set_error('mailchimp_ecommerce_fixed_inventory_amount', 'Inventory amount must be an integer.');
+    return FALSE;
+  }
+
+  // If a blank string was passed in, reset the variable to our default.
+  if ($amount == '') {
+    $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'] = 1;
+  }
 }
 
 /**
@@ -340,8 +383,9 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
+  $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
   // TODO: Get product description from product display, if available.
-  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price, $image_url);
+  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -352,7 +396,8 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
-  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url);
+  $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -622,4 +667,28 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
   }
 
   return $image_url;
+}
+
+/**
+ * Find the inventory of a given product.
+ *
+ * @param object $product
+ *   The Commerce product.
+ *
+ * @return int
+ *   The stock amount, or 1 if no options are configured.
+ */
+function _mailchimp_ecommerce_commerce_get_inventory($product) {
+  // A default inventory amount is required for product recommendations.
+  // Setting to 1 is a safe fallback in case no stock modules are enabled.
+  $inventory_amount = variable_get('mailchimp_ecommerce_fixed_inventory_amount', 1);
+
+  if (variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE) == FALSE) {
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    if ($product_wrapper->__isset('commerce_stock') && $product_wrapper->commerce_stock->value()) {
+      $inventory_amount = (int) $product_wrapper->commerce_stock->value();
+    }
+  }
+
+  return $inventory_amount;
 }

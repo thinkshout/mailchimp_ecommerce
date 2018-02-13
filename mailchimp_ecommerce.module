@@ -804,8 +804,12 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
  *   The product URL.
  * @param float $price
  *   The product price.
+ * @param string $image_url
+ *   A URL to a representative product Image.
+ * @param int $stock
+ *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '') {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -833,6 +837,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
           'url' => $url,
           'price' => $price,
           'image_url' => $image_url,
+          'inventory_quantity' => (int) $stock,
         ];
 
         $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, [$variant], [
@@ -855,6 +860,8 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
         'title' => $title,
         'sku' => $sku,
         'price' => $price,
+        'image_url' => $image_url,
+        'inventory_quantity' => (int) $stock,
       ]);
     }
   }
@@ -882,8 +889,12 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  *   The product SKU.
  * @param float $price
  *   The product price.
+ * @param string $image_url
+ *   A URL to a representative product Image.
+ * @param int $stock
+ *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '') {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -898,6 +909,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
       'url' => $url,
       'price' => $price,
       'image_url' => $image_url,
+      'inventory_quantity' => (int) $stock,
     ]);
   }
   catch (Exception $e) {
