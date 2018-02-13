@@ -787,6 +787,24 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
 }
 
 /**
+ * Get the description for a given product from its configured field.
+ */
+function _mailchimp_ecommerce_commerce_get_description($product) {
+  $description = '';
+  $field = variable_get('mailchimp_ecommerce_commerce_description_field' ,'');
+  if (!empty($field)) {
+    $wrapper = entity_metadata_wrapper('commerce_product', $product);
+    if ($wrapper->__isset($field) && $wrapper->{$field}->value()) {
+      $description = check_plain($wrapper->{$field}->value());
+
+      // Allow other modules to alter the description.
+      drupal_alter('mailchimp_ecommerce_product_description', $description, $product);
+    }
+  }
+  return $description;
+}
+
+/**
  * Find the inventory of a given product.
  *
  * @param object $product
