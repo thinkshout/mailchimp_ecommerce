@@ -230,13 +230,112 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
 }
 
 /**
+ * Implements hook_commerce_order_update().
+ *
+ * When an in-progress cart order changes status, notify
+ * MailChimp if we're configured to do so.
+ */
+function mailchimp_ecommerce_commerce_commerce_order_update($order){
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Only send a cart if we are in cart or checkout status, and the status has changed.
+  if ($send_carts == TRUE && $order->original->status <> $order->status) {
+    $cart_states = array_keys(commerce_order_statuses(array('state' => 'cart')));
+    $checkout_states = array_keys(commerce_order_statuses(array('state' => 'checkout')));
+
+    if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
+      // @todo: Handle admin-created orders.
+      _mailchimp_ecommerce_commerce_send_cart($order);
+    }
+  }
+}
+
+/**
+ * Implements hook_commerce_order_delete().
+ */
+function mailchimp_ecommerce_commerce_commerce_order_delete($order) {
+  // If this order was completed, it is an MC Order.
+  $post_checkout = array_keys(commerce_order_statuses(array('state' => 'completed')));
+  if (in_array($order->status, $post_checkout)) {
+    mailchimp_ecommerce_delete_order($order->order_id);
+  }
+  // Otherwise it's a cart.
+  else {
+    mailchimp_ecommerce_delete_cart($order->order_id);
+  }
+}
+
+/**
+ * Implements hook_commerce_cart_product_add().
+ */
+function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  // If this order is new, that means this is the first line item;
+  // send the entire cart to MailChimp first.
+  if ($order->created == $order->changed) {
+    _mailchimp_ecommerce_commerce_send_cart($order);
+  }
+  else {
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $cart_product = [
+      'product_id' => $product->product_id,
+      'product_variant_id' => $product->sku,
+      'quantity' => $quantity,
+      'price' => commerce_currency_amount_to_decimal(
+        $line_item_wrapper->commerce_unit_price->amount->value(),
+        $line_item_wrapper->commerce_unit_price->currency_code->value()),
+    ];
+    mailchimp_ecommerce_add_cart_line($order->order_id, $line_item->line_item_id, $cart_product);
+  }
+}
+
+/**
  * Implements hook_commerce_cart_product_remove().
  *
  * Removing a product from a shopping cart requires
  * deleting the cartLine from MailChimp.
  */
 function mailchimp_ecommerce_commerce_commerce_cart_product_remove($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
   mailchimp_ecommerce_delete_cart_line($order->order_id, $line_item->line_item_id);
+}
+
+/**
+ * Implements hook_commerce_line_item_update().
+ */
+function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+    $product = $line_item_wrapper->commerce_product->value();
+    $mc_product = [
+      'product_id' => $product->product_id,
+      'product_variant_id' => $product->sku,
+      'quantity' => $line_item->quantity,
+      'price' => commerce_currency_amount_to_decimal(
+        $line_item_wrapper->commerce_unit_price->amount->value(),
+        $line_item_wrapper->commerce_unit_price->currency_code->value()),
+    ];
+    mailchimp_ecommerce_update_cart_line($line_item->order_id, $line_item->line_item_id, $mc_product);
+  }
 }
 
 /**
