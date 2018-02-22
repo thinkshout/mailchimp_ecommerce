@@ -35,6 +35,18 @@ function mailchimp_ecommerce_menu() {
     'weight' => 21,
   );
 
+	$items['admin/config/services/mailchimp/ecommerce/sync-orders'] = array(
+		'title' => 'eCommerce historical orders sync',
+		'description' => 'Sync past eCommerce order data to MailChimp.',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('mailchimp_ecommerce_admin_sync_orders'),
+		'access callback' => 'mailchimp_apikey_ready_access',
+		'access arguments' => array('administer mailchimp'),
+		'file' => 'includes/mailchimp_ecommerce.admin.inc',
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 21,
+	);
+
   return $items;
 }
 

@@ -14,6 +14,10 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
 
   // Identify Ubercart to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Ubercart';
+
+	$form['sync']['orders'] = [
+		'#markup' => '<br>'.l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
+	];
 }
 
 /**
