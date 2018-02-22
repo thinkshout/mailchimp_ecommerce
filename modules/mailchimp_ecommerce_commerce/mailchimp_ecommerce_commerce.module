@@ -62,10 +62,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
         // Only list product reference fields.
         if (isset($properties['settings']['referenceable_types'])) {
           $node_field_options[$field_name] = $properties['label'];
-        }
 
-        // Track referenceable product variation types for this field.
-        $product_image_types += array_filter($properties['settings']['referenceable_types']);
+          // Track referenceable product variation types for this field.
+          $product_image_types += array_filter($properties['settings']['referenceable_types']);
+        }
       }
     }
   }
@@ -112,8 +112,51 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '#default_value' => variable_get('mailchimp_ecommerce_commerce_image_style', ''),
   ];
 
+  // If Stock modules are detected, show the admin some options for
+  // handling inventory quantities.
+  // @todo: Allow for any other known Stock modules.
+  if (module_exists('commerce_stock')) {
+    $form['stock'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Inventory'),
+      '#description' => t("Stock module detected. The Fixed Inventory Amount will be used for any products that do not have stock fields configured."),
+      '#collapsible' => FALSE,
+    ];
+    $form['stock']['mailchimp_ecommerce_use_fixed_inventory'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Use fixed inventory'),
+      '#description' => t('Enable to set the Fixed Inventory Amount for all products regardless of stock availability.'),
+      '#default_value' => variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE),
+    ];
+    $form['stock']['mailchimp_ecommerce_fixed_inventory_amount'] = [
+      '#type' => 'textfield',
+      '#title' => t('Fixed inventory amount'),
+      '#default_value' => variable_get('mailchimp_ecommerce_fixed_inventory_amount', 1),
+    ];
+  }
+
   // Identify Drupal Commerce to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Commerce';
+
+  // Validate our settings.
+  $form['#validate'][] = 'mailchimp_ecommerce_commerce_admin_validate';
+}
+
+/**
+ * Validation handler for our admin settings form.
+ */
+function mailchimp_ecommerce_commerce_admin_validate(&$form, &$form_state) {
+  // Make sure the inventory amount is an integer.
+  $amount = $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'];
+  if (!empty($amount) && !is_numeric($amount) && !is_int($amount)) {
+    form_set_error('mailchimp_ecommerce_fixed_inventory_amount', 'Inventory amount must be an integer.');
+    return FALSE;
+  }
+
+  // If a blank string was passed in, reset the variable to our default.
+  if ($amount == '') {
+    $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'] = 1;
+  }
 }
 
 /**
@@ -183,6 +226,115 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
     ]);
 
     $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+  }
+}
+
+/**
+ * Implements hook_commerce_order_update().
+ *
+ * When an in-progress cart order changes status, notify
+ * MailChimp if we're configured to do so.
+ */
+function mailchimp_ecommerce_commerce_commerce_order_update($order){
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Only send a cart if we are in cart or checkout status, and the status has changed.
+  if ($send_carts == TRUE && $order->original->status <> $order->status) {
+    $cart_states = array_keys(commerce_order_statuses(array('state' => 'cart')));
+    $checkout_states = array_keys(commerce_order_statuses(array('state' => 'checkout')));
+
+    if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
+      // @todo: Handle admin-created orders.
+      _mailchimp_ecommerce_commerce_send_cart($order);
+    }
+  }
+}
+
+/**
+ * Implements hook_commerce_order_delete().
+ */
+function mailchimp_ecommerce_commerce_commerce_order_delete($order) {
+  // If this order was completed, it is an MC Order.
+  $post_checkout = array_keys(commerce_order_statuses(array('state' => 'completed')));
+  if (in_array($order->status, $post_checkout)) {
+    mailchimp_ecommerce_delete_order($order->order_id);
+  }
+  // Otherwise it's a cart.
+  else {
+    mailchimp_ecommerce_delete_cart($order->order_id);
+  }
+}
+
+/**
+ * Implements hook_commerce_cart_product_add().
+ */
+function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  // If this order is new, that means this is the first line item;
+  // send the entire cart to MailChimp first.
+  if ($order->created == $order->changed) {
+    _mailchimp_ecommerce_commerce_send_cart($order);
+  }
+  else {
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $cart_product = [
+      'product_id' => $product->product_id,
+      'product_variant_id' => $product->sku,
+      'quantity' => $quantity,
+      'price' => commerce_currency_amount_to_decimal(
+        $line_item_wrapper->commerce_unit_price->amount->value(),
+        $line_item_wrapper->commerce_unit_price->currency_code->value()),
+    ];
+    mailchimp_ecommerce_add_cart_line($order->order_id, $line_item->line_item_id, $cart_product);
+  }
+}
+
+/**
+ * Implements hook_commerce_cart_product_remove().
+ *
+ * Removing a product from a shopping cart requires
+ * deleting the cartLine from MailChimp.
+ */
+function mailchimp_ecommerce_commerce_commerce_cart_product_remove($order, $product, $quantity, $line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  mailchimp_ecommerce_delete_cart_line($order->order_id, $line_item->line_item_id);
+}
+
+/**
+ * Implements hook_commerce_line_item_update().
+ */
+function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
+  $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
+
+  // Do not send Carts to MailChimp if we're not configured to.
+  if ($send_carts == FALSE) {
+    return;
+  }
+
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
+    $product = $line_item_wrapper->commerce_product->value();
+    $mc_product = [
+      'product_id' => $product->product_id,
+      'product_variant_id' => $product->sku,
+      'quantity' => $line_item->quantity,
+      'price' => commerce_currency_amount_to_decimal(
+        $line_item_wrapper->commerce_unit_price->amount->value(),
+        $line_item_wrapper->commerce_unit_price->currency_code->value()),
+    ];
+    mailchimp_ecommerce_update_cart_line($line_item->order_id, $line_item->line_item_id, $mc_product);
   }
 }
 
@@ -330,8 +482,9 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
+  $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
   // TODO: Get product description from product display, if available.
-  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price, $image_url);
+  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -342,7 +495,8 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $price = commerce_currency_amount_to_decimal($product_wrapper->commerce_price->amount->value(), $product_wrapper->commerce_price->currency_code->value());
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
-  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url);
+  $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -612,4 +766,28 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
   }
 
   return $image_url;
+}
+
+/**
+ * Find the inventory of a given product.
+ *
+ * @param object $product
+ *   The Commerce product.
+ *
+ * @return int
+ *   The stock amount, or 1 if no options are configured.
+ */
+function _mailchimp_ecommerce_commerce_get_inventory($product) {
+  // A default inventory amount is required for product recommendations.
+  // Setting to 1 is a safe fallback in case no stock modules are enabled.
+  $inventory_amount = variable_get('mailchimp_ecommerce_fixed_inventory_amount', 1);
+
+  if (variable_get('mailchimp_ecommerce_use_fixed_inventory', FALSE) == FALSE) {
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+    if ($product_wrapper->__isset('commerce_stock') && $product_wrapper->commerce_stock->value()) {
+      $inventory_amount = (int) $product_wrapper->commerce_stock->value();
+    }
+  }
+
+  return $inventory_amount;
 }
