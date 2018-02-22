@@ -70,8 +70,9 @@ function mailchimp_ecommerce_admin_settings() {
       '#collapsible' => FALSE,
       '#weight' => 99,
     ];
+    $platform = module_exists('mailchimp_ecommerce_ubercart') ? 'Ubercart' : 'Commerce';
     $form['sync']['products'] = [
-      '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
+      '#markup' => l(t('Sync existing @platform products to MailChimp', ['@platform'=>$platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
     ];
   }
 
