@@ -154,6 +154,7 @@ function mailchimp_ecommerce_page_build(&$page) {
   $campaign_id = isset($_GET['mc_cid']) ? check_plain($_GET['mc_cid']) : '';
   if ($campaign_id) {
     $_SESSION['mc_cid'] = $campaign_id;
+    $_SESSION['mc_landing_site'] = $_SERVER['HTTP_HOST'] . request_uri();
   }
 }
 
@@ -405,6 +406,7 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
       $cart['campaign_id'] = $campaign_id;
+      $cart['landing_site'] = isset($_SESSION['mc_landing_site']) ? $_SESSION['mc_landing_site'] : '';
     }
 
     if (mailchimp_ecommerce_use_queue()) {
@@ -710,6 +712,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
       $order['campaign_id'] = $campaign_id;
+      $order['landing_site'] = isset($_SESSION['mc_landing_site']) ? $_SESSION['mc_landing_site'] : '';
     }
 
     if (mailchimp_ecommerce_use_queue()) {
