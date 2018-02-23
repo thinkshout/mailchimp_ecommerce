@@ -672,7 +672,7 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
  * @return object
  *   The order.
  */
-function mailchimp_ecommerce_get_order($order_id) {
+function mailchimp_ecommerce_get_order($order_id, $log_404 = TRUE) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -685,8 +685,13 @@ function mailchimp_ecommerce_get_order($order_id) {
     return $order;
   }
   catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
-    mailchimp_ecommerce_show_error($e->getMessage());
+	  if ($e->getCode() == 404 && !$log_404) {
+		  // Order doesn't exist in the store; no need to log an error.
+	  }
+	  else {
+		  mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
+		  mailchimp_ecommerce_show_error($e->getMessage());
+	  }
   }
 
   return NULL;
