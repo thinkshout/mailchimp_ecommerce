@@ -321,7 +321,7 @@ function mailchimp_ecommerce_get_customer($customer_id) {
       // Customer doesn't exist in the store; no need to log an error.
     }
     else {
-      mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to get a customer: ' . $e->getMessage());
       mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
