@@ -12,6 +12,7 @@ function mailchimp_ecommerce_page_attachments(array &$attachments) {
   $campaign_id = filter_input(INPUT_GET, 'mc_cid', FILTER_SANITIZE_STRING);
   if (!empty($campaign_id)) {
     $_SESSION['mc_cid'] = $campaign_id;
+    $_SESSION['mc_landing_site'] = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
   }
 }
 

@@ -52,6 +52,7 @@ class OrderHandler implements OrderHandlerInterface {
       $campaign_id = mailchimp_ecommerce_get_campaign_id();
       if (!empty($campaign_id)) {
         $order['campaign_id'] = $campaign_id;
+        $order['landing_site'] = isset($_SESSION['mc_landing_site']) ? $_SESSION['mc_landing_site'] : '';
       }
 
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
