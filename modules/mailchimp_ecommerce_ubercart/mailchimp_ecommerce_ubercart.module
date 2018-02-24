@@ -369,7 +369,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 
   if (!empty($products)) {
     foreach ($products as $product) {
-      if ($product->module === "uc_coupon") {
+      if (isset($product->module) && $product->module === "uc_coupon") {
       	// calculate discount_total for order
 	    $discount_total += $product->price;
       } else {
