@@ -514,13 +514,15 @@ function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
 		$mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
 		// create customer if they do not already exist
-		if (is_null(mailchimp_ecommerce_get_customer($order->uid))) {
+		$lookup_customer = mailchimp_ecommerce_get_customer($order->uid);
+		if (is_null($lookup_customer)) {
 			// Create new customer in MailChimp.
 			mailchimp_ecommerce_add_customer($mc_order['customer']);
 		}
 
 		// create / update order
-		if (is_null(mailchimp_ecommerce_get_order($order->order_id, FALSE))) {
+		$lookup_order = mailchimp_ecommerce_get_order($order->order_id, FALSE);
+		if (is_null($lookup_order)) {
 			// Create new order in MailChimp.
 			mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
 		} else {
