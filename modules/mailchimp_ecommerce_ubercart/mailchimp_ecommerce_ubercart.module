@@ -356,7 +356,14 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 
   $order_total = uc_order_get_total($order);
 
-  $products = uc_cart_get_contents();
+  if (empty($order->products)) {
+  	// carts needs separate product lookup
+	  $products = uc_cart_get_contents();
+  } else {
+	  // completed orders are loaded with products
+	  $products = $order->products;
+  }
+
   if (!empty($products)) {
     foreach ($products as $product) {
       if ($product->module === "uc_coupon") {
@@ -364,7 +371,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 	    $discount_total += $product->price;
       } else {
 	      $line = [
-		      'id'                 => $product->cart_item_id,
+		      'id'                 => isset($product->cart_item_id) ? $product->cart_item_id : $product->order_product_id,
 		      'product_id'         => $product->nid,
 		      'product_variant_id' => $product->model,
 		      'quantity'           => (int) $product->qty,
