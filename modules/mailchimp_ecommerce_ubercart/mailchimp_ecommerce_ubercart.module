@@ -14,6 +14,10 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
 
   // Identify Ubercart to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Ubercart';
+
+	$form['sync']['orders'] = [
+		'#markup' => '<br>'.l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
+	];
 }
 
 /**
@@ -91,6 +95,9 @@ function mailchimp_ecommerce_ubercart_get_product_variant_values($product) {
 			$variants[$sku]['price'] = $product['price'] + $variant_data->price;
 		}
 	}
+
+	// Calling all modules implementing hook_mailchimp_ecommerce_ubercart_product_variant_alter():
+	drupal_alter('mailchimp_ecommerce_ubercart_product_variant', $variants, $product);
 
 	return $variants;
 }
@@ -352,15 +359,22 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
 
   $order_total = uc_order_get_total($order);
 
-  $products = uc_cart_get_contents();
+  if (empty($order->products)) {
+  	// carts needs separate product lookup
+	  $products = uc_cart_get_contents();
+  } else {
+	  // completed orders are loaded with products
+	  $products = $order->products;
+  }
+
   if (!empty($products)) {
     foreach ($products as $product) {
-      if ($product->module === "uc_coupon") {
+      if (isset($product->module) && $product->module === "uc_coupon") {
       	// calculate discount_total for order
 	    $discount_total += $product->price;
       } else {
 	      $line = [
-		      'id'                 => $product->cart_item_id,
+		      'id'                 => isset($product->cart_item_id) ? $product->cart_item_id : $product->order_product_id,
 		      'product_id'         => $product->nid,
 		      'product_variant_id' => $product->model,
 		      'quantity'           => (int) $product->qty,
@@ -440,4 +454,92 @@ function _mailchimp_ecommerce_ubercart_build_product_url($nid) {
 	$url = $base_url . '/' . $path;
 
 	return $url;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_sync_orders_alter(&$form, &$form_state) {
+	$form['#submit'][] = 'mailchimp_ecommerce_ubercart_admin_sync_orders_submit';
+}
+
+/**
+ * Submit handler for the MailChimp eCommerce sync form.
+ */
+function mailchimp_ecommerce_ubercart_admin_sync_orders_submit($form, &$form_state) {
+	if (!empty($form_state['values']['sync_orders'])) {
+		$batch = [
+			'title' => t('Adding orders to MailChimp'),
+			'operations' => [],
+		];
+
+		// get completed orders within specified time period (months)
+		$months = abs(intval($form_state['values']['timespan'])) * -1;
+		$min_timestamp = strtotime($months . ' months');
+		$result = db_select('uc_orders', 'o')
+			->fields('o', ['order_id'])
+			->condition('o.order_status', 'completed')
+			->condition('o.created', $min_timestamp, '>')
+			->execute()
+			->fetchCol();
+
+		if (count($result)) {
+			$order_ids = array_unique($result);
+			$batch['operations'][] = [
+				'mailchimp_ecommerce_ubercart_batch_add_orders',
+				[$order_ids],
+			];
+		}
+
+		batch_set($batch);
+	}
+}
+
+/**
+ * Batch callback used to add orders to MailChimp.
+ */
+function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
+	if (!isset($context['sandbox']['progress'])) {
+		$context['sandbox']['progress'] = 0;
+		$context['sandbox']['total'] = count($order_ids);
+		$context['results']['order_ids'] = $order_ids;
+		$context['sandbox']['current_order'] = 0;
+	}
+
+	$batch_limit = variable_get('mailchimp_batch_limit', 100);
+
+	$batch = array_slice($context['results']['order_ids'], $context['sandbox']['progress'], $batch_limit);
+	$orders = uc_order_load_multiple($batch);
+
+	foreach ($orders as $order) {
+		$context['sandbox']['current_order'] = $order->order_id;
+
+		$mc_order = mailchimp_ecommerce_ubercart_build_order($order);
+
+		// create customer if they do not already exist
+		$lookup_customer = mailchimp_ecommerce_get_customer($mc_order['customer']['id']);
+		if (is_null($lookup_customer)) {
+			// Create new customer in MailChimp.
+			mailchimp_ecommerce_add_customer($mc_order['customer']);
+		}
+
+		// create / update order
+		$lookup_order = mailchimp_ecommerce_get_order($order->order_id, FALSE);
+		if (is_null($lookup_order)) {
+			// Create new order in MailChimp.
+			mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+		} else {
+			// Update existing order in MailChimp.
+			mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
+		}
+
+		$context['sandbox']['progress']++;
+
+		$context['message'] = t('Sent @count of @total orders to MailChimp', [
+			'@count' => $context['sandbox']['progress'],
+			'@total' => $context['sandbox']['total'],
+		]);
+
+		$context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+	}
 }
