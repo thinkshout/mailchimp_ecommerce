@@ -96,6 +96,9 @@ function mailchimp_ecommerce_ubercart_get_product_variant_values($product) {
 		}
 	}
 
+	// Calling all modules implementing hook_mailchimp_ecommerce_ubercart_product_variant_alter():
+	drupal_alter('mailchimp_ecommerce_ubercart_product_variant', $variants, $product);
+
 	return $variants;
 }
 
