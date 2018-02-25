@@ -793,11 +793,26 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
  */
 function _mailchimp_ecommerce_commerce_get_description($product) {
   $description = '';
-  $field = variable_get('mailchimp_ecommerce_commerce_description_field' ,'');
-  if (!empty($field)) {
-    $wrapper = entity_metadata_wrapper('commerce_product', $product);
-    if ($wrapper->__isset($field) && $wrapper->{$field}->value()) {
-      $description = check_plain($wrapper->{$field}->value());
+  $field = variable_get('mailchimp_ecommerce_description_field' ,'');
+  $node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+
+  if (!empty($field) && !empty($node_type)) {
+    // Query the database to find the display node.
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', $node_type)
+      ->fieldCondition('field_product', 'product_id', $product->product_id, '=')
+      ->range(0, 1);
+
+    $result = $query->execute();
+
+    if ($result && !empty($result['node'])) {
+      $node = array_pop($result['node']);
+      $node = node_load($node->nid);
+      $wrapper = entity_metadata_wrapper('node', $node);
+      if ($wrapper->__isset($field) && $wrapper->{$field}->value()) {
+        $description = $wrapper->{$field}->value(['sanitize' => TRUE])['value'];
+      }
     }
   }
 
