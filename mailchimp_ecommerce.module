@@ -35,6 +35,18 @@ function mailchimp_ecommerce_menu() {
     'weight' => 21,
   );
 
+	$items['admin/config/services/mailchimp/ecommerce/sync-orders'] = array(
+		'title' => 'eCommerce historical orders sync',
+		'description' => 'Sync past eCommerce order data to MailChimp.',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('mailchimp_ecommerce_admin_sync_orders'),
+		'access callback' => 'mailchimp_apikey_ready_access',
+		'access arguments' => array('administer mailchimp'),
+		'file' => 'includes/mailchimp_ecommerce.admin.inc',
+		'type' => MENU_LOCAL_TASK,
+		'weight' => 21,
+	);
+
   return $items;
 }
 
@@ -310,7 +322,7 @@ function mailchimp_ecommerce_get_customer($customer_id) {
       // Customer doesn't exist in the store; no need to log an error.
     }
     else {
-      mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to get a customer: ' . $e->getMessage());
       mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
@@ -662,7 +674,7 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
  * @return object
  *   The order.
  */
-function mailchimp_ecommerce_get_order($order_id) {
+function mailchimp_ecommerce_get_order($order_id, $log_404 = TRUE) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -675,8 +687,13 @@ function mailchimp_ecommerce_get_order($order_id) {
     return $order;
   }
   catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
-    mailchimp_ecommerce_show_error($e->getMessage());
+	  if ($e->getCode() == 404 && !$log_404) {
+		  // Order doesn't exist in the store; no need to log an error.
+	  }
+	  else {
+		  mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
+		  mailchimp_ecommerce_show_error($e->getMessage());
+	  }
   }
 
   return NULL;

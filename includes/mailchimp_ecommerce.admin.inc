@@ -70,8 +70,9 @@ function mailchimp_ecommerce_admin_settings() {
       '#collapsible' => FALSE,
       '#weight' => 99,
     ];
+    $platform = module_exists('mailchimp_ecommerce_ubercart') ? 'Ubercart' : 'Commerce';
     $form['sync']['products'] = [
-      '#markup' => l(t('Sync existing Commerce products to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync'),
+      '#markup' => l(t('Sync existing @platform products to MailChimp', ['@platform'=>$platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
     ];
   }
 
@@ -172,3 +173,35 @@ function mailchimp_ecommerce_admin_sync() {
  */
 function mailchimp_ecommerce_admin_sync_submit($form, &$form_state) {
 }
+
+
+/**
+ * The MailChimp eCommerce historical order data sync form.
+ */
+function mailchimp_ecommerce_admin_sync_orders() {
+	$form['sync_orders'] = [
+		'#type' => 'checkbox',
+		'#title' => t('Sync Orders'),
+		'#description' => t('Sync historical orders to MailChimp.'),
+	];
+
+	$form['timespan'] = [
+		'#type' => 'textfield',
+		'#title' => t('Time span'),
+		'#default_value' => 6,
+		'#field_suffix' => 'months',
+		'#description' => 'MailChimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
+		'#size' => 3,
+		'#maxlength' => 3,
+	];
+
+	$form['actions']['submit'] = [
+		'#type' => 'submit',
+		'#value' => t('Sync with MailChimp'),
+	];
+
+	$form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';
+
+	return $form;
+}
+
