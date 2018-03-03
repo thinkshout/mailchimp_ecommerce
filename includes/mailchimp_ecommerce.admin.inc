@@ -53,8 +53,8 @@ function mailchimp_ecommerce_admin_settings() {
   }
 
   $list_options_currency = [
-    '' => '-- Select --',
-  ] + mailchimp_ecommerce_get_currency_codes();
+      '' => '-- Select --',
+    ] + mailchimp_ecommerce_get_currency_codes();
   $form['mailchimp_ecommerce_currency'] = [
     '#type' => 'select',
     '#options' => $list_options_currency,
@@ -72,7 +72,7 @@ function mailchimp_ecommerce_admin_settings() {
     ];
     $platform = module_exists('mailchimp_ecommerce_ubercart') ? 'Ubercart' : 'Commerce';
     $form['sync']['products'] = [
-      '#markup' => l(t('Sync existing @platform products to MailChimp', ['@platform'=>$platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
+      '#markup' => l(t('Sync existing @platform products to MailChimp', ['@platform' => $platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
     ];
   }
 
