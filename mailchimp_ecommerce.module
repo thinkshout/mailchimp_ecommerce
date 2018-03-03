@@ -71,8 +71,8 @@ function mailchimp_ecommerce_cron_queue_info() {
  *
  * @param array $item
  *   Properties to send to the Queue API.
- *   - 'op' (string) The operation to be performed by the MailChimp API. This maps
- *     to the actual MailChimp API methods.
+ *   - 'op' (string) The operation to be performed by the MailChimp API. This
+ *   maps to the actual MailChimp API methods.
  *   - 'cart_id' (string) The ID of the current cart.
  *   - 'store_id' (string) The Store ID.
  *   - 'customer' (array) A fully loaded MailChimp $customer.
@@ -687,13 +687,13 @@ function mailchimp_ecommerce_get_order($order_id) {
     return $order;
   }
   catch (Exception $e) {
-	  if ($e->getCode() == 404) {
-		  // Order doesn't exist in the store; no need to log an error.
-	  }
-	  else {
-		  mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
-		  mailchimp_ecommerce_show_error($e->getMessage());
-	  }
+    if ($e->getCode() == 404) {
+      // Order doesn't exist in the store; no need to log an error.
+    }
+    else {
+      mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
+      mailchimp_ecommerce_show_error($e->getMessage());
+    }
   }
 
   return NULL;
@@ -1245,8 +1245,8 @@ function _mailchimp_ecommerce_get_local_customer($email) {
  */
 function _mailchimp_ecommerce_increment_order_total($email_address, $total_spent, $orders_count = 1) {
   $query = $this->database->select('mailchimp_ecommerce_customer', 'c')
-                          ->fields('c', ['mailchimp_customer_id', 'orders_count', 'total_spent'])
-                          ->condition('mail', $email_address);
+    ->fields('c', ['mailchimp_customer_id', 'orders_count', 'total_spent'])
+    ->condition('mail', $email_address);
 
   $result = $query->execute()->fetch();
 
@@ -1256,12 +1256,12 @@ function _mailchimp_ecommerce_increment_order_total($email_address, $total_spent
     $new_total_spent = ($result->total_spent + $total_spent);
 
     $this->database->update('mailchimp_ecommerce_customer')
-                   ->fields([
-                     'orders_count' => $new_orders_count,
-                     'total_spent' => $new_total_spent,
-                   ])
-                   ->condition('mailchimp_customer_id', $customer_id)
-                   ->execute();
+      ->fields([
+        'orders_count' => $new_orders_count,
+        'total_spent' => $new_total_spent,
+      ])
+      ->condition('mailchimp_customer_id', $customer_id)
+      ->execute();
 
     return TRUE;
   }
@@ -1288,12 +1288,12 @@ function mailchimp_ecommerce_show_error($message) {
  *  String for the name of the type if it exists, otherwise FALSE
  */
 function mailchimp_ecommerce_get_node_type_name($type_slug) {
-	$all_types = node_type_get_names();
-	$type_name = false;
+  $all_types = node_type_get_names();
+  $type_name = FALSE;
 
-	if (isset($all_types[$type_slug])) {
-		$type_name = $all_types[$type_slug];
-	}
+  if (isset($all_types[$type_slug])) {
+    $type_name = $all_types[$type_slug];
+  }
 
-	return $type_name;
+  return $type_name;
 }
