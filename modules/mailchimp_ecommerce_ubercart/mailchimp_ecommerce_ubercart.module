@@ -15,9 +15,9 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
   // Identify Ubercart to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Ubercart';
 
-	$form['sync']['orders'] = [
-		'#markup' => '<br>'.l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
-	];
+  $form['sync']['orders'] = [
+    '#markup' => '<br>' . l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
+  ];
 }
 
 /**
@@ -29,9 +29,9 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     // get variants
-	$variants = mailchimp_ecommerce_ubercart_get_product_variant_values($product);
+    $variants = mailchimp_ecommerce_ubercart_get_product_variant_values($product);
 
-	// add base product
+    // add base product
     mailchimp_ecommerce_add_product(
       $product['id'],
       $product['variant_id'],
@@ -45,18 +45,18 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
 
   // add variants
   if (!empty($variants)) {
-  	foreach ($variants as $variant) {
-  		// mailchimp_ecommerce_add_product() will add variants if product already exists
-	    mailchimp_ecommerce_add_product(
-		    $product['id'],
-		    $variant['variant_id'],
-		    $variant['title'],
-		    $product['description'],
-		    $product['type'],
-		    $variant['sku'],
-		    $product['url'],
-		    $variant['price']
-	    );
+    foreach ($variants as $variant) {
+      // mailchimp_ecommerce_add_product() will add variants if product already exists
+      mailchimp_ecommerce_add_product(
+        $product['id'],
+        $variant['variant_id'],
+        $variant['title'],
+        $product['description'],
+        $product['type'],
+        $variant['sku'],
+        $product['url'],
+        $variant['price']
+      );
     }
   }
 }
@@ -65,78 +65,79 @@ function mailchimp_ecommerce_ubercart_node_insert($node) {
  * Returns an array of variant specific data from a product.
  *
  * @param $product
- *  array of product info from mailchimp_ecommerce_ubercart_get_product_values_from_node()
+ *  array of product info from
+ *   mailchimp_ecommerce_ubercart_get_product_values_from_node()
  *
  * @return array
  */
 function mailchimp_ecommerce_ubercart_get_product_variant_values($product) {
-	$variants = [];
+  $variants = [];
 
-	if (module_exists('uc_attribute')) {
-		$attributes = uc_product_get_attributes($product['id']);
+  if (module_exists('uc_attribute')) {
+    $attributes = uc_product_get_attributes($product['id']);
 
-		// Get variant adjusted price, and modified title (from UC option name)
-		$combinations = db_select('uc_product_adjustments', 'pa')
-			->fields('pa', ['combination', 'model'])
-			->condition('pa.nid', $product['id'])
-			->execute()
-			->fetchAllKeyed();
+    // Get variant adjusted price, and modified title (from UC option name)
+    $combinations = db_select('uc_product_adjustments', 'pa')
+      ->fields('pa', ['combination', 'model'])
+      ->condition('pa.nid', $product['id'])
+      ->execute()
+      ->fetchAllKeyed();
 
-		foreach ($combinations as $serialized_combo => $sku) {
-			$combo = unserialize($serialized_combo);
-			$option_id = reset($combo);
-			$attribute_id = key($combo);
-			$variant_data = $attributes[$attribute_id]->options[$option_id];
+    foreach ($combinations as $serialized_combo => $sku) {
+      $combo = unserialize($serialized_combo);
+      $option_id = reset($combo);
+      $attribute_id = key($combo);
+      $variant_data = $attributes[$attribute_id]->options[$option_id];
 
-			// store variant data for adding to MC API
-			$variants[$sku]['variant_id'] = $sku;
-			$variants[$sku]['sku'] = $sku;
-			$variants[$sku]['title'] = $product['title'] . ' (' . $attributes[$attribute_id]->label . ': '. $variant_data->name . ')';
-			$variants[$sku]['price'] = $product['price'] + $variant_data->price;
-		}
-	}
+      // store variant data for adding to MC API
+      $variants[$sku]['variant_id'] = $sku;
+      $variants[$sku]['sku'] = $sku;
+      $variants[$sku]['title'] = $product['title'] . ' (' . $attributes[$attribute_id]->label . ': ' . $variant_data->name . ')';
+      $variants[$sku]['price'] = $product['price'] + $variant_data->price;
+    }
+  }
 
-	// Calling all modules implementing hook_mailchimp_ecommerce_ubercart_product_variant_alter():
-	drupal_alter('mailchimp_ecommerce_ubercart_product_variant', $variants, $product);
+  // Calling all modules implementing hook_mailchimp_ecommerce_ubercart_product_variant_alter():
+  drupal_alter('mailchimp_ecommerce_ubercart_product_variant', $variants, $product);
 
-	return $variants;
+  return $variants;
 }
 
 /**
  * Implements hook_node_update().
  */
 function mailchimp_ecommerce_ubercart_node_update($node) {
-	if (uc_product_is_product($node)) {
-		// Update the corresponding MailChimp product.
-		$product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
+  if (uc_product_is_product($node)) {
+    // Update the corresponding MailChimp product.
+    $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
-		// get variants
-		$variants = mailchimp_ecommerce_ubercart_get_product_variant_values($product);
+    // get variants
+    $variants = mailchimp_ecommerce_ubercart_get_product_variant_values($product);
 
-		// update base variant
-		mailchimp_ecommerce_update_product(
-			$product['id'],
-			$product['variant_id'],
-			$product['title'],
-			$product['sku'],
-			$product['url'],
-			$product['price']
-		);
+    // update base variant
+    mailchimp_ecommerce_update_product(
+      $product['id'],
+      $product['variant_id'],
+      $product['title'],
+      $product['sku'],
+      $product['url'],
+      $product['price']
+    );
 
-		// add variants
-		if (!empty($variants)) {
-			foreach ($variants as $variant) {
-				mailchimp_ecommerce_update_product(
-					$product['id'],
-					$variant['variant_id'],
-					$variant['title'],
-					$variant['sku'],
-					$product['url'],
-					$variant['price']
-				);
-			}
-		}
-	}
+    // add variants
+    if (!empty($variants)) {
+      foreach ($variants as $variant) {
+        mailchimp_ecommerce_update_product(
+          $product['id'],
+          $variant['variant_id'],
+          $variant['title'],
+          $variant['sku'],
+          $product['url'],
+          $variant['price']
+        );
+      }
+    }
+  }
 }
 
 // TODO update product when Ubercart Attributes, Options, or Adjustments are saved
