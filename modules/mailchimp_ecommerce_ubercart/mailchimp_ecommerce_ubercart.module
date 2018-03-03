@@ -166,14 +166,14 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
 
 
   // select all nodes that are types of products
-	$query = db_select('node', 'n')
-		->fields('n', ['nid']);
-	$query->join('node_type', 'nt', 'n.type = nt.type');
-	$nids = $query->condition('nt.base', ['uc_product', 'uc_product_kit'], 'IN')
-		->execute()
-		->fetchCol();
+  $query = db_select('node', 'n')
+    ->fields('n', ['nid']);
+  $query->join('node_type', 'nt', 'n.type = nt.type');
+  $nids = $query->condition('nt.base', ['uc_product', 'uc_product_kit'], 'IN')
+    ->execute()
+    ->fetchCol();
 
-	$products = node_load_multiple($nids);
+  $products = node_load_multiple($nids);
 
   if (!empty($products)) {
     $product_ids = array_keys($products);
@@ -195,64 +195,64 @@ function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
  * Implements hook_form_FORM_ID_alter().
  */
 function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_sync_alter(&$form, &$form_state) {
-	$form['#submit'][] = 'mailchimp_ecommerce_ubercart_admin_sync_submit';
+  $form['#submit'][] = 'mailchimp_ecommerce_ubercart_admin_sync_submit';
 }
 
 /**
  * Submit handler for the MailChimp eCommerce sync form.
  */
 function mailchimp_ecommerce_ubercart_admin_sync_submit($form, &$form_state) {
-	if (!empty($form_state['values']['sync_products'])) {
-		$batch = [
-			'title' => t('Adding products to MailChimp'),
-			'operations' => [],
-		];
+  if (!empty($form_state['values']['sync_products'])) {
+    $batch = [
+      'title' => t('Adding products to MailChimp'),
+      'operations' => [],
+    ];
 
-		$result = db_select('uc_products', 'ucp')
-			->fields('ucp', ['nid'])
-			->execute()
-			->fetchCol();
+    $result = db_select('uc_products', 'ucp')
+      ->fields('ucp', ['nid'])
+      ->execute()
+      ->fetchCol();
 
-		if (count($result)) {
-			$product_ids = array_unique($result);
-			$batch['operations'][] = [
-				'mailchimp_ecommerce_ubercart_batch_add_products',
-				[$product_ids],
-			];
-		}
+    if (count($result)) {
+      $product_ids = array_unique($result);
+      $batch['operations'][] = [
+        'mailchimp_ecommerce_ubercart_batch_add_products',
+        [$product_ids],
+      ];
+    }
 
-		batch_set($batch);
-	}
+    batch_set($batch);
+  }
 }
 
 /**
  * Batch callback used to add products to MailChimp.
  */
 function mailchimp_ecommerce_ubercart_batch_add_products($product_ids, &$context) {
-	if (!isset($context['sandbox']['progress'])) {
-		$context['sandbox']['progress'] = 0;
-		$context['sandbox']['total'] = count($product_ids);
-		$context['results']['product_ids'] = $product_ids;
-	}
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['total'] = count($product_ids);
+    $context['results']['product_ids'] = $product_ids;
+  }
 
-	$batch_limit = variable_get('mailchimp_batch_limit', 100);
+  $batch_limit = variable_get('mailchimp_batch_limit', 100);
 
-	$batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
+  $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
 
-	foreach ($batch as $product_id) {
-		$node = node_load($product_id);
+  foreach ($batch as $product_id) {
+    $node = node_load($product_id);
 
-		mailchimp_ecommerce_ubercart_node_insert($node);
+    mailchimp_ecommerce_ubercart_node_insert($node);
 
-		$context['sandbox']['progress']++;
+    $context['sandbox']['progress']++;
 
-		$context['message'] = t('Sent @count of @total products to MailChimp', [
-			'@count' => $context['sandbox']['progress'],
-			'@total' => $context['sandbox']['total'],
-		]);
+    $context['message'] = t('Sent @count of @total products to MailChimp', [
+      '@count' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
+    ]);
 
-		$context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
-	}
+    $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+  }
 }
 
 /**
@@ -327,7 +327,7 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
       }
     }
   }
-  elseif ($op  == 'update') {
+  elseif ($op == 'update') {
     if ($order->order_status == 'in_checkout') {
       $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
@@ -361,28 +361,30 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
   $order_total = uc_order_get_total($order);
 
   if (empty($order->products)) {
-  	// carts needs separate product lookup
-	  $products = uc_cart_get_contents();
-  } else {
-	  // completed orders are loaded with products
-	  $products = $order->products;
+    // carts needs separate product lookup
+    $products = uc_cart_get_contents();
+  }
+  else {
+    // completed orders are loaded with products
+    $products = $order->products;
   }
 
   if (!empty($products)) {
     foreach ($products as $product) {
       if (isset($product->module) && $product->module === "uc_coupon") {
-      	// calculate discount_total for order
-	    $discount_total += $product->price;
-      } else {
-	      $line = [
-		      'id'                 => isset($product->cart_item_id) ? $product->cart_item_id : $product->order_product_id,
-		      'product_id'         => $product->nid,
-		      'product_variant_id' => $product->model,
-		      'quantity'           => (int) $product->qty,
-		      'price'              => $product->price,
-	      ];
+        // calculate discount_total for order
+        $discount_total += $product->price;
+      }
+      else {
+        $line = [
+          'id' => isset($product->cart_item_id) ? $product->cart_item_id : $product->order_product_id,
+          'product_id' => $product->nid,
+          'product_variant_id' => $product->model,
+          'quantity' => (int) $product->qty,
+          'price' => $product->price,
+        ];
 
-	      $lines[] = $line;
+        $lines[] = $line;
       }
     }
   }
@@ -400,7 +402,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
   $order_data = [
     'currency_code' => $currency_code,
     'order_total' => $order_total,
-	'discount_total' => abs($discount_total),
+    'discount_total' => abs($discount_total),
     'billing_address' => $billing_address,
     'processed_at_foreign' => date('c'),
     'lines' => $lines,
@@ -445,6 +447,7 @@ function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
  *
  * @param object $product
  *   The Commerce object.
+ *
  * @return string
  *   The URL of the node referencing the product.
  */
@@ -526,7 +529,7 @@ function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
     }
 
     // check if the order exists so we can call the correct endpoint.
-    if ($order->order_status == 'pending' || $order->order_status =='complete') {
+    if ($order->order_status == 'pending' || $order->order_status == 'complete') {
       $order = mailchimp_ecommerce_get_order($order->order_id);
       if ($order) {
         mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
