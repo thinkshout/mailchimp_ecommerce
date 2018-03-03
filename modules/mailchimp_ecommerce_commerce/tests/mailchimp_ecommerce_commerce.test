@@ -17,11 +17,11 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    *   Formatted as specified by simpletest.
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'MailChimp eCommerce Commerce',
       'description' => 'Test MailChimp eCommerce integration with Drupal Commerce.',
       'group' => 'MailChimp',
-    );
+    ];
   }
 
   /**
@@ -35,7 +35,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
     $this->profile = drupal_get_profile();
 
     // Enable modules required for the test.
-    $enabled_modules = array(
+    $enabled_modules = [
       'commerce',
       'commerce_product_ui',
       'entity',
@@ -46,7 +46,7 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
       'mailchimp_ecommerce',
       'mailchimp_ecommerce_commerce',
       'mailchimp_signup',
-    );
+    ];
 
     parent::setUp($enabled_modules);
 
@@ -69,13 +69,13 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp.
    */
   public function testAddStore() {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'administer site configuration',
       'administer mailchimp',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
-    $edit = array();
+    $edit = [];
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
     $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
@@ -91,13 +91,13 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp with no list.
    */
   public function testAddStoreNoList() {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'administer site configuration',
       'administer mailchimp',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
-    $edit = array();
+    $edit = [];
 
     $edit['mailchimp_ecommerce_integration'] = 'commerce';
     $edit['mailchimp_ecommerce_store_name'] = 'Freddie\'s Merchandise';
@@ -114,14 +114,14 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddProduct() {
     // Should pass.
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'administer site configuration',
       'configure store',
       'administer commerce_product entities',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
-    $edit = array();
+    $edit = [];
 
     $edit['sku'] = 'Jokes002';
     $edit['title'] = 'Freddie\'s Jokes Volume 2';
@@ -145,20 +145,20 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddCustomer() {
     // Should pass.
-//    $customer = [
-//      'id' => '001',
-//      'email_address' => 'sarah@example.com',
-//      'first_name' => 'Sarah',
-//      'last_name' => 'Connor'
-//    ];
-//    mailchimp_ecommerce_add_customer($customer);
-//    $new_customer = mailchimp_ecommerce_get_customer($customer['id']);
-//    var_dump($new_customer);
-//
-//    $this->assertEqual($new_customer['id'], $customer['id']);
-//    $this->assertEqual($new_customer['email_address'], $customer['email_address']);
-//    $this->assertEqual($new_customer['first_name'], $customer['first_name']);
-//    $this->assertEqual($new_customer['last_name'], $customer['last_name']);
+    //    $customer = [
+    //      'id' => '001',
+    //      'email_address' => 'sarah@example.com',
+    //      'first_name' => 'Sarah',
+    //      'last_name' => 'Connor'
+    //    ];
+    //    mailchimp_ecommerce_add_customer($customer);
+    //    $new_customer = mailchimp_ecommerce_get_customer($customer['id']);
+    //    var_dump($new_customer);
+    //
+    //    $this->assertEqual($new_customer['id'], $customer['id']);
+    //    $this->assertEqual($new_customer['email_address'], $customer['email_address']);
+    //    $this->assertEqual($new_customer['first_name'], $customer['first_name']);
+    //    $this->assertEqual($new_customer['last_name'], $customer['last_name']);
   }
 
   /**
