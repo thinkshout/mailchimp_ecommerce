@@ -85,7 +85,10 @@ function mailchimp_ecommerce_admin_settings() {
 
   $form['mailchimp_ecommerce_send_carts'] = [
     '#type' => 'checkbox',
-    '#options' => [1 => 'Send all active Carts', 0 => 'Send completed orders only'],
+    '#options' => [
+      1 => 'Send all active Carts',
+      0 => 'Send completed orders only',
+    ],
     '#title' => t('Send Carts to MailChimp'),
     '#default_value' => variable_get('mailchimp_ecommerce_send_carts', FALSE),
     '#description' => t('When enabled, shopping carts are sent to MailChimp during each step of their lifecycle. When disabled, only completed orders are sent during Checkout completion.'),
@@ -179,29 +182,29 @@ function mailchimp_ecommerce_admin_sync_submit($form, &$form_state) {
  * The MailChimp eCommerce historical order data sync form.
  */
 function mailchimp_ecommerce_admin_sync_orders() {
-	$form['sync_orders'] = [
-		'#type' => 'checkbox',
-		'#title' => t('Sync Orders'),
-		'#description' => t('Sync historical orders to MailChimp.'),
-	];
+  $form['sync_orders'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Sync Orders'),
+    '#description' => t('Sync historical orders to MailChimp.'),
+  ];
 
-	$form['timespan'] = [
-		'#type' => 'textfield',
-		'#title' => t('Time span'),
-		'#default_value' => 6,
-		'#field_suffix' => 'months',
-		'#description' => 'MailChimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
-		'#size' => 3,
-		'#maxlength' => 3,
-	];
+  $form['timespan'] = [
+    '#type' => 'textfield',
+    '#title' => t('Time span'),
+    '#default_value' => 6,
+    '#field_suffix' => 'months',
+    '#description' => 'MailChimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
+    '#size' => 3,
+    '#maxlength' => 3,
+  ];
 
-	$form['actions']['submit'] = [
-		'#type' => 'submit',
-		'#value' => t('Sync with MailChimp'),
-	];
+  $form['actions']['submit'] = [
+    '#type' => 'submit',
+    '#value' => t('Sync with MailChimp'),
+  ];
 
-	$form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';
+  $form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';
 
-	return $form;
+  return $form;
 }
 
