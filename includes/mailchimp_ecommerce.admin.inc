@@ -96,7 +96,7 @@ function mailchimp_ecommerce_admin_settings() {
 
   $form['mailchimp_ecommerce_use_queue'] = [
     '#type' => 'radios',
-    '#options' => [ 1  => 'Queue requests', 0 => 'Do not use queue'],
+    '#options' => [1 => 'Queue requests', 0 => 'Do not use queue'],
     '#title' => t('Use Queue'),
     '#required' => TRUE,
     '#default_value' => variable_get('mailchimp_ecommerce_use_queue', 0),
