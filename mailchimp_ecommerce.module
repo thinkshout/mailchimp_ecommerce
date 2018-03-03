@@ -737,7 +737,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
         'op' => 'addOrder',
         'store_id' => $store_id,
         'order_id' => $order_id,
-        'customer' => $customer, 
+        'customer' => $customer,
         'order' => $order,
       ]);
     }
@@ -896,12 +896,12 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
     $variant = [
-      'id'                 => $product_variant_id,
-      'title'              => $title,
-      'sku'                => $sku,
-      'url'                => $url,
-      'price'              => $price,
-      'image_url'          => $image_url,
+      'id' => $product_variant_id,
+      'title' => $title,
+      'sku' => $sku,
+      'url' => $url,
+      'price' => $price,
+      'image_url' => $image_url,
       'inventory_quantity' => (int) $stock,
     ];
 
@@ -1001,12 +1001,12 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
     $variant = [
-      'id'                 => $product_variant_id,
-      'title'              => $title,
-      'sku'                => $sku,
-      'url'                => $url,
-      'price'              => $price,
-      'image_url'          => $image_url,
+      'id' => $product_variant_id,
+      'title' => $title,
+      'sku' => $sku,
+      'url' => $url,
+      'price' => $price,
+      'image_url' => $image_url,
       'inventory_quantity' => (int) $stock,
     ];
 
