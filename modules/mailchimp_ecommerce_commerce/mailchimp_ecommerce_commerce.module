@@ -793,10 +793,10 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
  */
 function _mailchimp_ecommerce_commerce_get_description($product) {
   $description = '';
-  $field = variable_get('mailchimp_ecommerce_description_field' ,'');
+  $field_name = variable_get('mailchimp_ecommerce_description_field' ,'');
   $node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
 
-  if (!empty($field) && !empty($node_type)) {
+  if (!empty($field_name) && !empty($node_type)) {
     // Query the database to find the display node.
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node')
@@ -809,9 +809,16 @@ function _mailchimp_ecommerce_commerce_get_description($product) {
     if ($result && !empty($result['node'])) {
       $node = array_pop($result['node']);
       $node = node_load($node->nid);
-      $wrapper = entity_metadata_wrapper('node', $node);
-      if ($wrapper->__isset($field) && $wrapper->{$field}->value()) {
-        $description = $wrapper->{$field}->value(['sanitize' => TRUE])['value'];
+      if (isset($node->{$field_name}) && !empty($node->{$field_name})) {
+        $wrapper = entity_metadata_wrapper('node', $node);
+        // If this is a textfield with formatting, we need to pull
+        // the value from the 'value' subfield.
+        if ($wrapper->__isset($field_name->value) && $wrapper->{$field_name}->value->value()) {
+          $description = strip_tags($wrapper->{$field_name}->value->value());
+        }
+        else {
+          $description = strip_tags($wrapper->{$field_name}->value());
+        }
       }
     }
   }
