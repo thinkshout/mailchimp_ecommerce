@@ -24,8 +24,8 @@ function mailchimp_ecommerce_menu() {
   );
 
   $items['admin/config/services/mailchimp/ecommerce/sync'] = array(
-    'title' => 'eCommerce data sync',
-    'description' => 'Sync eCommerce data to MailChimp.',
+    'title' => 'eCommerce product sync',
+    'description' => 'Sync eCommerce product data to MailChimp.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('mailchimp_ecommerce_admin_sync'),
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -33,6 +33,18 @@ function mailchimp_ecommerce_menu() {
     'file' => 'includes/mailchimp_ecommerce.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 21,
+  );
+
+  $items['admin/config/services/mailchimp/ecommerce/sync-orders'] = array(
+    'title' => 'eCommerce historical orders sync',
+    'description' => 'Sync past eCommerce order data to MailChimp.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mailchimp_ecommerce_admin_sync_orders'),
+    'access callback' => 'mailchimp_apikey_ready_access',
+    'access arguments' => array('administer mailchimp'),
+    'file' => 'includes/mailchimp_ecommerce.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 22,
   );
 
   return $items;
@@ -154,6 +166,7 @@ function mailchimp_ecommerce_page_build(&$page) {
   $campaign_id = isset($_GET['mc_cid']) ? check_plain($_GET['mc_cid']) : '';
   if ($campaign_id) {
     $_SESSION['mc_cid'] = $campaign_id;
+    $_SESSION['mc_landing_site'] = $_SERVER['HTTP_HOST'] . request_uri();
   }
 }
 
@@ -309,7 +322,7 @@ function mailchimp_ecommerce_get_customer($customer_id) {
       // Customer doesn't exist in the store; no need to log an error.
     }
     else {
-      mailchimp_ecommerce_log_error_message('Unable to delete a customer: ' . $e->getMessage());
+      mailchimp_ecommerce_log_error_message('Unable to get a customer: ' . $e->getMessage());
       mailchimp_ecommerce_show_error($e->getMessage());
     }
   }
@@ -405,6 +418,7 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
       $cart['campaign_id'] = $campaign_id;
+      $cart['landing_site'] = isset($_SESSION['mc_landing_site']) ? $_SESSION['mc_landing_site'] : '';
     }
 
     if (mailchimp_ecommerce_use_queue()) {
@@ -673,8 +687,13 @@ function mailchimp_ecommerce_get_order($order_id) {
     return $order;
   }
   catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
-    mailchimp_ecommerce_show_error($e->getMessage());
+	  if ($e->getCode() == 404) {
+		  // Order doesn't exist in the store; no need to log an error.
+	  }
+	  else {
+		  mailchimp_ecommerce_log_error_message('Unable to get order: ' . $e->getMessage());
+		  mailchimp_ecommerce_show_error($e->getMessage());
+	  }
   }
 
   return NULL;
@@ -710,6 +729,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
     $campaign_id = mailchimp_ecommerce_get_campaign_id();
     if (!empty($campaign_id)) {
       $order['campaign_id'] = $campaign_id;
+      $order['landing_site'] = isset($_SESSION['mc_landing_site']) ? $_SESSION['mc_landing_site'] : '';
     }
 
     if (mailchimp_ecommerce_use_queue()) {
@@ -872,45 +892,34 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
       throw new Exception('Cannot add a product without a store ID.');
     }
 
-    // TRUE when a new product is created, false if a product variant is added.
-    $new_product = FALSE;
-
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
+    $variant = [
+      'id'                 => $product_variant_id,
+      'title'              => $title,
+      'sku'                => $sku,
+      'url'                => $url,
+      'price'              => $price,
+      'image_url'          => $image_url,
+      'inventory_quantity' => (int) $stock,
+    ];
+
     // Create MailChimp product from product type.
-    try {
-      $mc_ecommerce->getProduct($store_id, $product_id);
-    }
-    catch (Exception $e) {
-      if ($e->getCode() == 404) {
-      	// TODO check if product has adjustments with additional SKUs defined. Add these as variants instead of default
-        // No existing product; create new product with default variant.
-        $variant = [
-          'id' => $product_variant_id,
-          'title' => $title,
-          'sku' => $sku,
-          'url' => $url,
-          'price' => $price,
-          'image_url' => $image_url,
-          'inventory_quantity' => (int) $stock,
-        ];
-
-        $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, [$variant], [
-          'description' => $description,
-          'type' => $type,
-        ]);
-
-        $new_product = TRUE;
-      }
-      else {
-        // An actual error occurred; pass on the exception.
-        throw new Exception($e->getMessage(), $e->getCode(), $e);
-      }
-    }
-
-    if (!$new_product) {
-      // Add a variant to an existing product.
+    $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, [$variant], [
+      'title' => $title,
+      'description' => $description,
+      'type' => $type,
+      'sku' => $sku,
+      'url' => $url,
+      'price' => $price,
+      'image_url' => $image_url,
+      'inventory_quantity' => (int) $stock,
+    ]);
+  }
+  catch (Exception $e) {
+    // Product already exists, so try adding a variant.
+    if ($e->getCode() == 400) {
       try {
         $mc_ecommerce->addProductVariant($store_id, $product_id, [
           'id' => $product_variant_id,
@@ -926,15 +935,21 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
       catch (Exception $e) {
         // If the variant already exists, update it.
         if ($e->getCode() == 400) {
-          $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
-            'description' => $description,
-            'type' => $type,
-            'title' => $title,
-            'sku' => $sku,
-            'url' => $url,
-            'price' => $price,
-            'image_url' => $image_url,
-          ]);
+          try {
+            $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
+              'description' => $description,
+              'type' => $type,
+              'title' => $title,
+              'sku' => $sku,
+              'url' => $url,
+              'price' => $price,
+              'image_url' => $image_url,
+            ]);
+          }
+          catch (Exception $e) {
+            mailchimp_ecommerce_log_error_message('Unable to update a product variant: ' . $e->getMessage());
+            mailchimp_ecommerce_show_error($e->getMessage());
+          }
         }
         else {
           mailchimp_ecommerce_log_error_message('Unable to add a product variant: ' . $e->getMessage());
@@ -942,10 +957,13 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
         }
       }
     }
-  }
-  catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to add a product: ' . $e->getMessage());
-    mailchimp_ecommerce_show_error($e->getMessage());
+
+    if ($e->getCode() != 404) {
+      // TODO: check if product has adjustments with additional SKUs defined. Add these as variants instead of default
+      // No existing product; create new product with default variant.
+      mailchimp_ecommerce_log_error_message('Unable to add a product: ' . $e->getMessage());
+      mailchimp_ecommerce_show_error($e->getMessage());
+    }
   }
 }
 
@@ -981,7 +999,19 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
 
     /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
     $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
-    $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
+
+    $variant = [
+      'id'                 => $product_variant_id,
+      'title'              => $title,
+      'sku'                => $sku,
+      'url'                => $url,
+      'price'              => $price,
+      'image_url'          => $image_url,
+      'inventory_quantity' => (int) $stock,
+    ];
+
+    // This code only runs if the 404 isn't returned on get product.
+    $mc_ecommerce->updateProduct($store_id, $product_id, [$variant], [
       'title' => $title,
       'sku' => $sku,
       'url' => $url,
@@ -989,10 +1019,11 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
       'image_url' => $image_url,
       'inventory_quantity' => (int) $stock,
     ]);
+
   }
   catch (Exception $e) {
-    mailchimp_ecommerce_log_error_message('Unable to update product: ' . $e->getMessage());
-    drupal_set_message($e->getMessage(), 'error');
+    mailchimp_ecommerce_log_error_message('Unable to add a product: ' . $e->getMessage());
+    mailchimp_ecommerce_show_error($e->getMessage());
   }
 }
 
