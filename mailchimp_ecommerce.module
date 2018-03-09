@@ -834,7 +834,8 @@ function mailchimp_ecommerce_delete_order($order_id) {
 /**
  * Adds a product to MailChimp.
  *
- * Adds a product variant if a product with the given ID exists.
+ * Adds a product variant if a product with the given ID exists. Gracefully
+ * handles updating an existing variant.
  *
  * In MailChimp, each product requires at least one product variant. This
  * function will create a single product variant when creating new products.
@@ -910,14 +911,36 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
 
     if (!$new_product) {
       // Add a variant to an existing product.
-      $mc_ecommerce->addProductVariant($store_id, $product_id, [
-        'id' => $product_variant_id,
-        'title' => $title,
-        'sku' => $sku,
-        'price' => $price,
-        'image_url' => $image_url,
-        'inventory_quantity' => (int) $stock,
-      ]);
+      try {
+        $mc_ecommerce->addProductVariant($store_id, $product_id, [
+          'id' => $product_variant_id,
+          'description' => $description,
+          'title' => $title,
+          'sku' => $sku,
+          'price' => $price,
+          'url' => $url,
+          'image_url' => $image_url,
+          'inventory_quantity' => (int) $stock,
+        ]);
+      }
+      catch (Exception $e) {
+        // If the variant already exists, update it.
+        if ($e->getCode() == 400) {
+          $mc_ecommerce->updateProductVariant($store_id, $product_id, $product_variant_id, [
+            'description' => $description,
+            'type' => $type,
+            'title' => $title,
+            'sku' => $sku,
+            'url' => $url,
+            'price' => $price,
+            'image_url' => $image_url,
+          ]);
+        }
+        else {
+          mailchimp_ecommerce_log_error_message('Unable to add a product variant: ' . $e->getMessage());
+          mailchimp_ecommerce_show_error($e->getMessage());
+        }
+      }
     }
   }
   catch (Exception $e) {
