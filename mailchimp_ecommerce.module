@@ -958,7 +958,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
       }
     }
 
-    if ($e->getCode() != 404) {
+    if ($e->getCode() != 404 && $e->getCode() != 400) {
       // TODO: check if product has adjustments with additional SKUs defined. Add these as variants instead of default
       // No existing product; create new product with default variant.
       mailchimp_ecommerce_log_error_message('Unable to add a product: ' . $e->getMessage());
