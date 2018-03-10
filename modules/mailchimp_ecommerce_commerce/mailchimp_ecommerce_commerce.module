@@ -516,7 +516,8 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
   $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
-  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url, $stock);
+  $description = _mailchimp_ecommerce_commerce_get_description($product);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $description, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**

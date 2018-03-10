@@ -884,7 +884,7 @@ function mailchimp_ecommerce_delete_order($order_id) {
  * @param int $stock
  *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description, $type, $sku, $url, $price, $image_url = '', $stock = 1) {
+function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $title, $description = '', $type, $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -897,6 +897,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
     $variant = [
       'id'                 => $product_variant_id,
       'title'              => $title,
+      'description'        => $description,
       'sku'                => $sku,
       'url'                => $url,
       'price'              => $price,
@@ -950,7 +951,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
  * @param int $stock
  *   If enabled, the current active inventory.
  */
-function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $sku, $url, $price, $image_url = '', $stock = 1) {
+function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $title, $description = '', $sku, $url, $price, $image_url = '', $stock = 1) {
   try {
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -963,6 +964,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
     $variant = [
       'id'                 => $product_variant_id,
       'title'              => $title,
+      'description'        => $description,
       'sku'                => $sku,
       'url'                => $url,
       'price'              => $price,
@@ -973,6 +975,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
     // This code only runs if the 404 isn't returned on get product.
     $mc_ecommerce->updateProduct($store_id, $product_id, [$variant], [
       'title' => $title,
+      'description' => $description,
       'sku' => $sku,
       'url' => $url,
       'price' => $price,
