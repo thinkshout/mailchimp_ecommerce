@@ -27,6 +27,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '' => '-- Select --',
   ];
 
+  $description_field_options = [
+    '' => '-- Select --',
+  ];
+
   $node_types = node_type_get_names();
 
   foreach ($node_types as $node_type => $node_name) {
@@ -65,6 +69,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
 
           // Track referenceable product variation types for this field.
           $product_image_types += array_filter($properties['settings']['referenceable_types']);
+        }
+
+        if (isset($properties['settings']['text_processing'])) {
+          $description_field_options[$field_name] = $properties['label'];
         }
       }
     }
@@ -110,6 +118,16 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '#title' => t('Image style'),
     '#description' => t('The image style to use when sending product images to MailChimp.'),
     '#default_value' => variable_get('mailchimp_ecommerce_commerce_image_style', ''),
+  ];
+
+  $form['product']['mailchimp_ecommerce_description_field'] = [
+    '#type' => 'select',
+    '#options' => $description_field_options,
+    '#title' => t('Description textfield'),
+    '#description' => t('Select the description text field used on the above content type.'),
+    '#default_value' => variable_get('mailchimp_ecommerce_description_field', ''),
+    '#prefix' => '<div id="node-field-wrapper">',
+    '#suffix' => '</div>',
   ];
 
   // If Stock modules are detected, show the admin some options for
@@ -483,8 +501,10 @@ function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
   $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
+  $description = _mailchimp_ecommerce_commerce_get_description($product);
+
   // TODO: Get product description from product display, if available.
-  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, '', $product->type, $product->sku, $url, $price, $image_url, $stock);
+  mailchimp_ecommerce_add_product($product->product_id, $product->sku, $product->title, $description, $product->type, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -496,7 +516,8 @@ function mailchimp_ecommerce_commerce_commerce_product_update($product) {
   $url = _mailchimp_ecommerce_commerce_build_product_url($product);
   $image_url = _mailchimp_ecommerce_commerce_build_image_url($product);
   $stock = _mailchimp_ecommerce_commerce_get_inventory($product);
-  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $product->sku, $url, $price, $image_url, $stock);
+  $description = _mailchimp_ecommerce_commerce_get_description($product);
+  mailchimp_ecommerce_update_product($product->product_id, $product->sku, $product->title, $description, $product->sku, $url, $price, $image_url, $stock);
 }
 
 /**
@@ -767,6 +788,47 @@ function _mailchimp_ecommerce_commerce_build_image_url($product) {
   }
 
   return $image_url;
+}
+
+/**
+ * Get the description for a given product from its configured field.
+ */
+function _mailchimp_ecommerce_commerce_get_description($product) {
+  $description = '';
+  $field_name = variable_get('mailchimp_ecommerce_description_field' ,'');
+  $node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+
+  if (!empty($field_name) && !empty($node_type)) {
+    // Query the database to find the display node.
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', $node_type)
+      ->fieldCondition('field_product', 'product_id', $product->product_id, '=')
+      ->range(0, 1);
+
+    $result = $query->execute();
+
+    if ($result && !empty($result['node'])) {
+      $node = array_pop($result['node']);
+      $node = node_load($node->nid);
+      if (isset($node->{$field_name}) && !empty($node->{$field_name})) {
+        $wrapper = entity_metadata_wrapper('node', $node);
+        // If this is a textfield with formatting, we need to pull
+        // the value from the 'value' subfield.
+        if ($wrapper->__isset($field_name->value) && $wrapper->{$field_name}->value->value()) {
+          $description = strip_tags($wrapper->{$field_name}->value->value());
+        }
+        else {
+          $description = strip_tags($wrapper->{$field_name}->value());
+        }
+      }
+    }
+  }
+
+  // Allow other modules to alter the description.
+  drupal_alter('mailchimp_ecommerce_product_description', $description, $product);
+
+  return $description;
 }
 
 /**
