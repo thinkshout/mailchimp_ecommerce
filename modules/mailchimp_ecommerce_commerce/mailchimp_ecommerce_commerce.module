@@ -253,7 +253,7 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
  * When an in-progress cart order changes status, notify
  * MailChimp if we're configured to do so.
  */
-function mailchimp_ecommerce_commerce_commerce_order_update($order){
+function mailchimp_ecommerce_commerce_commerce_order_update($order) {
   $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
 
   // Only send a cart if we are in cart or checkout status, and the status has changed.
@@ -365,7 +365,7 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
   if ($customer_profile->uid != 0) {
     $user = user_load($customer_profile->uid);
     $customer_email = $user->mail;
-  } 
+  }
   else {
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
@@ -374,14 +374,14 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_insert($customer
   $customer_profile_wrapper = entity_metadata_wrapper('commerce_customer_profile', $customer_profile);
 
   if (isset($customer_profile_wrapper->commerce_customer_address) &&
-      !empty($customer_profile_wrapper->commerce_customer_address->value()) &&
-      isset($customer_profile_wrapper->commerce_customer_address->first_name,
-        $customer_profile_wrapper->commerce_customer_address->last_name)
+    !empty($customer_profile_wrapper->commerce_customer_address->value()) &&
+    isset($customer_profile_wrapper->commerce_customer_address->first_name,
+      $customer_profile_wrapper->commerce_customer_address->last_name)
   ) {
     $first_name = $customer_profile_wrapper->commerce_customer_address->first_name->value();
     $last_name = $customer_profile_wrapper->commerce_customer_address->last_name->value();
   }
-  
+
   $customer = [
     'id' => $customer_id,
     'email_address' => $customer_email,
@@ -421,11 +421,11 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   else {
     return;
   }
-  
+
   if ($customer_profile->uid != 0) {
     $user = user_load($customer_profile->uid);
     $customer_email = $user->mail;
-  } 
+  }
   else {
     $customer_email = check_plain($_POST['account']['login']['mail']);
   }
@@ -615,8 +615,8 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
   $address = [];
 
   if (isset($customer_profile_wrapper->commerce_customer_address) &&
-      !empty($customer_profile_wrapper->commerce_customer_address->value()) &&
-      isset($customer_profile_wrapper->commerce_customer_address->thoroughfare,
+    !empty($customer_profile_wrapper->commerce_customer_address->value()) &&
+    isset($customer_profile_wrapper->commerce_customer_address->thoroughfare,
       $customer_profile_wrapper->commerce_customer_address->premise,
       $customer_profile_wrapper->commerce_customer_address->locality,
       $customer_profile_wrapper->commerce_customer_address->administrative_area,
@@ -721,6 +721,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
  *
  * @param object $product
  *   The Commerce object.
+ *
  * @return string
  *   The URL of the node referencing the product.
  */
