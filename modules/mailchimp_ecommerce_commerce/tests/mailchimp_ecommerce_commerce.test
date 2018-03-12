@@ -69,7 +69,10 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp.
    */
   public function testAddStore() {
-    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
+    $admin = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'administer mailchimp',
+    ));
     $this->drupalLogin($admin);
 
     $edit = array();
@@ -88,7 +91,10 @@ class MailchimpEcommerceCommerceTestCase extends DrupalWebTestCase {
    * Tests adding a store to MailChimp with no list.
    */
   public function testAddStoreNoList() {
-    $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
+    $admin = $this->drupalCreateUser(array(
+      'administer site configuration',
+      'administer mailchimp',
+    ));
     $this->drupalLogin($admin);
 
     $edit = array();
