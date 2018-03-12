@@ -726,8 +726,6 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
  *   The URL of the node referencing the product.
  */
 function _mailchimp_ecommerce_commerce_build_product_url($product) {
-  global $base_url;
-
   // MailChimp will accept an empty string if no URL is available.
   $url = '';
 
@@ -746,9 +744,7 @@ function _mailchimp_ecommerce_commerce_build_product_url($product) {
     $result = $query->execute();
     if (!empty($result) && !empty($result['node'])) {
       $node = reset($result['node']);
-
-      $path = drupal_get_path_alias('node/' . $node->nid);
-      $url = $base_url . '/' . $path;
+      $url = url('node/' . $node->nid, ['absolute' => TRUE]);
     }
   }
 

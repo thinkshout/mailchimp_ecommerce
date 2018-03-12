@@ -452,11 +452,7 @@ function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
  *   The URL of the node referencing the product.
  */
 function _mailchimp_ecommerce_ubercart_build_product_url($nid) {
-  global $base_url;
-
-  $path = drupal_get_path_alias('node/' . $nid);
-  $url = $base_url . '/' . $path;
-
+  $url = url('node/' . $node->nid, ['absolute' => TRUE]);
   return $url;
 }
 
