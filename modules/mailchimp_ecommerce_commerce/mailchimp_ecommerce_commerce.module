@@ -475,6 +475,99 @@ function mailchimp_ecommerce_commerce_commerce_checkout_complete($order) {
 }
 
 /**
+ * Implements hook_node_insert().
+ *
+ * When a node gets created, send it to MailChimp.
+ */
+function mailchimp_ecommerce_commerce_node_insert($node) {
+  $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+
+  if (!empty($product_node_type) && $node->type == $product_node_type) {
+    // See if the configured product field exists.
+    $field = variable_get('mailchimp_ecommerce_product_node_field', '');
+    if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
+      $wrapper = entity_metadata_wrapper('node', $node);
+      if ($products = $wrapper->{$field}->value()) {
+        foreach ($products as $product) {
+          mailchimp_ecommerce_commerce_commerce_product_insert($product);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ *
+ * Update a node at MailChimp when it is updated.
+ */
+function mailchimp_ecommerce_commerce_node_update($node) {
+  $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+
+  if (!empty($product_node_type) && $node->type == $product_node_type) {
+    // See if the configured product field exists.
+    $field = variable_get('mailchimp_ecommerce_product_node_field', '');
+    if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
+      $wrapper = entity_metadata_wrapper('node', $node);
+      $ids = $wrapper->{$field}->raw();
+      foreach (array_values($ids) as $product_id) {
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'node')
+          ->entityCondition('bundle', $product_node_type)
+          ->propertyCondition('nid', $node->nid, '<>')
+          ->fieldCondition($field, 'product_id', $product_id)
+          ->propertyCondition('status', TRUE)
+          ->range(0, 10);
+
+        $result = $query->execute();
+
+        if (!empty($result['node'])) {
+          $product = commerce_product_load($product_id);
+          mailchimp_ecommerce_commerce_commerce_product_update($product);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_delete().
+ *
+ * Delete a product at MailChimp, but only if no other nodes are referencing it.
+ */
+function mailchimp_ecommerce_commerce_node_delete($node) {
+  $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+
+  if (!empty($product_node_type) && $node->type == $product_node_type) {
+    // See if the configured product field exists.
+    $field = variable_get('mailchimp_ecommerce_product_node_field', '');
+    if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
+      $wrapper = entity_metadata_wrapper('node', $node);
+      $ids = $wrapper->{$field}->raw();
+
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $product_id) {
+          $query = new EntityFieldQuery();
+          $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $product_node_type)
+            ->propertyCondition('nid', $node->nid, '<>')
+            ->fieldCondition($field, 'product_id', $product_id)
+            ->propertyCondition('status', TRUE)
+            ->range(0, 10);
+
+          $result = $query->execute();
+
+          if (empty($result['node'])) {
+            $product = commerce_product_load($product_id);
+            mailchimp_ecommerce_commerce_commerce_product_delete($product);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_commerce_product_insert().
  */
 function mailchimp_ecommerce_commerce_commerce_product_insert($product) {
