@@ -485,8 +485,11 @@ function mailchimp_ecommerce_commerce_node_insert($node) {
   if (!empty($product_node_type) && $node->type == $product_node_type) {
     // See if the configured product field exists.
     $field = variable_get('mailchimp_ecommerce_product_node_field', '');
+
     if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
       $wrapper = entity_metadata_wrapper('node', $node);
+
+      // Only add a product if one is already referenced in the field.
       if ($products = $wrapper->{$field}->value()) {
         foreach ($products as $product) {
           mailchimp_ecommerce_commerce_commerce_product_insert($product);
@@ -507,9 +510,13 @@ function mailchimp_ecommerce_commerce_node_update($node) {
   if (!empty($product_node_type) && $node->type == $product_node_type) {
     // See if the configured product field exists.
     $field = variable_get('mailchimp_ecommerce_product_node_field', '');
+
+    // If the product reference field exists and has data, loop through
+    // the associated product IDs, looking for all product display nodes.
     if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
       $wrapper = entity_metadata_wrapper('node', $node);
       $ids = $wrapper->{$field}->raw();
+
       foreach (array_values($ids) as $product_id) {
         $query = new EntityFieldQuery();
         $query->entityCondition('entity_type', 'node')
@@ -520,6 +527,7 @@ function mailchimp_ecommerce_commerce_node_update($node) {
 
         $result = $query->execute();
 
+        // Update our available products.
         if (!empty($result['node'])) {
           $product = commerce_product_load($product_id);
           mailchimp_ecommerce_commerce_commerce_product_update($product);
@@ -538,12 +546,14 @@ function mailchimp_ecommerce_commerce_node_delete($node) {
   $product_node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
 
   if (!empty($product_node_type) && $node->type == $product_node_type) {
+
     // See if the configured product field exists.
     $field = variable_get('mailchimp_ecommerce_product_node_field', '');
     if (!empty($field) && isset($node->{$field}) && !empty($node->{$field})) {
       $wrapper = entity_metadata_wrapper('node', $node);
       $ids = $wrapper->{$field}->raw();
 
+      // Find all product IDs referenced in our configured field.
       if (!empty($ids)) {
         foreach (array_values($ids) as $product_id) {
           $query = new EntityFieldQuery();
@@ -556,6 +566,7 @@ function mailchimp_ecommerce_commerce_node_delete($node) {
 
           $result = $query->execute();
 
+          // If no other nodes reference this product, we can delete it.
           if (empty($result['node'])) {
             $product = commerce_product_load($product_id);
             mailchimp_ecommerce_commerce_commerce_product_delete($product);
