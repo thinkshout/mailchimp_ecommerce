@@ -45,10 +45,10 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
     '#title' => t('Product content type'),
     '#description' => t('Select the content type used to display products on your site.'),
     '#default_value' => $product_node_type,
-    '#ajax' => array(
+    '#ajax' => [
       'callback' => 'mailchimp_ecommerce_commerce_admin_settings_form_ajax_callback',
       'wrapper' => 'node-field-wrapper',
-    ),
+    ],
   ];
 
   if (empty($product_node_type)) {
@@ -258,8 +258,8 @@ function mailchimp_ecommerce_commerce_commerce_order_update($order) {
 
   // Only send a cart if we are in cart or checkout status, and the status has changed.
   if ($send_carts == TRUE && $order->original->status <> $order->status) {
-    $cart_states = array_keys(commerce_order_statuses(array('state' => 'cart')));
-    $checkout_states = array_keys(commerce_order_statuses(array('state' => 'checkout')));
+    $cart_states = array_keys(commerce_order_statuses(['state' => 'cart']));
+    $checkout_states = array_keys(commerce_order_statuses(['state' => 'checkout']));
 
     if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
       // @todo: Handle admin-created orders.
@@ -273,7 +273,7 @@ function mailchimp_ecommerce_commerce_commerce_order_update($order) {
  */
 function mailchimp_ecommerce_commerce_commerce_order_delete($order) {
   // If this order was completed, it is an MC Order.
-  $post_checkout = array_keys(commerce_order_statuses(array('state' => 'completed')));
+  $post_checkout = array_keys(commerce_order_statuses(['state' => 'completed']));
   if (in_array($order->status, $post_checkout)) {
     mailchimp_ecommerce_delete_order($order->order_id);
   }

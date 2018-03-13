@@ -17,11 +17,11 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
    *   Formatted as specified by simpletest.
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'MailChimp eCommerce',
       'description' => 'Test MailChimp eCommerce core integration.',
       'group' => 'MailChimp',
-    );
+    ];
   }
 
   /**
@@ -35,13 +35,13 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
     $this->profile = drupal_get_profile();
 
     // Enable modules required for the test.
-    $enabled_modules = array(
+    $enabled_modules = [
       'commerce',
       'entity',
       'libraries',
       'mailchimp',
       'mailchimp_ecommerce',
-    );
+    ];
 
     parent::setUp($enabled_modules);
 
@@ -69,11 +69,11 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
    */
   public function testAddStore() {
     $store_id = 1;
-    $store = array(
+    $store = [
       'list_id' => '57afe96172',
       'name' => 'Freddie\'s Merchandise',
       'currency_code' => 'USD',
-    );
+    ];
 
     mailchimp_ecommerce_add_store($store_id, $store);
 

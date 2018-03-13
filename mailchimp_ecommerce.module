@@ -9,43 +9,43 @@
  * Implements hook_menu().
  */
 function mailchimp_ecommerce_menu() {
-  $items = array();
+  $items = [];
 
-  $items['admin/config/services/mailchimp/ecommerce'] = array(
+  $items['admin/config/services/mailchimp/ecommerce'] = [
     'title' => 'eCommerce',
     'description' => 'Configure MailChimp eCommerce.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('mailchimp_ecommerce_admin_settings'),
+    'page arguments' => ['mailchimp_ecommerce_admin_settings'],
     'access callback' => 'mailchimp_apikey_ready_access',
-    'access arguments' => array('administer mailchimp'),
+    'access arguments' => ['administer mailchimp'],
     'file' => 'includes/mailchimp_ecommerce.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 20,
-  );
+  ];
 
-  $items['admin/config/services/mailchimp/ecommerce/sync'] = array(
+  $items['admin/config/services/mailchimp/ecommerce/sync'] = [
     'title' => 'eCommerce product sync',
     'description' => 'Sync eCommerce product data to MailChimp.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('mailchimp_ecommerce_admin_sync'),
+    'page arguments' => ['mailchimp_ecommerce_admin_sync'],
     'access callback' => 'mailchimp_apikey_ready_access',
-    'access arguments' => array('administer mailchimp'),
+    'access arguments' => ['administer mailchimp'],
     'file' => 'includes/mailchimp_ecommerce.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 21,
-  );
+  ];
 
-  $items['admin/config/services/mailchimp/ecommerce/sync-orders'] = array(
+  $items['admin/config/services/mailchimp/ecommerce/sync-orders'] = [
     'title' => 'eCommerce historical orders sync',
     'description' => 'Sync past eCommerce order data to MailChimp.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('mailchimp_ecommerce_admin_sync_orders'),
+    'page arguments' => ['mailchimp_ecommerce_admin_sync_orders'],
     'access callback' => 'mailchimp_apikey_ready_access',
-    'access arguments' => array('administer mailchimp'),
+    'access arguments' => ['administer mailchimp'],
     'file' => 'includes/mailchimp_ecommerce.admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 22,
-  );
+  ];
 
   return $items;
 }
@@ -59,10 +59,10 @@ function mailchimp_ecommerce_use_queue() {
  * Implements hook_queue_info().
  */
 function mailchimp_ecommerce_cron_queue_info() {
-  $queues['mailchimp_ecommerce_ops'] = array(
+  $queues['mailchimp_ecommerce_ops'] = [
     'worker callback' => 'mailchimp_ecommerce_queue_process',
     'time' => 60,
-  );
+  ];
   return $queues;
 }
 
@@ -1207,9 +1207,9 @@ function mailchimp_ecommerce_get_currency_codes() {
  */
 function mailchimp_ecommerce_log_error_message($message) {
   if (function_exists('watchdog')) {
-    watchdog('mailchimp_ecommerce', '%message', array(
+    watchdog('mailchimp_ecommerce', '%message', [
       '%message' => $message,
-    ), WATCHDOG_ERROR);
+    ], WATCHDOG_ERROR);
   }
 }
 
@@ -1218,9 +1218,9 @@ function mailchimp_ecommerce_log_error_message($message) {
  */
 function _mailchimp_ecommerce_get_local_customer($email) {
   // Load an existing customer using the order email.
-  $result = db_query("SELECT mailchimp_customer_id FROM {mailchimp_ecommerce_customer} WHERE mail = :mail", array(
+  $result = db_query("SELECT mailchimp_customer_id FROM {mailchimp_ecommerce_customer} WHERE mail = :mail", [
     ':mail' => $email,
-  ));
+  ]);
 
   $customer_id = NULL;
   $customer = $result->fetchAssoc();
@@ -1232,9 +1232,9 @@ function _mailchimp_ecommerce_get_local_customer($email) {
   if (empty($customer_id)) {
     // Create a new local customer.
     $customer_id = db_insert('mailchimp_ecommerce_customer')
-      ->fields(array(
+      ->fields([
         'mail' => $email,
-      ))
+      ])
       ->execute();
   }
 
