@@ -514,7 +514,6 @@ function mailchimp_ecommerce_commerce_node_update($node) {
         $query = new EntityFieldQuery();
         $query->entityCondition('entity_type', 'node')
           ->entityCondition('bundle', $product_node_type)
-          ->propertyCondition('nid', $node->nid, '<>')
           ->fieldCondition($field, 'product_id', $product_id)
           ->propertyCondition('status', TRUE)
           ->range(0, 10);
