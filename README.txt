@@ -3,10 +3,10 @@
 ## Description
 
 The MailChimp eCommerce module connects Drupal-based shopping carts to
-Mailchimp's eCommerce 360 API.
+Mailchimp's eCommerce API.
 
-For more information about eCommerce 360, please see:
-http://kb.mailchimp.com/integrations/other-integrations/about-ecommerce360
+For more information about Mailchimp eCommerce integration, please see:
+https://kb.mailchimp.com/integrations/e-commerce/sell-more-stuff-with-mailchimp
 
 ## Dependencies
   * MailChimp: https://www.drupal.org/project/mailchimp
