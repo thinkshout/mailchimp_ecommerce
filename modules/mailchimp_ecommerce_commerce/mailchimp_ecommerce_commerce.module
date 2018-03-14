@@ -517,20 +517,22 @@ function mailchimp_ecommerce_commerce_node_update($node) {
       $wrapper = entity_metadata_wrapper('node', $node);
       $ids = $wrapper->{$field}->raw();
 
-      foreach (array_values($ids) as $product_id) {
-        $query = new EntityFieldQuery();
-        $query->entityCondition('entity_type', 'node')
-          ->entityCondition('bundle', $product_node_type)
-          ->fieldCondition($field, 'product_id', $product_id)
-          ->propertyCondition('status', TRUE)
-          ->range(0, 10);
+      if (!empty($ids)) {
+        foreach (array_values($ids) as $product_id) {
+          $query = new EntityFieldQuery();
+          $query->entityCondition('entity_type', 'node')
+            ->entityCondition('bundle', $product_node_type)
+            ->fieldCondition($field, 'product_id', $product_id)
+            ->propertyCondition('status', TRUE)
+            ->range(0, 10);
 
-        $result = $query->execute();
+          $result = $query->execute();
 
-        // Update our available products.
-        if (!empty($result['node'])) {
-          $product = commerce_product_load($product_id);
-          mailchimp_ecommerce_commerce_commerce_product_update($product);
+          // Update our available products.
+          if (!empty($result['node'])) {
+            $product = commerce_product_load($product_id);
+            mailchimp_ecommerce_commerce_commerce_product_update($product);
+          }
         }
       }
     }
