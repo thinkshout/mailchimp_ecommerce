@@ -523,8 +523,7 @@ function mailchimp_ecommerce_commerce_node_update($node) {
           $query->entityCondition('entity_type', 'node')
             ->entityCondition('bundle', $product_node_type)
             ->fieldCondition($field, 'product_id', $product_id)
-            ->propertyCondition('status', TRUE)
-            ->range(0, 10);
+            ->propertyCondition('status', TRUE);
 
           $result = $query->execute();
 
@@ -563,8 +562,7 @@ function mailchimp_ecommerce_commerce_node_delete($node) {
             ->entityCondition('bundle', $product_node_type)
             ->propertyCondition('nid', $node->nid, '<>')
             ->fieldCondition($field, 'product_id', $product_id)
-            ->propertyCondition('status', TRUE)
-            ->range(0, 10);
+            ->propertyCondition('status', TRUE);
 
           $result = $query->execute();
 
