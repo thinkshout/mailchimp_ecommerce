@@ -156,6 +156,11 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
   // Identify Drupal Commerce to MailChimp.
   $form['platform']['#default_value'] = 'Drupal Commerce';
 
+  // Sync historical orders
+  $form['sync']['orders'] = [
+    '#markup' => '<br>' . l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
+  ];
+
   // Validate our settings.
   $form['#validate'][] = 'mailchimp_ecommerce_commerce_admin_validate';
 }
@@ -952,4 +957,101 @@ function _mailchimp_ecommerce_commerce_get_inventory($product) {
   }
 
   return $inventory_amount;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_sync_orders_alter(&$form, &$form_state) {
+  $form['#submit'][] = 'mailchimp_ecommerce_commerce_admin_sync_orders_submit';
+}
+
+/**
+ * Submit handler for the MailChimp eCommerce sync form.
+ */
+function mailchimp_ecommerce_commerce_admin_sync_orders_submit($form, &$form_state) {
+  if (!empty($form_state['values']['sync_orders'])) {
+    $batch = [
+      'title' => t('Adding orders to MailChimp'),
+      'operations' => [],
+    ];
+
+    // get orders within specified time period (months)
+    $months = abs(intval($form_state['values']['timespan'])) * -1;
+    $min_timestamp = strtotime($months . ' months');
+
+    $query = new EntityFieldQuery;
+    $results = $query
+      ->entityCondition('entity_type','commerce_order')
+      //->propertyCondition('created', $min_timestamp, '>')
+      ->execute();
+
+    if (isset($results['commerce_order'])) {
+      $order_ids = array_keys($results['commerce_order']);
+
+      $batch['operations'][] = [
+        'mailchimp_ecommerce_commerce_batch_add_orders',
+        [$order_ids],
+      ];
+
+      batch_set($batch);
+    }
+  }
+}
+
+/**
+ * Batch callback used to add orders to MailChimp.
+ */
+function mailchimp_ecommerce_commerce_batch_add_orders($order_ids, &$context) {
+  if (!isset($context['sandbox']['progress'])) {
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['total'] = count($order_ids);
+    $context['results']['order_ids'] = $order_ids;
+    $context['sandbox']['current_order'] = 0;
+  }
+
+  $batch_limit = variable_get('mailchimp_batch_limit', 100);
+
+  $batch = array_slice($context['results']['order_ids'], $context['sandbox']['progress'], $batch_limit);
+  $orders = commerce_order_load_multiple($batch);
+
+  foreach ($orders as $order) {
+    $context['sandbox']['current_order'] = $order->order_id;
+
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
+
+    // create customer if they do not already exist
+    $customer = mailchimp_ecommerce_get_customer($mc_order['customer']['id']);
+    if (($customer)) {
+      mailchimp_ecommerce_update_customer($mc_order['customer']);
+    }
+    else {
+      mailchimp_ecommerce_add_customer($mc_order['customer']);
+    }
+
+    if ($order->order_status == 'pending' || $order->order_status == 'complete') {
+      $order = mailchimp_ecommerce_get_order($order->order_id);
+      if ($order) {
+        mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
+      }
+      else {
+        mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      }
+    }
+    else {
+        // TODO What if the cart already exists?
+        mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      }
+    }
+
+    $context['sandbox']['progress']++;
+
+    $context['message'] = t('Sent @count of @total orders to MailChimp', [
+      '@count' => $context['sandbox']['progress'],
+      '@total' => $context['sandbox']['total'],
+    ]);
+
+    $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
+  }
 }
