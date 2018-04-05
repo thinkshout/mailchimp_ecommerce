@@ -1045,13 +1045,12 @@ function mailchimp_ecommerce_commerce_batch_add_orders($order_ids, &$context) {
       }
     }
 
-    $context['sandbox']['progress']++;
+  $context['sandbox']['progress']++;
 
-    $context['message'] = t('Sent @count of @total orders to MailChimp', [
-      '@count' => $context['sandbox']['progress'],
-      '@total' => $context['sandbox']['total'],
-    ]);
+  $context['message'] = t('Sent @count of @total orders to MailChimp', [
+    '@count' => $context['sandbox']['progress'],
+    '@total' => $context['sandbox']['total'],
+  ]);
 
-    $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
-  }
+  $context['finished'] = ($context['sandbox']['progress'] / $context['sandbox']['total']);
 }
