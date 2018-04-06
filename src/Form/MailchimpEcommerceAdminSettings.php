@@ -189,11 +189,19 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
     if (!empty(\Drupal::config('mailchimp_ecommerce.settings')->get('mailchimp_ecommerce_store_id'))) {
       $form['sync'] = [
         '#type' => 'fieldset',
-        '#title' => t('Data sync'),
+        '#title' => t('Product sync'),
         '#collapsible' => FALSE,
       ];
       $form['sync']['products'] = [
-        '#markup' => \Drupal::l(t('Sync existing Commerce products to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync')),
+        '#markup' => \Drupal::l(t('Sync existing Commerce products to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync'))
+      ];
+      $form['sync-orders'] = [
+        '#type' => 'fieldset',
+        '#title' => t('Order sync'),
+        '#collapsible' => FALSE,
+      ];
+      $form['sync-orders']['orders'] = [
+        '#markup' => \Drupal::l(t('Sync existing Commerce orders to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync_orders')),
       ];
     }
 

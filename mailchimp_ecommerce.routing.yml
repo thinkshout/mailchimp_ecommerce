@@ -10,8 +10,17 @@ mailchimp_ecommerce.admin_settings:
 mailchimp_ecommerce.sync:
   path: 'admin/config/services/mailchimp/ecommerce/sync'
   defaults:
-    _title: 'MailChimp eCommerce Data Sync'
+    _title: 'MailChimp eCommerce Product Sync'
     _form: '\Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceSync'
+  requirements:
+    _permission: 'administer mailchimp'
+    _mailchimp_configuration_access_check: 'TRUE'
+
+mailchimp_ecommerce.sync_orders:
+  path: 'admin/config/services/mailchimp/ecommerce/sync-orders'
+  defaults:
+    _title: 'MailChimp eCommerce Order Sync'
+    _form: '\Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceSyncOrders'
   requirements:
     _permission: 'administer mailchimp'
     _mailchimp_configuration_access_check: 'TRUE'
