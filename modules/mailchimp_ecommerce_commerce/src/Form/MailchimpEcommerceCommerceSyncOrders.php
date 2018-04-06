@@ -25,15 +25,15 @@ class MailchimpEcommerceCommerceSyncOrders extends MailchimpEcommerceSyncOrders 
         'operations' => [],
       ];
 
-      $query = \Drupal::entityQuery('commerce_orders');
+      $query = \Drupal::entityQuery('commerce_order');
       $result = $query->execute();
 
       if (!empty($result)) {
-        $product_ids = array_keys($result);
+        $order_ids = array_keys($result);
 
         $batch['operations'][] = [
           '\Drupal\mailchimp_ecommerce_commerce\BatchSyncOrders::syncOrders',
-          [$product_ids],
+          [$order_ids],
         ];
       }
 
