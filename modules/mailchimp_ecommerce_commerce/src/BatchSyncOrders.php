@@ -7,11 +7,15 @@ namespace Drupal\mailchimp_ecommerce_commerce;
  */
 class BatchSyncOrders {
 
-  public static function syncOrders($product_ids, &$context) {
+  /**
+   * @param $order_ids
+   * @param $context
+   */
+  public static function syncOrders($order_ids, &$context) {
     if (!isset($context['sandbox']['progress'])) {
       $context['sandbox']['progress'] = 0;
-      $context['sandbox']['total'] = count($product_ids);
-      $context['results']['product_ids'] = $product_ids;
+      $context['sandbox']['total'] = count($order_ids);
+      $context['results']['order_ids'] = $order_ids;
     }
 
     $config = \Drupal::config('mailchimp.settings');
@@ -19,22 +23,64 @@ class BatchSyncOrders {
 
     $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
 
-    foreach ($batch as $product_id) {
-      /** @var \Drupal\commerce_product\Entity\Product $product */
-      $product = \Drupal\commerce_product\Entity\Product::load($product_id);
+    /** @var \Drupal\mailchimp_ecommerce\CustomerHandler $customer_handler */
+    $customer_handler = \Drupal::service('mailchimp_ecommerce.customer_handler');
 
-      $title = (!empty($product->get('title')->value)) ? $product->get('title')->value : '';
-      $description = (!empty($product->get('body')->value)) ? $product->get('body')->value : '';
-      $type = (!empty($product->get('type')->value)) ? $product->get('type')->value : '';
+    /** @var \Drupal\mailchimp_ecommerce\CartHandler $cart_handler */
+    $cart_handler = \Drupal::service('mailchimp_ecommerce.cart_handler');
 
-      /** @var \Drupal\mailchimp_ecommerce\ProductHandler $product_handler */
-      $product_handler = \Drupal::service('mailchimp_ecommerce.product_handler');
+    /** @var \Drupal\mailchimp_ecommerce\OrderHandler $order_handler */
+    $order_handler = \Drupal::service('mailchimp_ecommerce.order_handler');
 
-      $url = $product_handler->buildProductUrl($product);
-      $variants = $product_handler->buildProductVariants($product);
-      $image_url = $product_handler->getProductImageUrl($product);
+    foreach ($batch as $order_id) {
 
-      $product_handler->addProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
+      /** @var \Drupal\commerce_order\Entity\Order $order */
+      $order = \Drupal\commerce_Order\Entity\Order::load($order_id);
+
+      $customer = [];
+      $order_data = [];
+      $order_state = $order->get('state')->value;
+
+      // Handle guest orders at the checkout review step - first time the user's
+      // email address is available.
+      if (empty($order->getCustomer()->id()) && ($order->get('checkout_step')->value == 'review')) {
+        $customer['email_address'] = $order->getEmail();
+        if (!empty($customer['email_address'])) {
+          $billing_profile = $order->getBillingProfile();
+          $customer = $customer_handler->buildCustomer($customer, $billing_profile);
+          $customer_handler->addOrUpdateCustomer($customer);
+        }
+
+        $order_data = $order_handler->buildOrder($order, $customer);
+
+        // Add cart item price to order data.
+        if (!isset($order_data['currency_code'])) {
+          $price = $order->getTotalPrice();
+
+          $order_data['currency_code'] = $price->getCurrencyCode();
+          $order_data['order_total'] = $price->getNumber();
+        }
+
+        $cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
+      }
+
+      // On order completion, replace cart in MailChimp with order.
+      // TODO: Only perform action the first time an order has 'completed' status.
+      if ($order_state == 'completed') {
+        $cart_handler->deleteCart($order->id());
+
+        // Update the customer's total order count and total amount spent.
+        $customer_handler->incrementCustomerOrderTotal($customer['email_address'], $order_data['order_total']);
+
+        // Email address should always be available on checkout completion.
+        $customer['email_address'] = $order->getEmail();
+        $billing_profile = $order->getBillingProfile();
+
+        $customer = $customer_handler->buildCustomer($customer, $billing_profile);
+        $order_data = $order_handler->buildOrder($order, $customer);
+
+        $order_handler->addOrder($order->id(), $customer, $order_data);
+      }
 
       $context['sandbox']['progress']++;
 
