@@ -2,7 +2,6 @@
 
 namespace Drupal\mailchimp_ecommerce\Form;
 
-use Drupal\commerce_store\CurrentStoreInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormInterface;
@@ -13,13 +12,6 @@ use Drupal\mailchimp_ecommerce\StoreHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MailchimpEcommerceAdminSettings extends ConfigFormBase {
-
-  /**
-   * The Store Context Interface.
-   *
-   * @var \Drupal\commerce_store\CurrentStoreInterface $store_context
-   */
-  protected $store_context;
 
   /**
    * The Store Handler Interface.
@@ -38,10 +30,9 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    * @param \Drupal\mailchimp_ecommerce\StoreHandlerInterface $store_handler
    *   The Store Handler Interface.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, CurrentStoreInterface $store_context, StoreHandlerInterface $store_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, StoreHandlerInterface $store_handler) {
     parent::__construct($config_factory);
 
-    $this->store_context = $store_context;
     $this->store_handler = $store_handler;
   }
 
@@ -49,20 +40,11 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    if (\Drupal::moduleHandler()->moduleExists('commerce')) {
-      $static = new static(
-        $container->get('config.factory'),
-        $container->get('commerce_store.current_store'),
-        $container->get('mailchimp_ecommerce.store_handler')
-      );
-    }
-    else {
-      $static = new static(
-        $container->get('config.factory'),
-        '',
-        $container->get('mailchimp_ecommerce.store_handler')
-      );
-    }
+
+    $static = new static(
+      $container->get('config.factory'),
+      $container->get('mailchimp_ecommerce.store_handler')
+    );
 
       return $static;
   }
