@@ -175,7 +175,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
         '#collapsible' => FALSE,
       ];
       $form['sync']['products'] = [
-        '#markup' => \Drupal::l(t('Sync existing Commerce products to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync'))
+        '#markup' => \Drupal::l(t('Sync existing products to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync'))
       ];
       $form['sync-orders'] = [
         '#type' => 'fieldset',
@@ -183,7 +183,7 @@ class MailchimpEcommerceAdminSettings extends ConfigFormBase {
         '#collapsible' => FALSE,
       ];
       $form['sync-orders']['orders'] = [
-        '#markup' => \Drupal::l(t('Sync existing Commerce orders to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync_orders')),
+        '#markup' => \Drupal::l(t('Sync existing orders to MailChimp'), Url::fromRoute('mailchimp_ecommerce.sync_orders')),
       ];
     }
 
