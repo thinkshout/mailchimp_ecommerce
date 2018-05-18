@@ -37,7 +37,7 @@ class BatchSyncOrders {
       // TODO Replace this
       //$order = \Drupal\commerce_Order\Entity\Order::load($order_id);
       $order = null;
-      
+
       $customer = [];
       $order_data = [];
       $order_state = $order->get('state')->value;
