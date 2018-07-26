@@ -3,8 +3,11 @@
 namespace Drupal\mailchimp_ecommerce_commerce\Form;
 
 use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceAdminSettings;
+use Drupal\mailchimp_ecommerce\StoreHandlerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSettings {
 
@@ -33,7 +36,7 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
    *   The Store Handler Interface.
    */
   public function __construct(ConfigFactoryInterface $config_factory, CurrentStoreInterface $store_context, StoreHandlerInterface $store_handler) {
-    parent::__construct($config_factory);
+    parent::__construct($config_factory, $store_handler);
 
     $this->store_context = $store_context;
     $this->store_handler = $store_handler;
