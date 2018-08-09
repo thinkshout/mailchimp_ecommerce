@@ -101,6 +101,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
         $order_data['order_total'] = $price->getNumber();
       }
 
+      $order_data['checkout_url'] = Url::fromRoute('commerce_checkout.form', ['commerce_order' => $order->id()])->toString();
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
   }
