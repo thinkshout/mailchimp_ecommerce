@@ -119,6 +119,7 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
       $product['id'],
       $product['variant_id'],
       $product['title'],
+      $product['description'],
       $product['sku'],
       $product['url'],
       $product['price']
@@ -131,6 +132,7 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
           $product['id'],
           $variant['variant_id'],
           $variant['title'],
+          $product['description'],
           $variant['sku'],
           $product['url'],
           $variant['price']
