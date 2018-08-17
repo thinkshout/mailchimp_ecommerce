@@ -671,7 +671,7 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
  * @param string $order_id
  *   The order ID.
  *
- * @return object
+ * @return object|null
  *   The order.
  */
 function mailchimp_ecommerce_get_order($order_id) {
@@ -705,7 +705,7 @@ function mailchimp_ecommerce_get_order($order_id) {
  * @param string $cart_id
  *   The cart ID.
  *
- * @return object
+ * @return object|null
  *   The cart.
  */
 function mailchimp_ecommerce_get_cart($cart_id) {
