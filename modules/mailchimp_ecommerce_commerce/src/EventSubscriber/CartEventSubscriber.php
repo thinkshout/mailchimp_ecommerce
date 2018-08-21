@@ -8,6 +8,7 @@ use Drupal\commerce_cart\Event\CartOrderItemRemoveEvent;
 use Drupal\commerce_cart\Event\CartOrderItemUpdateEvent;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_price\Price;
+use Drupal\Core\Url;
 use Drupal\mailchimp_ecommerce\CartHandler;
 use Drupal\mailchimp_ecommerce\CustomerHandler;
 use Drupal\mailchimp_ecommerce\OrderHandler;
