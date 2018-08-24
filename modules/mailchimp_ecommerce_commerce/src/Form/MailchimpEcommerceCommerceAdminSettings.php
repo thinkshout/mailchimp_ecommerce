@@ -3,8 +3,10 @@
 namespace Drupal\mailchimp_ecommerce_commerce\Form;
 
 use Drupal\commerce_store\CurrentStoreInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\mailchimp_ecommerce\Form\MailchimpEcommerceAdminSettings;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSettings {
 
