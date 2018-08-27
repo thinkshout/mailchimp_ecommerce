@@ -2,14 +2,20 @@
 
 namespace Drupal\mailchimp_ecommerce_commerce;
 
+use Drupal\commerce_order\Entity\Order;
+
 /**
  * Batch process handler for syncing order data to MailChimp.
  */
 class BatchSyncOrders {
 
   /**
-   * @param $order_ids
-   * @param $context
+   * Batch processor for order sync.
+   *
+   * @param array $order_ids
+   *   IDs of orders to sync.
+   * @param array $context
+   *   Batch process context; stores progress data.
    */
   public static function syncOrders($order_ids, &$context) {
     if (!isset($context['sandbox']['progress'])) {
@@ -21,7 +27,7 @@ class BatchSyncOrders {
     $config = \Drupal::config('mailchimp.settings');
     $batch_limit = $config->get('batch_limit');
 
-    $batch = array_slice($context['results']['product_ids'], $context['sandbox']['progress'], $batch_limit);
+    $batch = array_slice($context['results']['order_ids'], $context['sandbox']['progress'], $batch_limit);
 
     /** @var \Drupal\mailchimp_ecommerce\CustomerHandler $customer_handler */
     $customer_handler = \Drupal::service('mailchimp_ecommerce.customer_handler');
@@ -33,9 +39,7 @@ class BatchSyncOrders {
     $order_handler = \Drupal::service('mailchimp_ecommerce.order_handler');
 
     foreach ($batch as $order_id) {
-
-      /** @var \Drupal\commerce_order\Entity\Order $order */
-      $order = \Drupal\commerce_Order\Entity\Order::load($order_id);
+      $order = Order::load($order_id);
 
       $customer = [];
       $order_data = [];
@@ -64,8 +68,6 @@ class BatchSyncOrders {
         $cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
       }
 
-      // On order completion, replace cart in MailChimp with order.
-      // TODO: Only perform action the first time an order has 'completed' status.
       if ($order_state == 'completed') {
         $cart_handler->deleteCart($order->id());
 

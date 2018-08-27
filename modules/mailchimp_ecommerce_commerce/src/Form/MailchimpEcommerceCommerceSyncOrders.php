@@ -25,9 +25,24 @@ class MailchimpEcommerceCommerceSyncOrders extends MailchimpEcommerceSyncOrders 
         'operations' => [],
       ];
 
-      $query = \Drupal::entityQuery('commerce_order');
+      // Set timestamp of earliest order to sync.
+      $min_timestamp = 0;
+
+      $timespan = $form_state->getValue('timespan');
+
+      if (!empty($timespan)) {
+        // Calculate timestamp as current time minus given timespan (months).
+        $months = (abs(intval($timespan)) * -1);
+        $min_timestamp = strtotime($months . ' months');
+      }
+
+      // Retrieve orders created at or after the timestamp calculated above.
+      $query = \Drupal::entityQuery('commerce_order')
+        ->condition('created', $min_timestamp, '>=');
+
       $result = $query->execute();
 
+      // Add orders to a batch operation for processing.
       if (!empty($result)) {
         $order_ids = array_keys($result);
 
