@@ -1,6 +1,6 @@
 {
   "name": "drupal/mailchimp_ecommerce",
-  "description": "Add Ecoomerce functionality with Mailchimp email service.",
+  "description": "Add E-Commerce functionality with Mailchimp email service.",
   "type": "drupal-module",
   "license": "GPL-2.0+",
   "minimum-stability": "dev",
