@@ -126,7 +126,12 @@ class CartEventSubscriber implements EventSubscriberInterface {
     /** @var \Drupal\commerce_order\Entity\Order $order */
     $order = $event->getCart();
 
-    $this->cart_handler->deleteCartLine($order->id(), $event->getOrderItem()->id());
+    if (empty($order->getItems())) {
+      $this->cart_handler->deleteCart($order->id());
+    }
+    else {
+      $this->cart_handler->deleteCartLine($order->id(), $event->getOrderItem()->id());
+    }
   }
 
   /**
