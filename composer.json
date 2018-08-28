@@ -1,0 +1,27 @@
+{
+  "name": "drupal/mailchimp_ecommerce",
+  "description": "Add Ecoomerce functionality with Mailchimp email service.",
+  "type": "drupal-module",
+  "license": "GPL-2.0+",
+  "minimum-stability": "dev",
+  "homepage": "https://www.drupal.org/project/mailchimp_ecommerce",
+  "authors": [
+    {
+      "name": "Dan Ruscoe (ruscoe)",
+      "homepage": "https://www.drupal.org/u/ruscoe",
+      "role": "Maintainer"
+    },
+    {
+      "name": "Amy Vaillancourt-Sals (amyvs)",
+      "homepage": "https://www.drupal.org/u/amyvs",
+      "role": "Maintainer"
+    }
+  ],
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/mailchimp_ecommerce",
+    "source": "http://cgit.drupalcode.org/mailchimp_ecommerce"
+  },
+  "require": {
+    "drupal/mailchimp": "^1.0"
+  }
+}
