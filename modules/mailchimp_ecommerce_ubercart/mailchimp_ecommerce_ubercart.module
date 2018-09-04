@@ -537,9 +537,13 @@ function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
       }
     }
     else {
-      // TODO This function doesn't exist. Should handle this with a try catch in add_cart
-      //$cart = mailchimp_ecommerce_get_cart($order->order_id);
-      mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      $cart = mailchimp_ecommerce_get_cart($order->order_id);
+      if ($cart) {
+        mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      }
+      else {
+        mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+      }
     }
 
     $context['sandbox']['progress']++;
