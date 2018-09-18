@@ -96,7 +96,7 @@ class OrderHandler implements OrderHandlerInterface {
     foreach ($order_items as $order_item) {
       $line = [
         'id' => $order_item->id(),
-        'product_id' => $order_item->getPurchasedEntityId(),
+        'product_id' => $order_item->getPurchasedEntity()->getProductId(),
         // TODO: Figure out how to differentiate between product and variant ID here.
         'product_variant_id' => $order_item->getPurchasedEntityId(),
         'quantity' => (int) $order_item->getQuantity(),
@@ -129,9 +129,10 @@ class OrderHandler implements OrderHandlerInterface {
    * @inheritdoc
    */
   public function buildProduct(OrderItem $order_item) {
+
     $product = [
       'id' => $order_item->id(),
-      'product_id' => $order_item->getPurchasedEntityId(),
+      'product_id' => $order_item->getPurchasedEntity()->getProductId(),
       // TODO: Figure out how to differentiate between product and variant ID here.
       'product_variant_id' => $order_item->getPurchasedEntityId(),
       'quantity' => (int) $order_item->getQuantity(),
