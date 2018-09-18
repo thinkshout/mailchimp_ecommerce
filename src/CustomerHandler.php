@@ -163,6 +163,12 @@ class CustomerHandler implements CustomerHandlerInterface {
       $customer['orders_count'] = (int) $this->getCustomerTotalOrders($customer['email_address']);
       $customer['total_spent'] = $this->getCustomerTotalSpent($customer['email_address']);
 
+      foreach ($customer as $key => $value) {
+        if ($value === NULL) {
+          unset($customer[$key]);
+        }
+      }
+
       $customer['address'] = [
         'address1'      => $address->getAddressLine1(),
         'address2'      => $address->getAddressLine2(),
