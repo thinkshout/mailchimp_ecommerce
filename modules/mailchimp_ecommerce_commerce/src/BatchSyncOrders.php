@@ -42,31 +42,26 @@ class BatchSyncOrders {
       $order = Order::load($order_id);
 
       $customer = [];
-      $order_data = [];
       $order_state = $order->get('state')->value;
 
-      // Handle guest orders at the checkout review step - first time the user's
-      // email address is available.
-      if (empty($order->getCustomer()->id()) && ($order->get('checkout_step')->value == 'review')) {
-        $customer['email_address'] = $order->getEmail();
-        if (!empty($customer['email_address'])) {
-          $billing_profile = $order->getBillingProfile();
-          $customer = $customer_handler->buildCustomer($customer, $billing_profile);
-          $customer_handler->addOrUpdateCustomer($customer);
-        }
-
-        $order_data = $order_handler->buildOrder($order, $customer);
-
-        // Add cart item price to order data.
-        if (!isset($order_data['currency_code'])) {
-          $price = $order->getTotalPrice();
-
-          $order_data['currency_code'] = $price->getCurrencyCode();
-          $order_data['order_total'] = $price->getNumber();
-        }
-
-        $cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
+      $customer['email_address'] = $order->getEmail();
+      if (!empty($customer['email_address'])) {
+        $billing_profile = $order->getBillingProfile();
+        $customer = $customer_handler->buildCustomer($customer, $billing_profile);
+        $customer_handler->addOrUpdateCustomer($customer);
       }
+
+      $order_data = $order_handler->buildOrder($order, $customer);
+
+      // Add cart item price to order data.
+      if (!isset($order_data['currency_code'])) {
+        $price = $order->getTotalPrice();
+
+        $order_data['currency_code'] = $price->getCurrencyCode();
+        $order_data['order_total'] = $price->getNumber();
+      }
+
+      $cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
 
       if ($order_state == 'completed') {
         $cart_handler->deleteCart($order->id());
@@ -81,7 +76,15 @@ class BatchSyncOrders {
         $customer = $customer_handler->buildCustomer($customer, $billing_profile);
         $order_data = $order_handler->buildOrder($order, $customer);
 
-        $order_handler->addOrder($order->id(), $customer, $order_data);
+        // Add or update existing order.
+        $existing_order = $order_handler->getOrder($order->id());
+
+        if (!empty($existing_order)) {
+          $order_handler->updateOrder($order->id(), $order_data);
+        }
+        else {
+          $order_handler->addOrder($order->id(), $customer, $order_data);
+        }
       }
 
       $context['sandbox']['progress']++;
