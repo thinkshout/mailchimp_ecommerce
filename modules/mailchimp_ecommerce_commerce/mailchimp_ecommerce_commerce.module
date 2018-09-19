@@ -4,35 +4,3 @@
  * @file
  * Integrates Drupal Commerce with MailChimp eCommerce.
  */
-
-/**
- * Parses an address from a Commerce customer profile.
- *
- * @param object $customer_profile_wrapper
- *   Commerce customer profile object.
- *
- * @return object
- *   Address object in a MailChimp-friendly format.
- */
-function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_profile_wrapper) {
-  $address = [];
-
-  if (isset($customer_profile_wrapper->commerce_customer_address->thoroughfare) &&
-    isset($customer_profile_wrapper->commerce_customer_address->premise) &&
-    isset($customer_profile_wrapper->commerce_customer_address->locality) &&
-    isset($customer_profile_wrapper->commerce_customer_address->administrative_area) &&
-    isset($customer_profile_wrapper->commerce_customer_address->postal_code) &&
-    isset($customer_profile_wrapper->commerce_customer_address->country)
-  ) {
-    $address = (object) [
-      'address1' => $customer_profile_wrapper->commerce_customer_address->thoroughfare->value(),
-      'address2' => $customer_profile_wrapper->commerce_customer_address->premise->value(),
-      'city' => $customer_profile_wrapper->commerce_customer_address->locality->value(),
-      'province_code' => $customer_profile_wrapper->commerce_customer_address->administrative_area->value(),
-      'postal_code' => $customer_profile_wrapper->commerce_customer_address->postal_code->value(),
-      'country_code' => $customer_profile_wrapper->commerce_customer_address->country->value(),
-    ];
-  }
-
-  return $address;
-}
