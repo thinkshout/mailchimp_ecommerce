@@ -7,7 +7,7 @@ function mailchimp_ecommerce_drush_command() {
   $commands = [];
 
   $commands['mc-ecommerce-get-stores'] = [
-    'description' => 'Gets stores attached to the currently set MailChimp API key.',
+    'description' => 'Gets stores attached to the currently set Mailchimp API key.',
     'aliases' => ['mcstores'],
   ];
 
@@ -15,7 +15,7 @@ function mailchimp_ecommerce_drush_command() {
     'description' => 'Gets orders attached to a given store ID.',
     'aliases' => ['mcorders'],
     'options' => [
-      'store_id' => 'ID of the store as defined by MailChimp.',
+      'store_id' => 'ID of the store as defined by Mailchimp.',
     ],
   ];
 
@@ -23,7 +23,7 @@ function mailchimp_ecommerce_drush_command() {
 }
 
 /**
- * Drush command to retrieve a list of MailChimp eCommerce stores.
+ * Drush command to retrieve a list of Mailchimp eCommerce stores.
  */
 function drush_mailchimp_ecommerce_mc_ecommerce_get_stores() {
   $api_key = \Drupal::config('mailchimp.settings')->get('api_key');
@@ -46,7 +46,7 @@ function drush_mailchimp_ecommerce_mc_ecommerce_get_stores() {
 }
 
 /**
- * Drush command to retrieve a list of orders for a MailChimp eCommerce store.
+ * Drush command to retrieve a list of orders for a Mailchimp eCommerce store.
  */
 function drush_mailchimp_ecommerce_mc_ecommerce_get_orders($store_id) {
   $api_key = \Drupal::config('mailchimp.settings')->get('api_key');

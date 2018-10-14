@@ -21,7 +21,7 @@ abstract class MailchimpEcommerceSyncOrders extends FormBase {
     $form['sync_orders'] = [
       '#type' => 'checkbox',
       '#title' => t('Sync Orders'),
-      '#description' => t('Sync all existing Orders to MailChimp.'),
+      '#description' => t('Sync all existing Orders to Mailchimp.'),
     ];
 
     $form['timespan'] = [
@@ -29,14 +29,14 @@ abstract class MailchimpEcommerceSyncOrders extends FormBase {
       '#title' => t('Time span'),
       '#default_value' => 6,
       '#field_suffix' => 'months',
-      '#description' => 'MailChimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
+      '#description' => 'Mailchimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
       '#size' => 3,
       '#maxlength' => 3,
     ];
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Sync with MailChimp'),
+      '#value' => $this->t('Sync with Mailchimp'),
       '#button_type' => 'primary',
     ];
 
@@ -51,9 +51,9 @@ abstract class MailchimpEcommerceSyncOrders extends FormBase {
   }
 
   /**
-   * Processes data sync to MailChimp.
+   * Processes data sync to Mailchimp.
    *
-   * Syncing data to MailChimp is specific to the shopping cart integration.
+   * Syncing data to Mailchimp is specific to the shopping cart integration.
    * You should implement this function in your integration to process the
    * data sync.
    */

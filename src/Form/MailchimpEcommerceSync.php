@@ -21,12 +21,12 @@ abstract class MailchimpEcommerceSync extends FormBase {
     $form['sync_products'] = [
       '#type' => 'checkbox',
       '#title' => t('Sync Products'),
-      '#description' => t('Sync all existing products to MailChimp.'),
+      '#description' => t('Sync all existing products to Mailchimp.'),
     ];
 
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Sync with MailChimp'),
+      '#value' => $this->t('Sync with Mailchimp'),
       '#button_type' => 'primary',
     ];
 
@@ -41,9 +41,9 @@ abstract class MailchimpEcommerceSync extends FormBase {
   }
 
   /**
-   * Processes data sync to MailChimp.
+   * Processes data sync to Mailchimp.
    *
-   * Syncing data to MailChimp is specific to the shopping cart integration.
+   * Syncing data to Mailchimp is specific to the shopping cart integration.
    * You should implement this function in your integration to process the
    * data sync.
    */

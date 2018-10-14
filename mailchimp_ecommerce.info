@@ -1,6 +1,6 @@
-name = MailChimp eCommerce
-description = Integrates Drupal-based shopping carts with MailChimp eCommerce.
-package = MailChimp
+name = Mailchimp eCommerce
+description = Integrates Drupal-based shopping carts with Mailchimp eCommerce.
+package = Mailchimp
 core = 7.x
 php = 5.5
 

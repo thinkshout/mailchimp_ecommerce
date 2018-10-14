@@ -59,7 +59,7 @@ class CartEventSubscriber implements EventSubscriberInterface {
   /**
    * Respond to event fired after adding a cart item.
    *
-   * Initial cart creation in MailChimp needs to happen when the first cart
+   * Initial cart creation in Mailchimp needs to happen when the first cart
    * item is added. This is because we can't rely on the total price being
    * available when the Commerce Order itself is first created.
    */

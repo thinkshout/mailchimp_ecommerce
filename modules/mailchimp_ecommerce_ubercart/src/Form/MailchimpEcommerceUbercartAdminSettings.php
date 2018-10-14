@@ -15,14 +15,14 @@ class MailchimpEcommerceUbercartAdminSettings extends MailchimpEcommerceAdminSet
 
     // TODO Get default currency
     if (!empty($store)) {
-      // Set default currency code for the MailChimp store.
+      // Set default currency code for the Mailchimp store.
       $default_currency = $store->getDefaultCurrencyCode();
       if (isset($form['mailchimp_ecommerce_currency']['#options'][$default_currency])) {
         $form['mailchimp_ecommerce_currency']['#default_value'] = $default_currency;
       }
     }
 
-    // Identify Ubercart to MailChimp.
+    // Identify Ubercart to Mailchimp.
     $form['platform']['#default_value'] = 'Drupal Ubercart';
 
     return $form;

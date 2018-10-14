@@ -2,7 +2,7 @@
 namespace Drupal\mailchimp_ecommerce_ubercart;
 
 /**
- * Tests for MailChimp eCommerce integration with Drupal Commerce.
+ * Tests for Mailchimp eCommerce integration with Drupal Commerce.
  */
 class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
 
@@ -14,9 +14,9 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'MailChimp eCommerce Ubercart',
-      'description' => 'Test MailChimp eCommerce integration with Ubercart.',
-      'group' => 'MailChimp',
+      'name' => 'Mailchimp eCommerce Ubercart',
+      'description' => 'Test Mailchimp eCommerce integration with Ubercart.',
+      'group' => 'Mailchimp',
     );
   }
 
@@ -76,7 +76,7 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a store to MailChimp.
+   * Tests adding a store to Mailchimp.
    */
   public function testAddStore() {
     $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
@@ -95,7 +95,7 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a store to MailChimp with no list.
+   * Tests adding a store to Mailchimp with no list.
    */
   public function testAddStoreNoList() {
     $admin = $this->drupalCreateUser(array('administer site configuration', 'administer mailchimp'));
@@ -114,7 +114,7 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a product to MailChimp.
+   * Tests adding a product to Mailchimp.
    */
   public function testAddProduct() {
     // Should pass.
@@ -138,14 +138,14 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a product to MailChimp with no product variants.
+   * Tests adding a product to Mailchimp with no product variants.
    */
   public function testAddProductNoVariants() {
     // Action should fail.
   }
 
   /**
-   * Tests adding a customer to MailChimp.
+   * Tests adding a customer to Mailchimp.
    */
   public function testAddCustomer() {
     // Should pass.
@@ -166,7 +166,7 @@ class MailchimpEcommerceUbercartTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a customer to MailChimp with no email address.
+   * Tests adding a customer to Mailchimp with no email address.
    */
   public function testAddCustomerNoEmail() {
     // Action should fail.

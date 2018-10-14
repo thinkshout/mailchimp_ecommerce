@@ -3,7 +3,7 @@
 namespace Drupal\mailchimp_ecommerce_commerce;
 
 /**
- * Batch process handler for syncing product data to MailChimp.
+ * Batch process handler for syncing product data to Mailchimp.
  */
 class BatchSyncProducts {
 
@@ -38,7 +38,7 @@ class BatchSyncProducts {
 
       $context['sandbox']['progress']++;
 
-      $context['message'] = t('Sent @count of @total products to MailChimp', [
+      $context['message'] = t('Sent @count of @total products to Mailchimp', [
         '@count' => $context['sandbox']['progress'],
         '@total' => $context['sandbox']['total'],
       ]);

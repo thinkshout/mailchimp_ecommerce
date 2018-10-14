@@ -11,7 +11,7 @@ use Drupal\commerce_order\Entity\OrderItem;
 interface OrderHandlerInterface {
 
   /**
-   * Gets an order from the current MailChimp store.
+   * Gets an order from the current Mailchimp store.
    *
    * @param string $order_id
    *   The order ID.
@@ -22,7 +22,7 @@ interface OrderHandlerInterface {
   public function getOrder($order_id);
 
   /**
-   * Adds a new order to the current MailChimp store.
+   * Adds a new order to the current Mailchimp store.
    *
    * @param string $order_id
    *   The order ID.
@@ -40,7 +40,7 @@ interface OrderHandlerInterface {
   public function addOrder($order_id, array $customer, array $order);
 
   /**
-   * Updates an existing order in the current MailChimp store.
+   * Updates an existing order in the current Mailchimp store.
    *
    * @param string $order_id
    *   The order ID.
@@ -55,7 +55,7 @@ interface OrderHandlerInterface {
   public function updateOrder($order_id, array $order);
 
   /**
-   * Returns customer and order data formatted for use with MailChimp.
+   * Returns customer and order data formatted for use with Mailchimp.
    *
    * @param \Drupal\commerce_order\Entity\Order $order
    *   The Commerce Order.
@@ -69,7 +69,7 @@ interface OrderHandlerInterface {
   public function buildOrder(Order $order, array $customer);
 
   /**
-   * Returns product data formatted for use with MailChimp.
+   * Returns product data formatted for use with Mailchimp.
    *
    * @param \Drupal\commerce_order\Entity\OrderItem $item
    *   The Commerce Order Item.
@@ -80,13 +80,13 @@ interface OrderHandlerInterface {
   public function buildProduct(OrderItem $item);
 
   /**
-   * Builds a MailChimp order from an Ubercart order.
+   * Builds a Mailchimp order from an Ubercart order.
    *
    * @param UcOrder $order
    *   The Ubercart order.
    *
    * @return object
-   *   Order object in a MailChimp-friendly format.
+   *   Order object in a Mailchimp-friendly format.
    */
   public function buildUberOrder(\Drupal\uc_order\Entity\Order $order);
 

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * MailChimp eCommerce core functionality.
+ * Mailchimp eCommerce core functionality.
  */
 
 /**
@@ -17,7 +17,7 @@ function mailchimp_ecommerce_page_attachments(array &$attachments) {
 }
 
 /**
- * Generates a unique ID used to identify a store integration to MailChimp.
+ * Generates a unique ID used to identify a store integration to Mailchimp.
  *
  * @return string
  *   The unique store ID.
@@ -27,7 +27,7 @@ function mailchimp_ecommerce_generate_store_id() {
 }
 
 /**
- * Gets the store ID of the MailChimp eCommerce integration.
+ * Gets the store ID of the Mailchimp eCommerce integration.
  *
  * @return string
  *   The store ID.
@@ -49,7 +49,7 @@ function mailchimp_ecommerce_get_campaign_id() {
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
   $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
 
-  // Check to see if this is a valid MailChimp campaign.
+  // Check to see if this is a valid Mailchimp campaign.
   try {
     if (!empty($session_campaign)) {
       $campaign = $mc_campaigns->getCampaign($session_campaign);
@@ -70,7 +70,7 @@ function mailchimp_ecommerce_get_campaign_id() {
 }
 
 /**
- * Determines if a MailChimp eCommerce integration is enabled.
+ * Determines if a Mailchimp eCommerce integration is enabled.
  *
  * @return bool
  *   TRUE if an integration is enabled.

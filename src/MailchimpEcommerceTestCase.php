@@ -2,7 +2,7 @@
 namespace Drupal\mailchimp_ecommerce;
 
 /**
- * Tests for MailChimp eCommerce core integration.
+ * Tests for Mailchimp eCommerce core integration.
  */
 class MailchimpEcommerceTestCase extends DrupalWebTestCase {
 
@@ -14,9 +14,9 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
    */
   public static function getInfo() {
     return array(
-      'name' => 'MailChimp eCommerce',
-      'description' => 'Test MailChimp eCommerce core integration.',
-      'group' => 'MailChimp',
+      'name' => 'Mailchimp eCommerce',
+      'description' => 'Test Mailchimp eCommerce core integration.',
+      'group' => 'Mailchimp',
     );
   }
 
@@ -76,7 +76,7 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding a store to MailChimp.
+   * Tests adding a store to Mailchimp.
    */
   public function testAddStore() {
     $store_id = 1;
@@ -96,7 +96,7 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding an order to MailChimp.
+   * Tests adding an order to Mailchimp.
    */
   public function testAddOrder() {
     $store_id = 1;
@@ -142,7 +142,7 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
   }
 
   /**
-   * Tests adding an order to MailChimp with no line items.
+   * Tests adding an order to Mailchimp with no line items.
    */
   public function testAddOrderNoLineItems() {
     $store_id = 1;

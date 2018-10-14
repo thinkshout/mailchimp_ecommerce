@@ -8,7 +8,7 @@ namespace Drupal\mailchimp_ecommerce;
 interface CartHandlerInterface {
 
   /**
-   * Determines if a cart exists in MailChimp.
+   * Determines if a cart exists in Mailchimp.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -19,7 +19,7 @@ interface CartHandlerInterface {
   public function cartExists($cart_id);
 
   /**
-   * Gets an existing cart from the current MailChimp store.
+   * Gets an existing cart from the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -29,7 +29,7 @@ interface CartHandlerInterface {
   public function getCart($cart_id);
 
   /**
-   * Adds or updates a cart in the current MailChimp store.
+   * Adds or updates a cart in the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -47,7 +47,7 @@ interface CartHandlerInterface {
   public function addOrUpdateCart($cart_id, array $customer, array $cart);
 
   /**
-   * Deletes a cart in the current MailChimp store.
+   * Deletes a cart in the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -55,7 +55,7 @@ interface CartHandlerInterface {
   public function deleteCart($cart_id);
 
   /**
-   * Adds a line to a cart in the current MailChimp store.
+   * Adds a line to a cart in the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -71,7 +71,7 @@ interface CartHandlerInterface {
   public function addCartLine($cart_id, $line_id, $product);
 
   /**
-   * Updates an existing line in a cart in the current MailChimp store.
+   * Updates an existing line in a cart in the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.
@@ -87,7 +87,7 @@ interface CartHandlerInterface {
   public function updateCartLine($cart_id, $line_id, $product);
 
   /**
-   * Deletes a line in a cart in the current MailChimp store.
+   * Deletes a line in a cart in the current Mailchimp store.
    *
    * @param string $cart_id
    *   The cart ID.

@@ -15,7 +15,7 @@ interface CustomerHandlerInterface {
    *   Unique id of customer.
    *
    * @return object
-   *   MailChimp customer object.
+   *   Mailchimp customer object.
    */
   public function getCustomer($customer_id);
 
@@ -49,7 +49,7 @@ interface CustomerHandlerInterface {
   public function loadCustomerId($customer);
 
   /**
-   * Saves the customer locally and returns customer data formatted for use with MailChimp.
+   * Saves the customer locally and returns customer data formatted for use with Mailchimp.
    *
    * @param array $customer
    *   The customer.
@@ -65,7 +65,7 @@ interface CustomerHandlerInterface {
   /**
    * Increments the order count and total amount spent by a customer.
    *
-   * This information is tracked and sent to MailChimp with every order.
+   * This information is tracked and sent to Mailchimp with every order.
    *
    * @param string $email_address
    *   The email address associated with the customer.

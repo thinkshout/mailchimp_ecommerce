@@ -11,11 +11,11 @@ use Drupal\commerce_product\Entity\Product;
 interface ProductHandlerInterface {
 
   /**
-   * Adds a product to MailChimp.
+   * Adds a product to Mailchimp.
    *
    * Adds a product variant if a product with the given ID exists.
    *
-   * In MailChimp, each product requires at least one product variant. This
+   * In Mailchimp, each product requires at least one product variant. This
    * function will create a single product variant when creating new products.
    *
    * A product variant is contained within a product and can be used to
@@ -41,9 +41,9 @@ interface ProductHandlerInterface {
   public function addProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
 
   /**
-   * Updates an existing product in MailChimp.
+   * Updates an existing product in Mailchimp.
    *
-   * MailChimp only allows for product variants to be updated. The parent
+   * Mailchimp only allows for product variants to be updated. The parent
    * product cannot be changed once created. This function will update the
    * variant associated with the given product ID and SKU.
    *
@@ -66,7 +66,7 @@ interface ProductHandlerInterface {
   public function updateProduct($product_id, $title, $url, $image_url, $description, $type, $variants);
 
   /**
-   * Deletes a product in MailChimp.
+   * Deletes a product in Mailchimp.
    *
    * @param string $product_id
    *   Unique ID of the product.
@@ -74,7 +74,7 @@ interface ProductHandlerInterface {
   public function deleteProduct($product_id);
 
   /**
-   * Adds a new product variant to MailChimp.
+   * Adds a new product variant to Mailchimp.
    *
    * @param string $product_id
    *   Unique ID of the product.
@@ -96,7 +96,7 @@ interface ProductHandlerInterface {
   public function addProductVariant($product_id, $product_variant_id, $title, $url, $image_url, $sku, $price, $stock);
 
   /**
-   * Gets a product variant from MailChimp.
+   * Gets a product variant from Mailchimp.
    *
    * @param string $product_id
    *   Unique ID of the product.
@@ -104,12 +104,12 @@ interface ProductHandlerInterface {
    *   ID of the product variant.
    *
    * @return object
-   *   MailChimp product variant object.
+   *   Mailchimp product variant object.
    */
   public function getProductVariant($product_id, $product_variant_id);
 
   /**
-   * Deletes a product variant in MailChimp.
+   * Deletes a product variant in Mailchimp.
    *
    * Automatically deletes the product if the only product variant is removed.
    *

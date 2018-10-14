@@ -21,7 +21,7 @@ class MailchimpEcommerceCommerceSyncOrders extends MailchimpEcommerceSyncOrders 
   public function _submitForm($form, $form_state) {
     if (!empty($form_state->getValue('sync_orders'))) {
       $batch = [
-        'title' => t('Adding orders to MailChimp'),
+        'title' => t('Adding orders to Mailchimp'),
         'operations' => [],
       ];
 

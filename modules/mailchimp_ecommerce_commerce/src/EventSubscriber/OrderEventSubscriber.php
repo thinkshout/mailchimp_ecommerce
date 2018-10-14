@@ -87,7 +87,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
       $this->cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
     }
 
-    // On order completion, replace cart in MailChimp with order.
+    // On order completion, replace cart in Mailchimp with order.
     // TODO: Only perform action the first time an order has 'completed' status.
     if ($order_state == 'completed') {
       $this->cart_handler->deleteCart($order->id());
@@ -115,7 +115,7 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     // An anonymous user has logged in or created an account after populating
     // a cart with items. This is the first point we can send this cart to
-    // MailChimp as we are now able to get the user's email address.
+    // Mailchimp as we are now able to get the user's email address.
     $account = $event->getAccount();
     $customer['email_address'] = $account->getEmail();
     $billing_profile = $order->getBillingProfile();
@@ -124,8 +124,8 @@ class OrderEventSubscriber implements EventSubscriberInterface {
 
     $this->customer_handler->addOrUpdateCustomer($customer);
 
-    // MailChimp considers any order to be a cart until the order is complete.
-    // This order is created as a cart in MailChimp when assigned to the user.
+    // Mailchimp considers any order to be a cart until the order is complete.
+    // This order is created as a cart in Mailchimp when assigned to the user.
     $order_data = $this->order_handler->buildOrder($order, $customer);
 
     // Add cart item price to order data.

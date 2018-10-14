@@ -71,7 +71,7 @@ class ProductHandler implements ProductHandlerInterface {
     }
     catch (\Exception $e) {
       if ($e->getCode() == 404) {
-        drupal_set_message('This product doesn\'t exist in MailChimp. Please sync all your products.');
+        drupal_set_message('This product doesn\'t exist in Mailchimp. Please sync all your products.');
       }
       else {
         // An actual error occurred; pass on the exception.
@@ -144,9 +144,9 @@ class ProductHandler implements ProductHandlerInterface {
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
       $product_variant = $mc_ecommerce->getProductVariant($store_id, $product_id, $product_variant_id);
 
-      // MailChimp will return a product variant object even if the variant
+      // Mailchimp will return a product variant object even if the variant
       // doesn't exist. Checking for an empty SKU is a reliable way to
-      // determine if a product variant doesn't exist in MailChimp.
+      // determine if a product variant doesn't exist in Mailchimp.
       if (empty($product_variant->sku)) {
         return NULL;
       }
@@ -219,7 +219,7 @@ class ProductHandler implements ProductHandlerInterface {
       }
       catch (\Exception $e) {
         if ($e->getCode() == 404) {
-          // This product isn't in MailChimp.
+          // This product isn't in Mailchimp.
           return;
         }
         else {
@@ -235,7 +235,7 @@ class ProductHandler implements ProductHandlerInterface {
   }
 
   /**
-   * Returns product variant data formatted for use with MailChimp.
+   * Returns product variant data formatted for use with Mailchimp.
    *
    * @param \Drupal\commerce_product\Entity\Product $product
    *   The Commerce Product.
@@ -269,7 +269,7 @@ class ProductHandler implements ProductHandlerInterface {
           $variant['price'] = 0;
         }
 
-        // Product variations contain a currency code, but MailChimp requires
+        // Product variations contain a currency code, but Mailchimp requires
         // store currency to be set at the point when the store is created, so
         // the variation currency is ignored here.
         // TODO: Make sure the user knows this through a form hint.
@@ -282,13 +282,13 @@ class ProductHandler implements ProductHandlerInterface {
   }
 
   /**
-   * Build MailChimp product values from an Ubercart product node.
+   * Build Mailchimp product values from an Ubercart product node.
    *
    * @param Node $node
    *   The Ubercart 'product' type node.
    *
    * @return array
-   *   Array of product values for use with MailChimp.
+   *   Array of product values for use with Mailchimp.
    */
   function buildProductFromNode(Node $node) {
 
@@ -332,7 +332,7 @@ class ProductHandler implements ProductHandlerInterface {
   public function buildProductUrl($product) {
     global $base_url;
 
-    // MailChimp will accept an empty string if no URL is available.
+    // Mailchimp will accept an empty string if no URL is available.
     $full_url = '';
 
     $url = $product->toURL();
@@ -355,7 +355,7 @@ class ProductHandler implements ProductHandlerInterface {
   public function buildNodeUrl(Node $product) {
     global $base_url;
 
-    // MailChimp will accept an empty string if no URL is available.
+    // Mailchimp will accept an empty string if no URL is available.
     $full_url = '';
 
     $url = $product->toUrl()->toString();

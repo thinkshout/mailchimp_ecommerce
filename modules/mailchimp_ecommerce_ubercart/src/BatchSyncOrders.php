@@ -3,7 +3,7 @@
 namespace Drupal\mailchimp_ecommerce_ubercart;
 
 /**
- * Batch process handler for syncing order data to MailChimp.
+ * Batch process handler for syncing order data to Mailchimp.
  */
 class BatchSyncOrders {
 
@@ -65,7 +65,7 @@ class BatchSyncOrders {
         $cart_handler->addOrUpdateCart($order->id(), $customer, $order_data);
       }
 
-      // On order completion, replace cart in MailChimp with order.
+      // On order completion, replace cart in Mailchimp with order.
       // TODO: Only perform action the first time an order has 'completed' status.
       if ($order_state == 'completed') {
         $cart_handler->deleteCart($order->id());
@@ -85,7 +85,7 @@ class BatchSyncOrders {
 
       $context['sandbox']['progress']++;
 
-      $context['message'] = t('Sent @count of @total products to MailChimp', [
+      $context['message'] = t('Sent @count of @total products to Mailchimp', [
         '@count' => $context['sandbox']['progress'],
         '@total' => $context['sandbox']['total'],
       ]);

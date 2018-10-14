@@ -14,7 +14,7 @@ interface StoreHandlerInterface {
    *   The ID of the store.
    *
    * @return object
-   *   MailChimp store object.
+   *   Mailchimp store object.
    */
   public function getStore($store_id);
 

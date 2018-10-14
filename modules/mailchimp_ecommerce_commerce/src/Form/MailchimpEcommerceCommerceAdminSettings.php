@@ -75,14 +75,14 @@ class MailchimpEcommerceCommerceAdminSettings extends MailchimpEcommerceAdminSet
     $store = $this->store_context->getStore();
 
     if (!empty($store)) {
-      // Set default currency code for the MailChimp store.
+      // Set default currency code for the Mailchimp store.
       $default_currency = $store->getDefaultCurrencyCode();
       if (isset($form['mailchimp_ecommerce_currency']['#options'][$default_currency])) {
         $form['mailchimp_ecommerce_currency']['#default_value'] = $default_currency;
       }
     }
 
-    // Identify Drupal Commerce to MailChimp.
+    // Identify Drupal Commerce to Mailchimp.
     $form['platform']['#default_value'] = 'Drupal Commerce';
 
     return $form;
