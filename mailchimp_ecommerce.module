@@ -2,7 +2,7 @@
 
 /**
  * @file
- * MailChimp eCommerce core functionality.
+ * Mailchimp eCommerce core functionality.
  */
 
 /**
@@ -13,7 +13,7 @@ function mailchimp_ecommerce_menu() {
 
   $items['admin/config/services/mailchimp/ecommerce'] = [
     'title' => 'eCommerce',
-    'description' => 'Configure MailChimp eCommerce.',
+    'description' => 'Configure Mailchimp eCommerce.',
     'page callback' => 'drupal_get_form',
     'page arguments' => ['mailchimp_ecommerce_admin_settings'],
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -25,7 +25,7 @@ function mailchimp_ecommerce_menu() {
 
   $items['admin/config/services/mailchimp/ecommerce/sync'] = [
     'title' => 'eCommerce product sync',
-    'description' => 'Sync eCommerce product data to MailChimp.',
+    'description' => 'Sync eCommerce product data to Mailchimp.',
     'page callback' => 'drupal_get_form',
     'page arguments' => ['mailchimp_ecommerce_admin_sync'],
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -37,7 +37,7 @@ function mailchimp_ecommerce_menu() {
 
   $items['admin/config/services/mailchimp/ecommerce/sync-orders'] = [
     'title' => 'eCommerce historical orders sync',
-    'description' => 'Sync past eCommerce order data to MailChimp.',
+    'description' => 'Sync past eCommerce order data to Mailchimp.',
     'page callback' => 'drupal_get_form',
     'page arguments' => ['mailchimp_ecommerce_admin_sync_orders'],
     'access callback' => 'mailchimp_apikey_ready_access',
@@ -71,11 +71,11 @@ function mailchimp_ecommerce_cron_queue_info() {
  *
  * @param array $item
  *   Properties to send to the Queue API.
- *   - 'op' (string) The operation to be performed by the MailChimp API. This
- *   maps to the actual MailChimp API methods.
+ *   - 'op' (string) The operation to be performed by the Mailchimp API. This
+ *   maps to the actual Mailchimp API methods.
  *   - 'cart_id' (string) The ID of the current cart.
  *   - 'store_id' (string) The Store ID.
- *   - 'customer' (array) A fully loaded MailChimp $customer.
+ *   - 'customer' (array) A fully loaded Mailchimp $customer.
  *   - 'cart'  For cart operations, this is the $order from Drupal.
  *   - 'order' For order operations, this is the $order from Drupal.
  */
@@ -85,7 +85,7 @@ function mailchimp_ecommerce_create_queue_item($item) {
 }
 
 /**
- * Worker function to process a MailChimp eCommerce queue item.
+ * Worker function to process a Mailchimp eCommerce queue item.
  *
  * @param DrupalQueueItem $item
  *  A Drupal Queue object.
@@ -177,7 +177,7 @@ function mailchimp_ecommerce_page_build(&$page) {
  *   The ID of the store.
  *
  * @return object
- *   MailChimp store object.
+ *   Mailchimp store object.
  */
 function mailchimp_ecommerce_get_store($store_id) {
   $store = NULL;
@@ -303,7 +303,7 @@ function mailchimp_ecommerce_add_customer($customer) {
  *   Unique id of customer.
  *
  * @return object
- *   MailChimp customer object.
+ *   Mailchimp customer object.
  */
 function mailchimp_ecommerce_get_customer($customer_id) {
   $customer = NULL;
@@ -384,7 +384,7 @@ function mailchimp_ecommerce_delete_customer($customer_id) {
 }
 
 /**
- * Adds a new cart to the current MailChimp store.
+ * Adds a new cart to the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -411,7 +411,7 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
       return;
     }
     if (!mailchimp_ecommerce_validate_customer($customer)) {
-      // A user not existing in the store's MailChimp list is not an error, so
+      // A user not existing in the store's Mailchimp list is not an error, so
       // don't throw an exception.
       return;
     }
@@ -450,7 +450,7 @@ function mailchimp_ecommerce_add_cart($cart_id, array $customer, array $cart) {
 }
 
 /**
- * Updates an existing cart in the current MailChimp store.
+ * Updates an existing cart in the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -510,7 +510,7 @@ function mailchimp_ecommerce_update_cart($cart_id, array $customer, array $cart)
 }
 
 /**
- * Deletes a cart in the current MailChimp store.
+ * Deletes a cart in the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -547,7 +547,7 @@ function mailchimp_ecommerce_delete_cart($cart_id) {
 }
 
 /**
- * Adds a line to a cart in the current MailChimp store.
+ * Adds a line to a cart in the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -589,7 +589,7 @@ function mailchimp_ecommerce_add_cart_line($cart_id, $line_id, $product) {
 }
 
 /**
- * Updates an existing line in a cart in the current MailChimp store.
+ * Updates an existing line in a cart in the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -631,7 +631,7 @@ function mailchimp_ecommerce_update_cart_line($cart_id, $line_id, $product) {
 }
 
 /**
- * Deletes a line in a cart in the current MailChimp store.
+ * Deletes a line in a cart in the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -666,7 +666,7 @@ function mailchimp_ecommerce_delete_cart_line($cart_id, $line_id) {
 }
 
 /**
- * Gets an order from the current MailChimp store.
+ * Gets an order from the current Mailchimp store.
  *
  * @param string $order_id
  *   The order ID.
@@ -700,7 +700,7 @@ function mailchimp_ecommerce_get_order($order_id) {
 }
 
 /**
- * Gets a cart from the current MailChimp store.
+ * Gets a cart from the current Mailchimp store.
  *
  * @param string $cart_id
  *   The cart ID.
@@ -734,7 +734,7 @@ function mailchimp_ecommerce_get_cart($cart_id) {
 }
 
 /**
- * Adds a new order to the current MailChimp store.
+ * Adds a new order to the current Mailchimp store.
  *
  * @param string $order_id
  *   The order ID.
@@ -756,7 +756,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
       throw new Exception('Cannot add an order without a store ID.');
     }
     if (!mailchimp_ecommerce_validate_customer($customer)) {
-      // A user not existing in the store's MailChimp list is not an error, so
+      // A user not existing in the store's Mailchimp list is not an error, so
       // don't throw an exception.
       return;
     }
@@ -800,7 +800,7 @@ function mailchimp_ecommerce_add_order($order_id, array $customer, array $order)
 }
 
 /**
- * Updates an existing order in the current MailChimp store.
+ * Updates an existing order in the current Mailchimp store.
  *
  * @param string $order_id
  *   The order ID.
@@ -840,7 +840,7 @@ function mailchimp_ecommerce_update_order($order_id, array $order) {
 }
 
 /**
- * Deletes an Order from the current MailChimp store.
+ * Deletes an Order from the current Mailchimp store.
  *
  * @param string $order_id
  *   The Order ID.
@@ -886,12 +886,12 @@ function mailchimp_ecommerce_delete_order($order_id) {
 }
 
 /**
- * Adds a product to MailChimp.
+ * Adds a product to Mailchimp.
  *
  * Adds a product variant if a product with the given ID exists. Gracefully
  * handles updating an existing variant.
  *
- * In MailChimp, each product requires at least one product variant. This
+ * In Mailchimp, each product requires at least one product variant. This
  * function will create a single product variant when creating new products.
  *
  * A product variant is contained within a product and can be used to
@@ -939,7 +939,7 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
       'inventory_quantity' => (int) $stock,
     ];
 
-    // Create MailChimp product from product type.
+    // Create Mailchimp product from product type.
     $mc_ecommerce->addProduct($store_id, $product_id, $title, $url, [$variant], [
       'title' => $title,
       'description' => $description,
@@ -1002,9 +1002,9 @@ function mailchimp_ecommerce_add_product($product_id, $product_variant_id, $titl
 }
 
 /**
- * Updates an existing product in MailChimp.
+ * Updates an existing product in Mailchimp.
  *
- * MailChimp only allows for product variants to be updated. The parent
+ * Mailchimp only allows for product variants to be updated. The parent
  * product cannot be changed once created. This function will update the
  * variant associated with the given product ID and SKU.
  *
@@ -1063,7 +1063,7 @@ function mailchimp_ecommerce_update_product($product_id, $product_variant_id, $t
 }
 
 /**
- * Deletes a product in MailChimp.
+ * Deletes a product in Mailchimp.
  *
  * @param string $product_id
  *   Unique ID of the product.
@@ -1086,7 +1086,7 @@ function mailchimp_ecommerce_delete_product($product_id) {
 }
 
 /**
- * Deletes a product variant in MailChimp.
+ * Deletes a product variant in Mailchimp.
  *
  * Automatically deletes the product if the only product variant is removed.
  *
@@ -1120,7 +1120,7 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $product_varian
     }
     catch (Exception $e) {
       if ($e->getCode() == 404) {
-        // This product isn't in MailChimp.
+        // This product isn't in Mailchimp.
         return;
       }
       else {
@@ -1136,7 +1136,7 @@ function mailchimp_ecommerce_delete_product_variant($product_id, $product_varian
 }
 
 /**
- * Generates a unique ID used to identify a store integration to MailChimp.
+ * Generates a unique ID used to identify a store integration to Mailchimp.
  *
  * @return string
  *   The unique store ID.
@@ -1146,7 +1146,7 @@ function mailchimp_ecommerce_generate_store_id() {
 }
 
 /**
- * Gets the store ID of the MailChimp eCommerce integration.
+ * Gets the store ID of the Mailchimp eCommerce integration.
  *
  * @return string
  *   The store ID.
@@ -1168,7 +1168,7 @@ function mailchimp_ecommerce_get_campaign_id() {
   /* @var \Mailchimp\MailchimpCampaigns $mc_campaigns */
   $mc_campaigns = mailchimp_get_api_object('MailchimpCampaigns');
 
-  // Check to see if this is a valid MailChimp campaign.
+  // Check to see if this is a valid Mailchimp campaign.
   try {
     if (!empty($session_campaign)) {
       $campaign = $mc_campaigns->getCampaign($session_campaign);

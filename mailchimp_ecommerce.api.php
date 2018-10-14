@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Hooks provided by the MailChimp eCommerce module.
+ * Hooks provided by the Mailchimp eCommerce module.
  */
 
 /**
- * Allows modules to react to the addition of a MailChimp store.
+ * Allows modules to react to the addition of a Mailchimp store.
  *
  * @param object $store
  *   The new store.
