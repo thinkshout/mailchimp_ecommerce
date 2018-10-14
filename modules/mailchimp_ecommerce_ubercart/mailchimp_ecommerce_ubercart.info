@@ -1,6 +1,6 @@
-name = MailChimp eCommerce Ubercart
-description = Integrates Ubercart with MailChimp eCommerce.
-package = MailChimp
+name = Mailchimp eCommerce Ubercart
+description = Integrates Ubercart with Mailchimp eCommerce.
+package = Mailchimp
 core = 7.x
 
 dependencies[] = uc_cart

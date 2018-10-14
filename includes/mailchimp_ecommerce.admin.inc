@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Administration forms for MailChimp eCommerce.
+ * Administration forms for Mailchimp eCommerce.
  */
 
 /**
- * The MailChimp eCommerce settings form.
+ * The Mailchimp eCommerce settings form.
  */
 function mailchimp_ecommerce_admin_settings() {
   $form['mailchimp_ecommerce_notice'] = [
@@ -17,14 +17,14 @@ function mailchimp_ecommerce_admin_settings() {
     '#title' => t('Store Name'),
     '#required' => TRUE,
     '#default_value' => variable_get('mailchimp_ecommerce_store_name', ''),
-    '#description' => t('The name of your store as it should appear in your MailChimp account.'),
+    '#description' => t('The name of your store as it should appear in your Mailchimp account.'),
   ];
   $form['mailchimp_ecommerce_store_domain'] = [
     '#type' => 'textfield',
     '#title' => t('Store Domain'),
     '#required' => TRUE,
     '#default_value' => variable_get('mailchimp_ecommerce_store_domain', ''),
-    '#description' => t('The domain of your store as it should appear in your MailChimp account. Use absolute URL without protocol or trailing slash.'),
+    '#description' => t('The domain of your store as it should appear in your Mailchimp account. Use absolute URL without protocol or trailing slash.'),
   ];
 
   $mailchimp_lists = mailchimp_get_lists();
@@ -72,11 +72,11 @@ function mailchimp_ecommerce_admin_settings() {
     ];
     $platform = module_exists('mailchimp_ecommerce_ubercart') ? 'Ubercart' : 'Commerce';
     $form['sync']['products'] = [
-      '#markup' => l(t('Sync existing @platform products to MailChimp', ['@platform' => $platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
+      '#markup' => l(t('Sync existing @platform products to Mailchimp', ['@platform' => $platform]), 'admin/config/services/mailchimp/ecommerce/sync'),
     ];
   }
 
-  // Identify the eCommerce platform to MailChimp. This value is set in this
+  // Identify the eCommerce platform to Mailchimp. This value is set in this
   // module's submodules for both Drupal Commerce and Ubercart.
   $form['platform'] = [
     '#type' => 'hidden',
@@ -89,9 +89,9 @@ function mailchimp_ecommerce_admin_settings() {
       1 => 'Send all active Carts',
       0 => 'Send completed orders only',
     ],
-    '#title' => t('Send Carts to MailChimp'),
+    '#title' => t('Send Carts to Mailchimp'),
     '#default_value' => variable_get('mailchimp_ecommerce_send_carts', FALSE),
-    '#description' => t('When enabled, shopping carts are sent to MailChimp during each step of their lifecycle. When disabled, only completed orders are sent during Checkout completion.'),
+    '#description' => t('When enabled, shopping carts are sent to Mailchimp during each step of their lifecycle. When disabled, only completed orders are sent during Checkout completion.'),
   ];
 
   $form['mailchimp_ecommerce_use_queue'] = [
@@ -110,7 +110,7 @@ function mailchimp_ecommerce_admin_settings() {
 }
 
 /**
- * Submit handler for the MailChimp eCommerce form.
+ * Submit handler for the Mailchimp eCommerce form.
  */
 function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
   $store_id = variable_get('mailchimp_ecommerce_store_id', NULL);
@@ -148,18 +148,18 @@ function mailchimp_ecommerce_admin_settings_submit($form, &$form_state) {
 }
 
 /**
- * The MailChimp eCommerce data sync form.
+ * The Mailchimp eCommerce data sync form.
  */
 function mailchimp_ecommerce_admin_sync() {
   $form['sync_products'] = [
     '#type' => 'checkbox',
     '#title' => t('Sync Products'),
-    '#description' => t('Sync all existing products to MailChimp.'),
+    '#description' => t('Sync all existing products to Mailchimp.'),
   ];
 
   $form['actions']['submit'] = [
     '#type' => 'submit',
-    '#value' => t('Sync with MailChimp'),
+    '#value' => t('Sync with Mailchimp'),
   ];
 
   $form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';
@@ -168,7 +168,7 @@ function mailchimp_ecommerce_admin_sync() {
 }
 
 /**
- * Empty submit submit handler for the MailChimp eCommerce sync form.
+ * Empty submit submit handler for the Mailchimp eCommerce sync form.
  *
  * Syncing data is specific to each shopping cart implementation.
  * Use a form_alter hook to add a custom submit handler to the
@@ -179,13 +179,13 @@ function mailchimp_ecommerce_admin_sync_submit($form, &$form_state) {
 
 
 /**
- * The MailChimp eCommerce historical order data sync form.
+ * The Mailchimp eCommerce historical order data sync form.
  */
 function mailchimp_ecommerce_admin_sync_orders() {
   $form['sync_orders'] = [
     '#type' => 'checkbox',
     '#title' => t('Sync Orders'),
-    '#description' => t('Sync historical orders to MailChimp.'),
+    '#description' => t('Sync historical orders to Mailchimp.'),
   ];
 
   $form['timespan'] = [
@@ -193,14 +193,14 @@ function mailchimp_ecommerce_admin_sync_orders() {
     '#title' => t('Time span'),
     '#default_value' => 6,
     '#field_suffix' => 'months',
-    '#description' => 'MailChimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
+    '#description' => 'Mailchimp recommends syncing the past 6 months of order data. Leave blank to sync all orders.',
     '#size' => 3,
     '#maxlength' => 3,
   ];
 
   $form['actions']['submit'] = [
     '#type' => 'submit',
-    '#value' => t('Sync with MailChimp'),
+    '#value' => t('Sync with Mailchimp'),
   ];
 
   $form['#submit'][] = 'mailchimp_ecommerce_admin_sync_submit';

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Hooks provided by the MailChimp eCommerce Ubercart module.
+ * Hooks provided by the Mailchimp eCommerce Ubercart module.
  */
 
 /**

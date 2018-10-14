@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Integrates Ubercart with MailChimp eCommerce.
+ * Integrates Ubercart with Mailchimp eCommerce.
  */
 
 /**
@@ -12,11 +12,11 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
   // Set default currently from Ubercart.
   $form['mailchimp_ecommerce_currency']['#default_value'] = variable_get('uc_currency_code', 'USD');
 
-  // Identify Ubercart to MailChimp.
+  // Identify Ubercart to Mailchimp.
   $form['platform']['#default_value'] = 'Drupal Ubercart';
 
   $form['sync']['orders'] = [
-    '#markup' => '<br>' . l(t('Sync historical orders to MailChimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
+    '#markup' => '<br>' . l(t('Sync historical orders to Mailchimp'), 'admin/config/services/mailchimp/ecommerce/sync-orders'),
   ];
 }
 
@@ -25,7 +25,7 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_settings_al
  */
 function mailchimp_ecommerce_ubercart_node_insert($node) {
   if (uc_product_is_product($node)) {
-    // Create a corresponding MailChimp product.
+    // Create a corresponding Mailchimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     // get variants
@@ -108,7 +108,7 @@ function mailchimp_ecommerce_ubercart_get_product_variant_values($product) {
  */
 function mailchimp_ecommerce_ubercart_node_update($node) {
   if (uc_product_is_product($node)) {
-    // Update the corresponding MailChimp product.
+    // Update the corresponding Mailchimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     // get variants
@@ -149,7 +149,7 @@ function mailchimp_ecommerce_ubercart_node_update($node) {
  */
 function mailchimp_ecommerce_ubercart_node_delete($node) {
   if (uc_product_is_product($node)) {
-    // Delete the corresponding MailChimp product.
+    // Delete the corresponding Mailchimp product.
     $product = mailchimp_ecommerce_ubercart_get_product_values_from_node($node);
 
     mailchimp_ecommerce_delete_product_variant($product['id'], $product['variant_id']);
@@ -160,9 +160,9 @@ function mailchimp_ecommerce_ubercart_node_delete($node) {
  * Implements hook_mailchimp_ecommerce_add_store().
  */
 function mailchimp_ecommerce_ubercart_mailchimp_ecommerce_add_store($store) {
-  // Add existing Ubercart products to MailChimp.
+  // Add existing Ubercart products to Mailchimp.
   $batch = [
-    'title' => t('Adding products to MailChimp'),
+    'title' => t('Adding products to Mailchimp'),
     'operations' => [],
   ];
 
@@ -201,12 +201,12 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_sync_alter(
 }
 
 /**
- * Submit handler for the MailChimp eCommerce sync form.
+ * Submit handler for the Mailchimp eCommerce sync form.
  */
 function mailchimp_ecommerce_ubercart_admin_sync_submit($form, &$form_state) {
   if (!empty($form_state['values']['sync_products'])) {
     $batch = [
-      'title' => t('Adding products to MailChimp'),
+      'title' => t('Adding products to Mailchimp'),
       'operations' => [],
     ];
 
@@ -228,7 +228,7 @@ function mailchimp_ecommerce_ubercart_admin_sync_submit($form, &$form_state) {
 }
 
 /**
- * Batch callback used to add products to MailChimp.
+ * Batch callback used to add products to Mailchimp.
  */
 function mailchimp_ecommerce_ubercart_batch_add_products($product_ids, &$context) {
   if (!isset($context['sandbox']['progress'])) {
@@ -248,7 +248,7 @@ function mailchimp_ecommerce_ubercart_batch_add_products($product_ids, &$context
 
     $context['sandbox']['progress']++;
 
-    $context['message'] = t('Sent @count of @total products to MailChimp', [
+    $context['message'] = t('Sent @count of @total products to Mailchimp', [
       '@count' => $context['sandbox']['progress'],
       '@total' => $context['sandbox']['total'],
     ]);
@@ -258,13 +258,13 @@ function mailchimp_ecommerce_ubercart_batch_add_products($product_ids, &$context
 }
 
 /**
- * Gets MailChimp product values from an Ubercart product node.
+ * Gets Mailchimp product values from an Ubercart product node.
  *
  * @param object $node
  *   The Ubercart 'product' type node.
  *
  * @return array
- *   Array of product values for use with MailChimp.
+ *   Array of product values for use with Mailchimp.
  */
 function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
   $node_wrapper = entity_metadata_wrapper('node', $node);
@@ -297,7 +297,7 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     }
     if ($order->order_status == 'in_checkout') {
       // Ubercart doesn't create an entity for a customer, so we create
-      // a customer in MailChimp at the same time as the cart.
+      // a customer in Mailchimp at the same time as the cart.
 
       if (mailchimp_ecommerce_get_customer($order->uid)) {
         mailchimp_ecommerce_update_customer($mc_order['customer']);
@@ -306,11 +306,11 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
         mailchimp_ecommerce_add_customer($mc_order['customer']);
       }
 
-      // Create new cart in MailChimp.
+      // Create new cart in Mailchimp.
       mailchimp_ecommerce_add_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
     else {
-      // Create new order in MailChimp.
+      // Create new order in Mailchimp.
       mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
   }
@@ -318,13 +318,13 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
     if ($order->order_status == 'in_checkout') {
-      // Update cart in MailChimp.
+      // Update cart in Mailchimp.
       mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
     else {
       if (!empty(mailchimp_ecommerce_get_order($order->order_id))) {
 
-        // Update existing order in MailChimp.
+        // Update existing order in Mailchimp.
         mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
       }
     }
@@ -333,7 +333,7 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
     if ($order->order_status == 'in_checkout') {
       $mc_order = mailchimp_ecommerce_ubercart_build_order($order);
 
-      // Convert cart to order in MailChimp.
+      // Convert cart to order in Mailchimp.
       mailchimp_ecommerce_delete_cart($order->order_id);
       mailchimp_ecommerce_add_order($order->order_id, $mc_order['customer'], $mc_order['order_data']);
     }
@@ -341,13 +341,13 @@ function mailchimp_ecommerce_ubercart_uc_order($op, $order) {
 }
 
 /**
- * Builds a MailChimp order from an Ubercart order.
+ * Builds a Mailchimp order from an Ubercart order.
  *
  * @param UcOrder $order
  *   The Ubercart order.
  *
  * @return object
- *   Order object in a MailChimp-friendly format.
+ *   Order object in a Mailchimp-friendly format.
  */
 function mailchimp_ecommerce_ubercart_build_order($order) {
   $currency_code = $order->currency;
@@ -420,7 +420,7 @@ function mailchimp_ecommerce_ubercart_build_order($order) {
  *   The Ubercart order.
  *
  * @return object
- *   An address object formatted for use with MailChimp.
+ *   An address object formatted for use with Mailchimp.
  */
 function mailchimp_ecommerce_ubercart_parse_billing_address($order) {
   $country = uc_get_country_data(['country_id' => $order->billing_country]);
@@ -466,12 +466,12 @@ function mailchimp_ecommerce_ubercart_form_mailchimp_ecommerce_admin_sync_orders
 }
 
 /**
- * Submit handler for the MailChimp eCommerce sync form.
+ * Submit handler for the Mailchimp eCommerce sync form.
  */
 function mailchimp_ecommerce_ubercart_admin_sync_orders_submit($form, &$form_state) {
   if (!empty($form_state['values']['sync_orders'])) {
     $batch = [
-      'title' => t('Adding orders to MailChimp'),
+      'title' => t('Adding orders to Mailchimp'),
       'operations' => [],
     ];
 
@@ -497,7 +497,7 @@ function mailchimp_ecommerce_ubercart_admin_sync_orders_submit($form, &$form_sta
 }
 
 /**
- * Batch callback used to add orders to MailChimp.
+ * Batch callback used to add orders to Mailchimp.
  */
 function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
   if (!isset($context['sandbox']['progress'])) {
@@ -548,7 +548,7 @@ function mailchimp_ecommerce_ubercart_batch_add_orders($order_ids, &$context) {
 
     $context['sandbox']['progress']++;
 
-    $context['message'] = t('Sent @count of @total orders to MailChimp', [
+    $context['message'] = t('Sent @count of @total orders to Mailchimp', [
       '@count' => $context['sandbox']['progress'],
       '@total' => $context['sandbox']['total'],
     ]);

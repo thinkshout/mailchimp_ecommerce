@@ -2,7 +2,7 @@
 
 /**
  * @file
- * MailChimp eCommerce install and update hooks.
+ * Mailchimp eCommerce install and update hooks.
  */
 
 /**
@@ -21,7 +21,7 @@ function mailchimp_ecommerce_uninstall() {
  */
 function mailchimp_ecommerce_schema() {
   $schema['mailchimp_ecommerce_customer'] = [
-    'description' => 'Maintains a connection between carts, orders and a MailChimp customer.',
+    'description' => 'Maintains a connection between carts, orders and a Mailchimp customer.',
     'fields' => [
       'mailchimp_customer_id' => [
         'description' => 'Primary Key (unique ID).',
