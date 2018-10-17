@@ -170,7 +170,7 @@ function mailchimp_ecommerce_commerce_form_mailchimp_ecommerce_admin_settings_al
  */
 function mailchimp_ecommerce_commerce_admin_validate(&$form, &$form_state) {
   // Make sure the inventory amount is an integer.
-  $amount = $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'];
+  $amount = isset($form_state['values']['mailchimp_ecommerce_fixed_inventory_amount']) ? $form_state['values']['mailchimp_ecommerce_fixed_inventory_amount'] : '';
   if (!empty($amount) && !is_numeric($amount) && !is_int($amount)) {
     form_set_error('mailchimp_ecommerce_fixed_inventory_amount', 'Inventory amount must be an integer.');
     return FALSE;
