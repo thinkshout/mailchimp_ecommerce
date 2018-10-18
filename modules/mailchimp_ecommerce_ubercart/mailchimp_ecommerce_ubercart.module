@@ -277,6 +277,7 @@ function mailchimp_ecommerce_ubercart_get_product_values_from_node($node) {
     'url' => $alias = drupal_get_path_alias($node->nid),
     'description' => (isset($node_wrapper->body->value()['value'])) ? $node_wrapper->body->value()['value'] : '',
     'price' => $node_wrapper->sell_price->value(),
+    // TODO 'url' index is in here twice. Figure out which one is correct.
     'url' => _mailchimp_ecommerce_ubercart_build_product_url($node_wrapper->nid->value()),
     'type' => mailchimp_ecommerce_get_node_type_name($node_wrapper->getBundle()),
   ];

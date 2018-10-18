@@ -31,6 +31,7 @@ function hook_mailchimp_ecommerce_product_description_alter(&$description, $prod
   $query = new EntityFieldQuery;
   $query->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'custom_node_type')
+    // TODO: $product_id is not defined in this function.
     ->fieldCondition('field_custom_product', 'product_id', $product_id, '=')
     ->range(0, 1);
 

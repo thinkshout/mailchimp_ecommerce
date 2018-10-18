@@ -261,15 +261,22 @@ function mailchimp_ecommerce_commerce_batch_add_products($product_ids, &$context
 function mailchimp_ecommerce_commerce_commerce_order_update($order) {
   $send_carts = variable_get('mailchimp_ecommerce_send_carts', FALSE);
 
-  // Only send a cart if we are in cart or checkout status, and the status has changed.
-  if ($send_carts == TRUE && $order->original->status <> $order->status) {
-    $cart_states = array_keys(commerce_order_statuses(['state' => 'cart']));
-    $checkout_states = array_keys(commerce_order_statuses(['state' => 'checkout']));
+  $cart_states = array_keys(commerce_order_statuses(['state' => 'cart']));
+  $checkout_states = array_keys(commerce_order_statuses(['state' => 'checkout']));
 
-    if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
+  // Only send a cart if we are in cart or checkout status, and the status has changed.
+  if (in_array($order->status, $cart_states) || in_array($order->status, $checkout_states)) {
+    if ($send_carts == TRUE && $order->original->status <> $order->status) {
       // @todo: Handle admin-created orders.
       _mailchimp_ecommerce_commerce_send_cart($order);
     }
+  }
+  else {
+    // Not a cart; update the order.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
+
+    mailchimp_ecommerce_update_order($order->order_id, $mc_order['order_data']);
   }
 }
 
@@ -347,6 +354,7 @@ function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
   }
 
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+  // TODO: $line_item_wrapper->type->value() may not function. Needs checking.
   if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
     $product = $line_item_wrapper->commerce_product->value();
     $mc_product = [
@@ -468,7 +476,8 @@ function mailchimp_ecommerce_commerce_commerce_customer_profile_update($customer
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
   $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
 
-  mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
+  // TODO: Restore when this function supports orders that are not carts.
+  //mailchimp_ecommerce_update_cart($order->order_id, $mc_order['customer'], $mc_order['order_data']);
 }
 
 /**
@@ -793,8 +802,8 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
     if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
       $products[] = $line_item_wrapper->commerce_product;
       $line = [
-        'id' => $line_item_wrapper->getIdentifier(),
-        'product_id' => $line_item_wrapper->commerce_product->raw(),
+        'id' => (string) $line_item_wrapper->getIdentifier(),
+        'product_id' => (string) $line_item_wrapper->commerce_product->raw(),
         'product_variant_id' => $line_item_wrapper->commerce_product->sku->value(),
         'quantity' => (int) $line_item_wrapper->quantity->value(),
         'price' => commerce_currency_amount_to_decimal(

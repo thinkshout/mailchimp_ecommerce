@@ -75,6 +75,7 @@ class MailchimpEcommerceTestCase extends DrupalWebTestCase {
       'currency_code' => 'USD',
     ];
 
+    // TODO: Missing $platform parameter.
     mailchimp_ecommerce_add_store($store_id, $store);
 
     $saved_store = mailchimp_ecommerce_get_store($store_id);
