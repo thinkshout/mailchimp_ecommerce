@@ -765,6 +765,10 @@ function mailchimp_ecommerce_commerce_parse_customer_profile_address($customer_p
  *   Throws an exception if Opt In Status is not set.
  */
 function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
+  $store_domain = variable_get('mailchimp_ecommerce_store_domain', '');
+  $order = $order_wrapper->value();
+  $cart_uri = commerce_checkout_order_uri($order);
+  $checkout_url = $store_domain ? $store_domain . '/' .  $cart_uri : '';
   $billing_address = [];
   $lines = [];
 
@@ -822,6 +826,7 @@ function _mailchimp_ecommerce_commerce_build_order($order_wrapper) {
 
   // Order parameters that are used as the 'cart' portions of the API wrapper.
   $order_data = [
+    'checkout_url' => $checkout_url,
     'currency_code' => $currency_code,
     'order_total' => $order_total,
     'billing_address' => $billing_address,
