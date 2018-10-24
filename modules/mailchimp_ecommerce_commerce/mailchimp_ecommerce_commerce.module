@@ -909,13 +909,14 @@ function _mailchimp_ecommerce_commerce_get_description($product) {
   $description = '';
   $field_name = variable_get('mailchimp_ecommerce_description_field' ,'');
   $node_type = variable_get('mailchimp_ecommerce_product_node_type', '');
+  $product_node_field = variable_get('mailchimp_ecommerce_product_node_field', '');
 
-  if (!empty($field_name) && !empty($node_type)) {
+  if (!empty($field_name) && !empty($node_type) && !empty($product_node_field)) {
     // Query the database to find the display node.
     $query = new EntityFieldQuery;
     $query->entityCondition('entity_type', 'node')
       ->entityCondition('bundle', $node_type)
-      ->fieldCondition('field_product', 'product_id', $product->product_id, '=')
+      ->fieldCondition($product_node_field, 'product_id', $product->product_id, '=')
       ->range(0, 1);
 
     $result = $query->execute();
