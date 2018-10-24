@@ -854,14 +854,27 @@ function mailchimp_ecommerce_delete_order($order_id) {
       throw new Exception('Cannot delete an order without a store ID.');
     }
 
+    // Get customer and order arrays.
+    $order = commerce_order_load($order_id);
+
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $mc_order = _mailchimp_ecommerce_commerce_build_order($order_wrapper);
+
+    $customer = $mc_order['customer'];
+    $order = $mc_order['order_data'];
+
     if (mailchimp_ecommerce_use_queue()) {
       mailchimp_ecommerce_create_queue_item([
         'op' => 'deleteOrder',
         'order_id' => $order_id,
         'store_id' => $store_id,
+        'customer' => $customer,
+        'order' => $order,
       ]);
     }
     else {
+      $list_id = mailchimp_ecommerce_get_list_id();
+
       /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
       $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
       $mc_ecommerce->deleteOrder($store_id, $order_id);
@@ -872,7 +885,7 @@ function mailchimp_ecommerce_delete_order($order_id) {
       // Decrement customer totals.
       $remote_customer = mailchimp_ecommerce_get_customer($order->customer->id);
       $customer['orders_count'] = $remote_customer->orders_count - 1;
-      $customer['total_spent'] = $remote_customer->total_spent - $order->order_total;
+      $customer['total_spent'] = $remote_customer->total_spent - $order['order_total'];
       $mc_ecommerce->updateCustomer($store_id, $customer);
     }
   }
