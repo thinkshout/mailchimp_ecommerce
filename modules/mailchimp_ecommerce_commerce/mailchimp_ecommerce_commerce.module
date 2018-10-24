@@ -354,7 +354,6 @@ function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
   }
 
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-  // TODO: $line_item_wrapper->type->value() may not function. Needs checking.
   if (in_array($line_item_wrapper->type->value(), commerce_product_line_item_types())) {
     $product = $line_item_wrapper->commerce_product->value();
     $mc_product = [

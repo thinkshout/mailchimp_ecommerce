@@ -96,6 +96,7 @@ function mailchimp_ecommerce_queue_process($item) {
   /* @var \Mailchimp\MailchimpEcommerce $mc_ecommerce */
   $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
+  $customer = NULL;
   if (isset($item->customer)) {
     $customer = $item->customer;
 
@@ -113,7 +114,6 @@ function mailchimp_ecommerce_queue_process($item) {
     $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
   }
 
-  // TODO: $customer needs to be set to something before this point.
   switch ($item->op) {
     case 'addCart':
     case 'updateCart':
@@ -156,6 +156,7 @@ function mailchimp_ecommerce_queue_process($item) {
       $remote_customer = mailchimp_ecommerce_get_customer($customer['id']);
       $customer['orders_count'] = $remote_customer->orders_count - 1;
       $customer['total_spent'] = $remote_customer->total_spent - $item->order['order_total'];
+      $mc_ecommerce->updateCustomer($store_id, $remote_customer);
       break;
   }
 }
@@ -866,15 +867,13 @@ function mailchimp_ecommerce_delete_order($order_id) {
       $mc_ecommerce->deleteOrder($store_id, $order_id);
 
       // Pull member information to get member status.
-      // TODO: $list_id and $customer are not defined in this function.
-      $memberinfo = mailchimp_get_memberinfo($list_id, $customer['email_address'], TRUE);
-      $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
+      $order = $mc_ecommerce->getOrder($store_id, $order_id);
 
       // Decrement customer totals.
-      $remote_customer = mailchimp_ecommerce_get_customer($customer['id']);
+      $remote_customer = mailchimp_ecommerce_get_customer($order->customer->id);
       $customer['orders_count'] = $remote_customer->orders_count - 1;
-      // TODO: $item is not defined in this function.
-      $customer['total_spent'] = $remote_customer->total_spent - $item->order['order_total'];
+      $customer['total_spent'] = $remote_customer->total_spent - $order->order_total;
+      $mc_ecommerce->updateCustomer($store_id, $customer);
     }
   }
   catch (Exception $e) {
