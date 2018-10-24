@@ -926,13 +926,12 @@ function _mailchimp_ecommerce_commerce_get_description($product) {
       $node = node_load($node->nid);
       if (isset($node->{$field_name}) && !empty($node->{$field_name})) {
         $wrapper = entity_metadata_wrapper('node', $node);
-        // If this is a textfield with formatting, we need to pull
-        // the value from the 'value' subfield.
-        if ($wrapper->__isset($field_name->value) && $wrapper->{$field_name}->value->value()) {
-          $description = strip_tags($wrapper->{$field_name}->value->value());
+        $field_value = $wrapper->{$field_name}->value();
+        if (is_array($field_value)) {
+          $description = strip_tags($field_value['value']);
         }
         else {
-          $description = strip_tags($wrapper->{$field_name}->value());
+          $description = strip_tags($field_value);
         }
       }
     }
