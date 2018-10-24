@@ -316,7 +316,7 @@ function mailchimp_ecommerce_commerce_commerce_cart_product_add($order, $product
     $cart_product = [
       'product_id' => $product->product_id,
       'product_variant_id' => $product->sku,
-      'quantity' => $quantity,
+      'quantity' => (int) $quantity,
       'price' => commerce_currency_amount_to_decimal(
         $line_item_wrapper->commerce_unit_price->amount->value(),
         $line_item_wrapper->commerce_unit_price->currency_code->value()),
@@ -359,7 +359,7 @@ function mailchimp_ecommerce_commerce_commerce_line_item_update($line_item) {
     $mc_product = [
       'product_id' => $product->product_id,
       'product_variant_id' => $product->sku,
-      'quantity' => $line_item->quantity,
+      'quantity' => (int) $line_item->quantity,
       'price' => commerce_currency_amount_to_decimal(
         $line_item_wrapper->commerce_unit_price->amount->value(),
         $line_item_wrapper->commerce_unit_price->currency_code->value()),
