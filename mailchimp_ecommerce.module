@@ -87,8 +87,8 @@ function mailchimp_ecommerce_create_queue_item($item) {
 /**
  * Worker function to process a Mailchimp eCommerce queue item.
  *
- * @param DrupalQueueItem $item
- *  A Drupal Queue object.
+ * @param array $item
+ *  A Drupal Queue item array.
  */
 function mailchimp_ecommerce_queue_process($item) {
   $list_id = mailchimp_ecommerce_get_list_id();
@@ -97,8 +97,8 @@ function mailchimp_ecommerce_queue_process($item) {
   $mc_ecommerce = mailchimp_get_api_object('MailchimpEcommerce');
 
   $customer = NULL;
-  if (isset($item->customer)) {
-    $customer = $item->customer;
+  if (isset($item['customer'])) {
+    $customer = $item['customer'];
 
     $store_id = mailchimp_ecommerce_get_store_id();
     if (empty($store_id)) {
@@ -114,23 +114,23 @@ function mailchimp_ecommerce_queue_process($item) {
     $customer['opt_in_status'] = (isset($memberinfo->status) && ($memberinfo->status == 'subscribed')) ? TRUE : FALSE;
   }
 
-  switch ($item->op) {
+  switch ($item['op']) {
     case 'addCart':
     case 'updateCart':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->cart_id, $customer, $item->cart);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['cart_id'], $customer, $item['cart']);
       break;
 
     case 'deleteCart':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->cart_id);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['cart_id']);
       break;
 
     case 'addCartLine':
     case 'updateCartLine':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->cart_id, $item->line_id, $item->product);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['cart_id'], $item['line_id'], $item['product']);
       break;
 
     case 'deleteCartLine':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->cart_id, $item->line_id);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['cart_id'], $item['line_id']);
       break;
 
     case 'addOrder':
@@ -141,21 +141,21 @@ function mailchimp_ecommerce_queue_process($item) {
       // Increment customer totals
       $remote_customer = mailchimp_ecommerce_get_customer($customer['id']);
       $customer['orders_count'] = $remote_customer->orders_count + 1;
-      $customer['total_spent'] = $remote_customer->total_spent + $item->order['order_total'];
-      $mc_ecommerce->{$item->op}($item->store_id, $item->order_id, $customer, $item->order);
+      $customer['total_spent'] = $remote_customer->total_spent + $item['order']['order_total'];
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['order_id'], $customer, $item['order']);
       break;
 
     case 'updateOrder':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->order_id, $item->order);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['order_id'], $item['order']);
       break;
 
     case 'deleteOrder':
-      $mc_ecommerce->{$item->op}($item->store_id, $item->order_id, $item->order);
+      $mc_ecommerce->{$item['op']}($item['store_id'], $item['order_id'], $item['order']);
 
       // Decrement customer totals.
       $remote_customer = mailchimp_ecommerce_get_customer($customer['id']);
       $customer['orders_count'] = $remote_customer->orders_count - 1;
-      $customer['total_spent'] = $remote_customer->total_spent - $item->order['order_total'];
+      $customer['total_spent'] = $remote_customer->total_spent - $item['order']['order_total'];
       $mc_ecommerce->updateCustomer($store_id, $remote_customer);
       break;
   }
